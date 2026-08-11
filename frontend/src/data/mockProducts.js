@@ -1,0 +1,39 @@
+import localPlaceholder from '../assets/images/editorial-placeholder.svg'
+
+export const mockProducts = [
+  { id: 'p-01', name: 'Floral Summer Dress', price: 2490, category: 'Dresses', gender: 'Women', color: 'Red', image: localPlaceholder, description: 'A softly structured midi dress with a botanical print and an easy, flowing shape.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.9, reviewCount: 128, badge: 'New', material: 'Cotton voile', available: true, visualClass: 'bg-[#eadfd7]' },
+  { id: 'p-02', name: 'Oversized Linen Shirt', price: 1890, category: 'Shirts', gender: 'Unisex', color: 'White', image: localPlaceholder, description: 'Relaxed linen tailoring made for warm days and effortless layering.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.8, reviewCount: 94, badge: 'Bestseller', material: 'European linen', available: true, visualClass: 'bg-[#dce4df]' },
+  { id: 'p-03', name: 'Classic Denim Jacket', price: 3290, category: 'Jackets', gender: 'Unisex', color: 'Blue', image: localPlaceholder, description: 'A timeless denim layer with a clean fit and softly worn finish.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.7, reviewCount: 76, badge: 'Icon', material: 'Organic cotton denim', available: true, visualClass: 'bg-[#d9e0e8]' },
+  { id: 'p-04', name: 'Wide Leg Jeans', price: 2790, category: 'Jeans', gender: 'Women', color: 'Blue', image: localPlaceholder, description: 'High-rise wide-leg jeans with a considered drape and everyday comfort.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.8, reviewCount: 112, material: 'Stretch denim', available: true, visualClass: 'bg-[#dfe3dc]' },
+  { id: 'p-05', name: 'Satin Evening Dress', price: 4190, category: 'Dresses', gender: 'Women', color: 'Red', image: localPlaceholder, description: 'Fluid satin falls into an elegant silhouette designed for after-dark moments.', sizes: ['XS', 'S', 'M'], rating: 5.0, reviewCount: 58, badge: 'Limited', material: 'Recycled satin', available: true, visualClass: 'bg-[#e6dce0]' },
+  { id: 'p-06', name: 'Casual Crop Top', price: 990, category: 'Tops', gender: 'Women', color: 'White', image: localPlaceholder, description: 'A compact everyday top with a soft hand feel and clean neckline.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.6, reviewCount: 83, material: 'Cotton jersey', available: true, visualClass: 'bg-[#e8e1d4]' },
+  { id: 'p-07', name: 'Relaxed Fit Blazer', price: 3890, category: 'Blazers', gender: 'Unisex', color: 'Beige', image: localPlaceholder, description: 'Soft tailoring with a relaxed shoulder for polished, comfortable dressing.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.9, reviewCount: 67, badge: 'New', material: 'Linen blend', available: true, visualClass: 'bg-[#dcdeda]' },
+  { id: 'p-08', name: 'Essential White Shirt', price: 1590, category: 'Shirts', gender: 'Men', color: 'White', image: localPlaceholder, description: 'A crisp essential with a versatile cut for workdays and weekends.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.8, reviewCount: 141, material: 'Poplin cotton', available: true, visualClass: 'bg-[#e9e7df]' },
+  { id: 'p-09', name: 'Pleated Midi Skirt', price: 2290, category: 'Skirts', gender: 'Women', color: 'Green', image: localPlaceholder, description: 'A graceful pleated midi with movement, texture, and an easy elastic waist.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.7, reviewCount: 49, material: 'Recycled polyester', available: true, visualClass: 'bg-[#dce7dc]' },
+  { id: 'p-10', name: 'Soft Knit Polo', price: 2190, category: 'T-Shirts', gender: 'Men', color: 'Green', image: localPlaceholder, description: 'A fine-gauge knit polo that brings a little structure to casual dressing.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.6, reviewCount: 38, material: 'Cotton modal', available: true, visualClass: 'bg-[#d9e1d9]' },
+  { id: 'p-11', name: 'Minimal Ribbed Tank', price: 790, category: 'Tops', gender: 'Unisex', color: 'Black', image: localPlaceholder, description: 'A close-fitting ribbed layer that works alone or under your favorite jacket.', sizes: ['XS', 'S', 'M', 'L', 'XL'], rating: 4.5, reviewCount: 103, material: 'Ribbed cotton', available: true, visualClass: 'bg-[#deddd8]' },
+  { id: 'p-12', name: 'Utility Overshirt', price: 2990, category: 'Jackets', gender: 'Men', color: 'Beige', image: localPlaceholder, description: 'A lightweight utility overshirt with practical pockets and a relaxed profile.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.7, reviewCount: 61, material: 'Brushed twill', available: true, visualClass: 'bg-[#e5ded0]' },
+  { id: 'p-13', name: 'Tailored Trousers', price: 2690, category: 'Jeans', gender: 'Men', color: 'Black', image: localPlaceholder, description: 'Straight tailored trousers with a clean break and comfortable stretch.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.8, reviewCount: 72, material: 'Wool blend', available: true, visualClass: 'bg-[#dededb]' },
+  { id: 'p-14', name: 'Embroidered Blouse', price: 1790, category: 'Tops', gender: 'Women', color: 'White', image: localPlaceholder, description: 'Delicate embroidery and a softly gathered sleeve make this blouse feel special.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.9, reviewCount: 46, badge: 'New', material: 'Cotton lawn', available: true, visualClass: 'bg-[#e8e1d9]' },
+  { id: 'p-15', name: 'Everyday Black Tee', price: 690, category: 'T-Shirts', gender: 'Unisex', color: 'Black', image: localPlaceholder, description: 'The reliable, softly weighted tee that earns its place in every wardrobe.', sizes: ['XS', 'S', 'M', 'L', 'XL'], rating: 4.8, reviewCount: 210, material: 'Organic cotton', available: true, visualClass: 'bg-[#d8d9d5]' },
+  { id: 'p-16', name: 'Suede Crossbody Bag', price: 3490, category: 'Accessories', gender: 'Women', color: 'Beige', image: localPlaceholder, description: 'A compact crossbody with tactile suede and just enough room for the essentials.', sizes: ['M'], rating: 4.7, reviewCount: 35, material: 'Faux suede', available: true, visualClass: 'bg-[#e5d7c9]' },
+  { id: 'p-17', name: 'Fine Knit Cardigan', price: 2390, category: 'Tops', gender: 'Women', color: 'Green', image: localPlaceholder, description: 'A fine knit cardigan with a gently cropped shape for thoughtful layering.', sizes: ['XS', 'S', 'M', 'L'], rating: 4.6, reviewCount: 55, material: 'Viscose blend', available: true, visualClass: 'bg-[#dce6da]' },
+  { id: 'p-18', name: 'Corduroy Overshirt', price: 3190, category: 'Shirts', gender: 'Men', color: 'Red', image: localPlaceholder, description: 'Soft corduroy and a generous fit make this overshirt an instant cool-weather layer.', sizes: ['S', 'M', 'L', 'XL'], rating: 4.7, reviewCount: 44, material: 'Cotton corduroy', available: true, visualClass: 'bg-[#e6d8d1]' },
+]
+
+export const mockCategories = [
+  { name: 'Women', description: 'Curated everyday edits', visualClass: 'bg-[#e9ddd5]' },
+  { name: 'Men', description: 'Modern wardrobe staples', visualClass: 'bg-[#dce3e5]' },
+  { name: 'Dresses', description: 'From day to evening', visualClass: 'bg-[#e8d9df]' },
+  { name: 'Tops', description: 'Easy layers and essentials', visualClass: 'bg-[#e8e2d2]' },
+  { name: 'Shirts', description: 'Clean, considered cuts', visualClass: 'bg-[#dce5dc]' },
+  { name: 'Jeans', description: 'Fits for every day', visualClass: 'bg-[#d8e0e8]' },
+  { name: 'Jackets', description: 'The finishing layer', visualClass: 'bg-[#deded7]' },
+  { name: 'Accessories', description: 'Details that define you', visualClass: 'bg-[#e7ded2]' },
+]
+
+export const mockLooks = [
+  { id: 'l-01', name: 'The Soft Tailoring Edit', price: '$156.00', image: localPlaceholder, visualClass: 'bg-[#dcdeda]' },
+  { id: 'l-02', name: 'Weekend in Linen', price: '$64.00', image: localPlaceholder, visualClass: 'bg-[#dce4df]' },
+  { id: 'l-03', name: 'After Dark Satin', price: '$142.00', image: localPlaceholder, visualClass: 'bg-[#e6dce0]' },
+]
