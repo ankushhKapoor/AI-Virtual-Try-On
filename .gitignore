@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# Models external source
+ai/CatVTON/
+
+# Model weights
+models/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.bin
+
+# Generated outputs
+outputs/
+results/
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
