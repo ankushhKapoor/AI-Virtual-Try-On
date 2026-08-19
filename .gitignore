@@ -6,6 +6,9 @@ __pycache__/
 # Models external source
 ai/CatVTON/
 
+ai_virtual_try_on.egg-info/
+densepose_/
+
 # Model weights
 models/
 *.safetensors
@@ -14,9 +17,14 @@ models/
 *.pt
 *.bin
 
-# Generated outputs
+# Inputs Outputs
+inputs/
 outputs/
 results/
+
+test_person.jpg
+test_cloth.jpg
+test_result.png
 
 # Environment
 .env
