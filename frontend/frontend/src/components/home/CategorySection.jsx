@@ -11,84 +11,49 @@ const categories = [
   {
     name: 'Women',
     description: 'Curated everyday edits',
-    query: 'women western clothing',
-    keywords: [
-      'women',
-      'women',
-      'ladies',
-      'female',
-    ],
+    query: 'women fashion clothing',
+    keywords: ['women', 'ladies', 'female', 'dress', 'top'],
   },
   {
     name: 'Men',
     description: 'Modern wardrobe staples',
-    query: 'men clothing fashion',
-    keywords: [
-      'men',
-      'men',
-      'shirt',
-      'jacket',
-      'tshirt',
-    ],
+    query: 'men fashion clothing',
+    keywords: ['men', 'shirt', 'jacket', 'tshirt', 'trouser'],
   },
   {
     name: 'Dresses',
     description: 'From day to evening',
-    query: 'women dresses party casual',
-    keywords: [
-      'dress',
-      'dresses',
-      'gown',
-    ],
+    query: 'women dresses',
+    keywords: ['dress', 'dresses', 'gown', 'maxi'],
   },
   {
     name: 'Tops',
     description: 'Easy layers and essentials',
-    query: 'women tops fashion',
-    keywords: [
-      'top',
-      'tops',
-      'crop',
-      'tank',
-      'blouse',
-    ],
+    query: 'women tops',
+    keywords: ['top', 'tops', 'crop', 'tank', 'blouse'],
   },
   {
     name: 'Shirts',
     description: 'Clean, considered cuts',
-    query: 'fashion shirts men women',
-    keywords: [
-      'shirt',
-      'shirts',
-      'formal shirt',
-      'casual shirt',
-    ],
+    query: 'fashion shirts',
+    keywords: ['shirt', 'shirts', 'formal', 'casual'],
   },
   {
     name: 'Jeans',
     description: 'Fits for every day',
-    query: 'jeans men women denim',
-    keywords: [
-      'jeans',
-      'denim',
-      'jean',
-    ],
+    query: 'jeans denim',
+    keywords: ['jeans', 'denim', 'jean'],
   },
   {
     name: 'Jackets',
     description: 'The finishing layer',
-    query: 'jackets men women fashion',
-    keywords: [
-      'jacket',
-      'jackets',
-      'bomber',
-      'windbreaker',
-    ],
+    query: 'jackets fashion',
+    keywords: ['jacket', 'jackets', 'bomber', 'windbreaker'],
   },
   {
     name: 'Accessories',
     description: 'Details that define you',
-    query: 'fashion accessories women men',
+    query: 'fashion accessories',
     keywords: [
       'accessories',
       'bag',
@@ -101,211 +66,239 @@ const categories = [
   },
 ]
 
-
 function scoreProduct(product, keywords) {
   if (!product) {
     return -1
   }
 
-  const title =
-    String(
-      product.title || ''
-    ).toLowerCase()
+  const title = String(
+    product.title || ''
+  ).toLowerCase()
 
   let score = 0
 
-  keywords.forEach(
-    keyword => {
-      if (
-        title.includes(
-          keyword.toLowerCase()
-        )
-      ) {
-        score += 10
-      }
+  keywords.forEach(keyword => {
+    if (title.includes(keyword.toLowerCase())) {
+      score += 10
     }
-  )
+  })
 
   if (product.image) {
-    score += 5
+    score += 20
   }
 
-  if (product.title) {
-    score += 1
+  if (product.asin) {
+    score += 2
   }
 
   return score
 }
 
-
 function CategorySection() {
   const navigate = useNavigate()
 
-  const [categoryProducts, setCategoryProducts] =
-    useState({})
-
-  const [loading, setLoading] =
-    useState(true)
-
+  const [categoryProducts, setCategoryProducts] = useState({})
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     let cancelled = false
 
-
     async function loadCategoryImages() {
-      const usedAsins = new Set()
       const results = {}
 
-
       try {
+        /*
+         * Load all category searches in parallel.
+         *
+         * The previous implementation requested each category
+         * one after another. If one request was slow or failed,
+         * it could leave several homepage cards without images.
+         */
+        const responses = await Promise.allSettled(
+          categories.map(async category => {
+            const response = await fetch(
+              `${API_BASE_URL}/search?query=${encodeURIComponent(
+                category.query
+              )}`
+            )
 
-        for (
-          const category of categories
-        ) {
+            if (!response.ok) {
+              throw new Error(
+                `Search failed with status ${response.status}`
+              )
+            }
 
-          if (cancelled) {
+            const data = await response.json()
+
+            const products = Array.isArray(data.products)
+              ? data.products.filter(
+                  product =>
+                    product &&
+                    product.asin &&
+                    product.image
+                )
+              : []
+
+            return {
+              category,
+              products,
+            }
+          })
+        )
+
+        /*
+         * First pass:
+         * choose the best matching image for every category.
+         *
+         * We intentionally don't require unique ASINs here because
+         * having a visible image is more important than returning
+         * an empty card.
+         */
+        responses.forEach(result => {
+          if (result.status !== 'fulfilled') {
             return
           }
 
+          const {
+            category,
+            products,
+          } = result.value
 
-          try {
-
-            const response =
-              await fetch(
-                `${API_BASE_URL}/search?query=${encodeURIComponent(
-                  category.query
-                )}`
-              )
-
-
-            if (!response.ok) {
-              continue
-            }
-
-
-            const data =
-              await response.json()
-
-
-            const products =
-              Array.isArray(
-                data.products
-              )
-                ? data.products.filter(
-                    product =>
-                      product &&
-                      product.asin &&
-                      product.image
-                  )
-                : []
-
-
-            /*
-             * Score products based on how
-             * closely the title matches
-             * this category.
-             */
-            const rankedProducts =
-              [...products].sort(
-                (a, b) =>
-                  scoreProduct(
-                    b,
-                    category.keywords
-                  ) -
-                  scoreProduct(
-                    a,
-                    category.keywords
-                  )
-              )
-
-
-            /*
-             * First choose the best matching
-             * product that has not already
-             * been used by another category.
-             */
-            const selectedProduct =
-              rankedProducts.find(
-                product =>
-                  !usedAsins.has(
-                    product.asin
-                  )
-              )
-
-
-            if (
-              selectedProduct
-            ) {
-
-              usedAsins.add(
-                selectedProduct.asin
-              )
-
-
-              results[
-                category.name
-              ] = {
-                image:
-                  selectedProduct.image,
-
-                asin:
-                  selectedProduct.asin,
-              }
-
-            }
-
-          } catch (error) {
-
-            console.error(
-              `Failed to load ${category.name} image:`,
-              error
-            )
-
+          if (!products.length) {
+            return
           }
-        }
 
+          const rankedProducts = [...products].sort(
+            (a, b) =>
+              scoreProduct(
+                b,
+                category.keywords
+              ) -
+              scoreProduct(
+                a,
+                category.keywords
+              )
+          )
+
+          const selectedProduct =
+            rankedProducts[0]
+
+          if (selectedProduct?.image) {
+            results[category.name] = {
+              image: selectedProduct.image,
+              asin: selectedProduct.asin,
+            }
+          }
+        })
 
         /*
-         * If the backend returned enough
-         * unique products, every category
-         * will have a different image.
+         * Second pass:
+         * try to avoid duplicate images/ASINs.
+         *
+         * If a category has no unique result, we keep its
+         * best image instead of leaving the card blank.
          */
+        const usedAsins = new Set()
+        const uniqueResults = {}
+
+        categories.forEach(category => {
+          const product =
+            results[category.name]
+
+          if (!product) {
+            return
+          }
+
+          if (!usedAsins.has(product.asin)) {
+            usedAsins.add(product.asin)
+
+            uniqueResults[category.name] =
+              product
+
+            return
+          }
+
+          /*
+           * Find another product from the same category
+           * if the best product was already used.
+           */
+          const responseResult =
+            responses.find(
+              result =>
+                result.status ===
+                  'fulfilled' &&
+                result.value.category.name ===
+                  category.name
+            )
+
+          const alternatives =
+            responseResult?.status ===
+            'fulfilled'
+              ? responseResult.value.products
+              : []
+
+          const alternative =
+            alternatives.find(
+              item =>
+                item.image &&
+                item.asin &&
+                !usedAsins.has(item.asin)
+            )
+
+          if (alternative) {
+            usedAsins.add(
+              alternative.asin
+            )
+
+            uniqueResults[
+              category.name
+            ] = {
+              image:
+                alternative.image,
+              asin:
+                alternative.asin,
+            }
+          } else {
+            /*
+             * Keep the original image as a final
+             * fallback rather than showing a blank card.
+             */
+            uniqueResults[
+              category.name
+            ] = product
+          }
+        })
+
         if (!cancelled) {
           setCategoryProducts(
-            results
+            uniqueResults
           )
         }
-
       } catch (error) {
-
         console.error(
           'Failed to load category images:',
           error
         )
 
+        if (!cancelled) {
+          setCategoryProducts({})
+        }
       } finally {
-
         if (!cancelled) {
           setLoading(false)
         }
-
       }
     }
 
-
     loadCategoryImages()
-
 
     return () => {
       cancelled = true
     }
-
   }, [])
-
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:px-10 lg:py-24">
-
       <SectionHeading
         eyebrow="Explore the edit"
         title="Find your everyday, elevated"
@@ -325,63 +318,41 @@ function CategorySection() {
         }
       />
 
-
       <div className="mt-9 grid grid-cols-2 gap-3 sm:grid-cols-4 lg:gap-5">
+        {categories.map(category => {
+          const product =
+            categoryProducts[
+              category.name
+            ]
 
-        {categories.map(
-          category => {
-
-            const product =
-              categoryProducts[
-                category.name
-              ]
-
-
-            return (
-              <CategoryCard
-                key={
-                  category.name
-                }
-
-                name={
-                  category.name
-                }
-
-                description={
-                  category.description
-                }
-
-                image={
-                  product?.image ||
-                  null
-                }
-
-                visualClass={
-                  loading
-                    ? 'bg-accent-soft animate-pulse'
-                    : 'bg-accent-soft'
-                }
-
-                onClick={() =>
-                  navigate(
-                    `/products?category=${encodeURIComponent(
-                      category.name
-                    )}`
-                  )
-                }
-
-                className="[&>div:first-child]:aspect-[5/4]"
-              />
-            )
-
-          }
-        )}
-
+          return (
+            <CategoryCard
+              key={category.name}
+              name={category.name}
+              description={category.description}
+              image={
+                product?.image ||
+                null
+              }
+              visualClass={
+                loading
+                  ? 'bg-accent-soft animate-pulse'
+                  : 'bg-accent-soft'
+              }
+              onClick={() =>
+                navigate(
+                  `/products?category=${encodeURIComponent(
+                    category.name
+                  )}`
+                )
+              }
+              className="[&>div:first-child]:aspect-[5/4]"
+            />
+          )
+        })}
       </div>
-
     </section>
   )
 }
-
 
 export default CategorySection
