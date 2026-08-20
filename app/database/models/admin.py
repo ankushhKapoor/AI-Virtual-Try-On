@@ -1,11 +1,11 @@
-from sqlalchemy import Column, BigInteger, String, DateTime, Boolean, Integer
+from sqlalchemy import Column, BigInteger, String, DateTime, Boolean
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
 
 
-class User(Base):
-    __tablename__ = "users"
+class Admin(Base):
+    __tablename__ = "admins"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
 
@@ -20,14 +20,6 @@ class User(Base):
 
     password_hash = Column(String(255), nullable=False)
 
-    image_path = Column(String(500), nullable=True)
-
-    try_on_count = Column(
-        Integer,
-        nullable=False,
-        default=0
-    )
-
     is_active = Column(
         Boolean,
         nullable=False,
@@ -37,12 +29,6 @@ class User(Base):
     created_at = Column(
         DateTime,
         server_default=func.now()
-    )
-
-    updated_at = Column(
-        DateTime,
-        server_default=func.now(),
-        onupdate=func.now()
     )
 
     last_login_at = Column(

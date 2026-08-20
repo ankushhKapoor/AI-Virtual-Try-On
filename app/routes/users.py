@@ -1,31 +1,20 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 
-from app.database.connection import get_db
 from app.database.models.user import User
+from app.database.core.dependencies import get_current_user
+
 
 router = APIRouter(prefix="/users", tags=["Users"])
 
 
-@router.post("/")
-def create_user(
-    name: str,
-    email: str,
-    password_hash: str,
-    db: Session = Depends(get_db)
-):
-    user = User(
-        name=name,
-        email=email,
-        password_hash=password_hash
-    )
-
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
+@router.get("/me")
+def get_me(current_user: User = Depends(get_current_user)):
     return {
-        "id": user.id,
-        "name": user.name,
-        "email": user.email
+        "id": current_user.id,
+        "name": current_user.name,
+        "email": current_user.email,
+        "try_on_count": current_user.try_on_count,
+        "is_active": current_user.is_active,
+        "created_at": current_user.created_at,
+        "last_login_at": current_user.last_login_at,
     }
