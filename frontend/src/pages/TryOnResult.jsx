@@ -20,7 +20,7 @@ function TryOnResult() {
   const { saveLook, isSaved } = useSavedLooks()
   const result = tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id) || null
 
-  if (!result) return <div className="min-h-screen bg-canvas"><Navbar /><main className="mx-auto max-w-2xl px-5 py-24 sm:px-8"><EmptyState title="Try-On result unavailable" message="This result is no longer in the current browser session. Start again to create a new preview." action={<Link to="/upload"><Button icon={ArrowLeft}>Try Again</Button></Link>} /></main><Footer /></div>
+  if (!result) return <div className="min-h-screen bg-canvas"><Navbar /><main className="mx-auto max-w-2xl px-5 py-24 sm:px-8"><EmptyState title="Your try-on result isn't available yet." message="A generated result will appear here once the VTON integration is connected." action={<div className="flex flex-wrap justify-center gap-3"><Link to="/try-on"><Button icon={ArrowLeft}>Try Again</Button></Link><Link to="/products"><Button variant="outline">Back to Categories</Button></Link></div>} /></main><Footer /></div>
 
   const product = result.product
   const displayPrice = typeof product.price === 'number' ? `₹${product.price.toLocaleString('en-IN')}` : product.price

@@ -5,6 +5,8 @@ function TryOnProvider({ children }) {
   const [userPhoto, setUserPhoto] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [tryOnResult, setTryOnResult] = useState(null)
+  const [processingState, setProcessingState] = useState('IDLE')
+  const [processingError, setProcessingError] = useState('')
   const [looks, setLooks] = useState([])
   const [favoriteLookId, setFavoriteLookId] = useState(null)
   const [history, setHistory] = useState(() => {
@@ -66,7 +68,7 @@ function TryOnProvider({ children }) {
     setLooks((current) => current.map((look) => ({ ...look, favorite: look.id === lookId })))
   }, [])
 
-  return <TryOnContext.Provider value={{ userPhoto, selectedProduct, selectProduct, setPhoto, clearPhoto, tryOnResult, setTryOnResult, looks, addLook, updateLook, removeLook, favoriteLookId, chooseFavorite, history, updateHistoryLook, removeHistoryLook }}>{children}</TryOnContext.Provider>
+  return <TryOnContext.Provider value={{ userPhoto, selectedProduct, selectProduct, setPhoto, clearPhoto, tryOnResult, setTryOnResult, processingState, setProcessingState, processingError, setProcessingError, looks, addLook, updateLook, removeLook, favoriteLookId, chooseFavorite, history, updateHistoryLook, removeHistoryLook }}>{children}</TryOnContext.Provider>
 }
 
 export default TryOnProvider

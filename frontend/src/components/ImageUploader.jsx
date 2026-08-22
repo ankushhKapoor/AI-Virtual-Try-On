@@ -32,8 +32,18 @@ function ImageUploader({ onImageSelect, onRemove, initialPreview = '', maxSizeMB
       setError(`Image must be smaller than ${maxSizeMB} MB.`)
       return
     }
-    setFile(nextFile)
-    onImageSelect?.(nextFile)
+    const objectUrl = URL.createObjectURL(nextFile)
+    const image = new Image()
+    image.onload = () => {
+      URL.revokeObjectURL(objectUrl)
+      setFile(nextFile)
+      onImageSelect?.(nextFile)
+    }
+    image.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      setError('This image could not be read. Please choose another file.')
+    }
+    image.src = objectUrl
   }
 
   function handleDrop(event) {

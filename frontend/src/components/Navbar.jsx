@@ -1,9 +1,10 @@
 import { Bookmark, Heart, Menu, Search, Sparkles, UserRound, X } from 'lucide-react'
 import { useState } from 'react'
-import { NavLink, Link } from 'react-router-dom'
+import { NavLink, Link, useNavigate } from 'react-router-dom'
 import Button from './Button'
 import useWishlist from '../hooks/useWishlist'
 import useSavedLooks from '../hooks/useSavedLooks'
+import useAuth from '../hooks/useAuth'
 
 const links = [
   { label: 'Home', to: '/' },
@@ -15,7 +16,10 @@ function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const { wishlistIds } = useWishlist()
   const { savedLooks } = useSavedLooks()
+  const { isAuthenticated, role, user, admin, logout } = useAuth()
+  const navigate = useNavigate()
   const linkClass = ({ isActive }) => `text-sm font-semibold transition-colors ${isActive ? 'text-accent' : 'text-muted hover:text-ink'}`
+  const handleLogout = () => navigate(logout())
 
   return (
     <header className="relative z-40 border-b border-line bg-canvas/95 backdrop-blur-sm">
@@ -29,11 +33,12 @@ function Navbar() {
           <Link to="/wishlist" className="relative hidden size-10 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink sm:inline-flex" aria-label={`Wishlist${wishlistIds.length ? `, ${wishlistIds.length} items` : ''}`}><Heart size={19} aria-hidden="true" />{wishlistIds.length ? <span className="absolute right-0.5 top-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold leading-4 text-white">{wishlistIds.length}</span> : null}</Link>
           <Link to="/history" className="hidden size-10 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink sm:inline-flex" aria-label="Profile and history"><UserRound size={19} aria-hidden="true" /></Link>
           <Link to="/saved-looks" className="relative hidden size-10 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink md:inline-flex" aria-label={`Saved Looks${savedLooks.length ? `, ${savedLooks.length} items` : ''}`}><Bookmark size={19} aria-hidden="true" />{savedLooks.length ? <span className="absolute right-0.5 top-0.5 inline-flex min-w-4 items-center justify-center rounded-full bg-accent px-1 text-[9px] font-bold leading-4 text-white">{savedLooks.length}</span> : null}</Link>
-          <Link to="/upload" className="hidden sm:block"><Button size="sm" icon={Sparkles}>Try On</Button></Link>
+          {!isAuthenticated ? <><Link to="/login" className="hidden px-2 text-sm font-semibold text-muted hover:text-ink sm:inline-flex">Login</Link><Link to="/register" className="hidden px-2 text-sm font-semibold text-accent hover:text-accent-dark sm:inline-flex">Register</Link></> : <><Link to={role === 'admin' ? '/admin/dashboard' : '/history'} className="hidden max-w-28 truncate px-2 text-sm font-semibold text-muted hover:text-ink sm:inline-flex" title={role === 'admin' ? admin?.email : user?.email}>{role === 'admin' ? 'Admin Dashboard' : 'My account'}</Link><button type="button" onClick={handleLogout} className="hidden px-2 text-sm font-semibold text-muted hover:text-ink sm:inline-flex">Log out</button></>}
+          {role !== 'admin' ? <Link to="/upload" className="hidden sm:block"><Button size="sm" icon={Sparkles}>Try On</Button></Link> : null}
           <button type="button" onClick={() => setMenuOpen((open) => !open)} className="inline-flex size-10 items-center justify-center rounded-full text-muted hover:bg-surface hover:text-ink lg:hidden" aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen}>{menuOpen ? <X size={21} aria-hidden="true" /> : <Menu size={21} aria-hidden="true" />}</button>
         </div>
       </div>
-      {menuOpen ? <nav className="border-t border-line bg-canvas px-5 py-4 lg:hidden" aria-label="Mobile navigation"><div className="mx-auto flex max-w-7xl flex-col gap-1">{links.map((link) => <NavLink key={link.label} to={link.to} onClick={() => setMenuOpen(false)} className={({ isActive }) => `rounded-md px-3 py-3 text-sm font-semibold ${isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-surface hover:text-ink'}`}>{link.label}</NavLink>)}<Link to="/wishlist" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Wishlist {wishlistIds.length ? `(${wishlistIds.length})` : ''}</Link><Link to="/saved-looks" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Saved Looks {savedLooks.length ? `(${savedLooks.length})` : ''}</Link><Link to="/history" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Try-On History</Link><Link to="/upload" onClick={() => setMenuOpen(false)} className="mt-2"><Button className="w-full" icon={Sparkles}>Try On</Button></Link></div></nav> : null}
+      {menuOpen ? <nav className="border-t border-line bg-canvas px-5 py-4 lg:hidden" aria-label="Mobile navigation"><div className="mx-auto flex max-w-7xl flex-col gap-1">{links.map((link) => <NavLink key={link.label} to={link.to} onClick={() => setMenuOpen(false)} className={({ isActive }) => `rounded-md px-3 py-3 text-sm font-semibold ${isActive ? 'bg-accent-soft text-accent' : 'text-muted hover:bg-surface hover:text-ink'}`}>{link.label}</NavLink>)}<Link to="/wishlist" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Wishlist {wishlistIds.length ? `(${wishlistIds.length})` : ''}</Link><Link to="/saved-looks" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Saved Looks {savedLooks.length ? `(${savedLooks.length})` : ''}</Link><Link to="/history" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Try-On History</Link>{!isAuthenticated ? <><Link to="/login" onClick={() => setMenuOpen(false)} className="mt-2 rounded-md px-3 py-3 text-sm font-semibold text-accent hover:bg-surface">Login</Link><Link to="/register" onClick={() => setMenuOpen(false)} className="rounded-md px-3 py-3 text-sm font-semibold text-accent hover:bg-surface">Register</Link></> : <><Link to={role === 'admin' ? '/admin/dashboard' : '/history'} onClick={() => setMenuOpen(false)} className="mt-2 rounded-md px-3 py-3 text-sm font-semibold text-accent hover:bg-surface">{role === 'admin' ? 'Admin Dashboard' : 'My account'}</Link><button type="button" onClick={() => { setMenuOpen(false); handleLogout() }} className="rounded-md px-3 py-3 text-left text-sm font-semibold text-muted hover:bg-surface hover:text-ink">Log out</button></>}{role !== 'admin' ? <Link to="/upload" onClick={() => setMenuOpen(false)} className="mt-2"><Button className="w-full" icon={Sparkles}>Try On</Button></Link> : null}</div></nav> : null}
     </header>
   )
 }

@@ -1,7 +1,7 @@
 import { Search, X } from 'lucide-react'
 import { useState } from 'react'
 
-function SearchBar({ placeholder = 'Search products', value, defaultValue = '', onChange, onSearch, className = '' }) {
+function SearchBar({ placeholder = 'Search products', label = 'Search products', value, defaultValue = '', onChange, onSearch, className = '' }) {
   const [internalValue, setInternalValue] = useState(defaultValue)
   const inputValue = value ?? internalValue
 
@@ -18,7 +18,7 @@ function SearchBar({ placeholder = 'Search products', value, defaultValue = '', 
   return (
     <form onSubmit={handleSubmit} className={`relative flex w-full items-center ${className}`} role="search">
       <Search size={18} className="pointer-events-none absolute left-4 text-subtle" aria-hidden="true" />
-      <label htmlFor="site-search" className="sr-only">Search products</label>
+      <label htmlFor="site-search" className="sr-only">{label}</label>
       <input
         id="site-search"
         type="search"

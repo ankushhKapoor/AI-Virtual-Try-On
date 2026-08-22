@@ -11,16 +11,24 @@ import Wishlist from './pages/Wishlist'
 import SavedLooks from './pages/SavedLooks'
 import History from './pages/History'
 import HowItWorks from './pages/HowItWorks'
+import Login from './pages/Login'
+import Register from './pages/Register'
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
 import TryOnProvider from './context/TryOnContext'
+import { AuthProvider } from './context/AuthContext'
+import ProtectedRoute, { AdminRoute, GuestRoute } from './components/ProtectedRoute'
 import NotFound from './pages/NotFound'
 
 function App() {
   return (
-    <TryOnProvider>
-      <BrowserRouter>
+    <BrowserRouter>
+      <AuthProvider>
+        <TryOnProvider>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/products" element={<Products />} />
+          <Route path="/categories" element={<Products />} />
           <Route path="/products/:id" element={<ProductDetails />} />
           <Route path="/upload" element={<UploadPhoto />} />
           <Route path="/try-on" element={<TryOn />} />
@@ -30,11 +38,20 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/wishlist" element={<Wishlist />} />
           <Route path="/saved-looks" element={<SavedLooks />} />
-          <Route path="/history" element={<History />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/history" element={<History />} />
+          </Route>
+          <Route path="/login" element={<GuestRoute><Login /></GuestRoute>} />
+          <Route path="/register" element={<GuestRoute><Register /></GuestRoute>} />
+          <Route path="/admin/login" element={<GuestRoute><AdminLogin /></GuestRoute>} />
+          <Route element={<AdminRoute />}>
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>
-      </BrowserRouter>
-    </TryOnProvider>
+        </TryOnProvider>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 

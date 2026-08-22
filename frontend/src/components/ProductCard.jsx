@@ -8,8 +8,10 @@ import useTryOn from '../hooks/useTryOn'
 import SafeImage from './SafeImage'
 
 function ProductCard({ product, onWishlist, onTryOn, className = '' }) {
-  const { id, image, name, price, category, isWishlisted = false, alt = name, badge, rating, visualClass = 'bg-accent-soft' } = product
-  const displayPrice = typeof price === 'number' ? `₹${price.toLocaleString('en-IN')}` : price
+  const { id, image, image_url: imageUrl, name, title, price, currency, category, isWishlisted = false, alt = title || name, badge, rating, visualClass = 'bg-accent-soft' } = product
+  const displayName = title || name
+  const displayImage = imageUrl || image
+  const displayPrice = typeof price === 'number' && currency ? `${currency}${currency.length > 2 ? ' ' : ''}${price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'Price unavailable'
   const navigate = useNavigate()
   const { selectProduct } = useTryOn()
 
@@ -22,7 +24,7 @@ function ProductCard({ product, onWishlist, onTryOn, className = '' }) {
   return (
     <article className={`group overflow-hidden rounded-md border border-line bg-surface transition-shadow duration-300 hover:shadow-[var(--shadow-soft)] ${className}`}>
       <div className={`relative aspect-[3/4] overflow-hidden bg-canvas ${visualClass}`}>
-        <Link to={`/products/${id}`} aria-label={`View ${name}`} className="block h-full">{image ? <SafeImage src={image} alt={alt} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" fallbackClassName="h-full w-full" /> : <div className="h-full w-full bg-inherit" aria-label={`${name} image placeholder`} role="img" />}</Link>
+        <Link to={`/products/${id}`} aria-label={`View ${displayName}`} className="block h-full"><SafeImage src={displayImage} alt={alt || displayName} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" fallbackClassName="h-full w-full" /></Link>
         {badge ? <div className="absolute left-3 top-3"><Badge variant="accent">{badge}</Badge></div> : null}
         <div className="absolute right-3 top-3"><WishlistButton isWishlisted={isWishlisted} onToggle={onWishlist} /></div>
       </div>
@@ -30,7 +32,7 @@ function ProductCard({ product, onWishlist, onTryOn, className = '' }) {
         <div className="flex items-start justify-between gap-3">
           <div>
             {category ? <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.12em] text-subtle">{category}</p> : null}
-            <Link to={`/products/${id}`} className="font-semibold text-ink hover:text-accent">{name}</Link>
+            <Link to={`/products/${id}`} className="font-semibold text-ink hover:text-accent">{displayName}</Link>
           </div>
           <ArrowUpRight size={17} className="mt-0.5 shrink-0 text-subtle" aria-hidden="true" />
         </div>

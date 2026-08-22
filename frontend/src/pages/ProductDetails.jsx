@@ -11,24 +11,26 @@ import Breadcrumbs from '../components/products/Breadcrumbs'
 import ProductGallery from '../components/products/ProductGallery'
 import SizeSelector from '../components/products/SizeSelector'
 import { mockProducts } from '../data/mockProducts'
+import { toProductViewModel } from '../data/productViewModel'
 import useWishlist from '../hooks/useWishlist'
 import useTryOn from '../hooks/useTryOn'
 
 function ProductDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const product = mockProducts.find((item) => item.id === id)
+  const sourceProduct = mockProducts.find((item) => item.id === id)
+  const product = sourceProduct ? toProductViewModel(sourceProduct) : null
   const { toggleWishlist, isWishlisted } = useWishlist()
   const { selectProduct } = useTryOn()
   const [selectedSize, setSelectedSize] = useState(product?.sizes.find((size) => size === 'M') || product?.sizes[0] || '')
 
   if (!product) return <div className="min-h-screen bg-canvas"><Navbar /><main className="mx-auto max-w-2xl px-5 py-24 sm:px-8"><EmptyState title="Product not found" message="This style may have moved, but there are plenty more to explore." action={<Link to="/products"><Button icon={ArrowRight}>Back to Shop</Button></Link>} /></main><Footer /></div>
 
-  const related = mockProducts.filter((item) => item.category === product.category && item.id !== product.id).slice(0, 4)
-  const displayPrice = `₹${product.price.toLocaleString('en-IN')}`
+  const related = mockProducts.filter((item) => item.category === product.category && item.id !== product.id).slice(0, 4).map(toProductViewModel)
+  const displayPrice = typeof product.price === 'number' && product.currency ? `${product.currency}${product.currency.length > 2 ? ' ' : ''}${product.price.toLocaleString(undefined, { maximumFractionDigits: 2 })}` : 'Price unavailable'
 
   function startTryOn() {
-    selectProduct(product)
+    selectProduct({ ...product, title: product.title || product.name, image_url: product.image_url || product.image, name: product.title || product.name, image: product.image_url || product.image })
     navigate('/upload', { state: { productId: product.id, productName: product.name, size: selectedSize } })
   }
 
