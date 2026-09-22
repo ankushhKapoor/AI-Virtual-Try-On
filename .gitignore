@@ -28,7 +28,9 @@ test_result.png
 
 # Environment
 .env
+# .env.* files (except examples)
 .env.*
+!.env.example
 
 # IDE
 .vscode/
