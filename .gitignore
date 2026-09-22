@@ -32,3 +32,17 @@ test_result.png
 
 # IDE
 .vscode/
+# Backend virtual environment
+backend/.venv/
+backend/__pycache__/
+
+# Frontend
+frontend/frontend/node_modules/
+frontend/node_modules/
+
+# Model API
+model_api/__pycache__/
+
+# Outputs
+outputs/
+results/
