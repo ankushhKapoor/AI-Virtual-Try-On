@@ -8,6 +8,9 @@
 # ============================================================
 set -euo pipefail
 
+# Ensure uv is on PATH (installed in ~/.local/bin)
+export PATH="$HOME/.local/bin:$PATH"
+
 PROJECT_ROOT="$(dirname "$(realpath "$0")")"
 BACKEND_DIR="$PROJECT_ROOT/backend"
 FRONTEND_DIR="$PROJECT_ROOT/frontend/frontend"

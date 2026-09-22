@@ -26,8 +26,16 @@ dependencies = [
     "torchvision>=0.28.0",
     "tqdm>=4.70.0",
     "transformers>=5.15.0",
+    # Model API service dependencies
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "requests>=2.32.0",
+    "python-dotenv>=1.0.0",
 ]
 
+
+[tool.setuptools.packages.find]
+include = ["ai*", "model_api*"]
 [tool.uv.sources]
 torch = { index = "pytorch" }
 torchvision = { index = "pytorch" }
