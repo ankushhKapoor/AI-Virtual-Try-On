@@ -49,10 +49,9 @@ if [ ! -d "$BACKEND_VENV" ]; then
   ok "Backend venv ready"
 fi
 
-PYTHONPATH="$PROJECT_ROOT" \
-  "$BACKEND_VENV/bin/uvicorn" backend.main:app \
-  --host 127.0.0.1 --port 8000 \
-  > "$LOG_DIR/backend.log" 2>&1 &
+( cd "$PROJECT_ROOT" && "$BACKEND_VENV/bin/uvicorn" backend.main:app \
+  --host 0.0.0.0 --port 8000 \
+  > "$LOG_DIR/backend.log" 2>&1 ) &
 PIDS+=($!)
 ok "Backend API -> http://127.0.0.1:8000  (log: $LOG_DIR/backend.log)"
 
@@ -64,7 +63,7 @@ if ! command -v uv &>/dev/null; then
 fi
 
 (cd "$PROJECT_ROOT" && uv run uvicorn model_api.main:app \
-    --host 127.0.0.1 --port 8001 \
+    --host 0.0.0.0 --port 8001 \
     > "$LOG_DIR/model_api.log" 2>&1) &
 PIDS+=($!)
 ok "Model API  -> http://127.0.0.1:8001  (log: $LOG_DIR/model_api.log)"
