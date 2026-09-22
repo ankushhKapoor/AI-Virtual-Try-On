@@ -77,7 +77,7 @@ if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
   ok "npm install complete"
 fi
 
-npm --prefix "$FRONTEND_DIR" run dev > "$LOG_DIR/frontend.log" 2>&1 &
+npm --prefix "$FRONTEND_DIR" run dev -- --host 0.0.0.0 --port 5173 > "$LOG_DIR/frontend.log" 2>&1 &
 PIDS+=($!)
 ok "Frontend   -> http://localhost:5173  (log: $LOG_DIR/frontend.log)"
 
