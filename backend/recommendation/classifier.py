@@ -95,6 +95,7 @@ def _classify_candidates(
     """
     Run FashionCLIP zero-shot classification on `image` with `candidates`.
     Returns (best_label, probability).
+    Runs inside the dedicated FashionCLIP executor thread.
     """
     import torch
     from .model import get_model_and_processor
@@ -110,13 +111,32 @@ def _classify_candidates(
         max_length=77,
     ).to(device)
 
-    with torch.no_grad():
+    with torch.inference_mode():
         outputs = model(**inputs)
-        # logits_per_image shape: (1, num_candidates)
         probs = outputs.logits_per_image.softmax(dim=1)[0]
 
     best_idx = int(probs.argmax())
     return candidates[best_idx], float(probs[best_idx])
+
+
+def _classify_all_attributes(image) -> dict:
+    """
+    Run all four FashionCLIP classification calls in sequence
+    inside the dedicated executor thread. Returns a dict of results.
+    This batches all calls into a single executor submission to
+    avoid repeated thread-hop overhead.
+    """
+    cat,  cat_conf = _classify_candidates(image, CATEGORY_CANDIDATES)
+    col,  _        = _classify_candidates(image, COLOR_CANDIDATES)
+    sty,  _        = _classify_candidates(image, STYLE_CANDIDATES)
+    pat,  _        = _classify_candidates(image, PATTERN_CANDIDATES)
+    return {
+        "category": cat if cat_conf >= _CONFIDENCE_THRESHOLD else None,
+        "color":    col,
+        "style":    sty,
+        "pattern":  pat,
+        "confidence": round(cat_conf, 4),
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -261,19 +281,16 @@ def classify_product(
 
     if image is not None:
         try:
-            from .model import get_model_and_processor
+            from .model import get_model_and_processor, _run_in_executor
             # Verify model is available (triggers lazy load)
             get_model_and_processor()
 
-            # Classify each attribute dimension
-            category, cat_conf = _classify_candidates(image, CATEGORY_CANDIDATES)
-            color, _   = _classify_candidates(image, COLOR_CANDIDATES)
-            style, _   = _classify_candidates(image, STYLE_CANDIDATES)
-            pattern, _ = _classify_candidates(image, PATTERN_CANDIDATES)
-
-            # Below-threshold → treat as unknown
-            if cat_conf < _CONFIDENCE_THRESHOLD:
-                category = None
+            # Run ALL FashionCLIP classification in one executor call
+            # (single dedicated thread — prevents uvicorn deadlock)
+            _logger.info(
+                "[CLASSIFIER] Running FashionCLIP inference in executor..."
+            )
+            clip_results = _run_in_executor(_classify_all_attributes, image)
 
             # Gender from title (FashionCLIP doesn't do gender classification)
             gender = None
@@ -282,12 +299,8 @@ def classify_product(
                 gender = title_attrs.get("gender")
 
             result = {
-                "category": category,
-                "color": color,
-                "style": style,
-                "pattern": pattern,
+                **clip_results,
                 "gender": gender,
-                "confidence": round(cat_conf, 4),
                 "source": "fashionclip",
             }
 

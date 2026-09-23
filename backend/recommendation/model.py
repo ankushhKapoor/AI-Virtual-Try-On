@@ -15,6 +15,7 @@ CPU fallback is always guaranteed.
 
 from __future__ import annotations
 
+import concurrent.futures
 import logging
 import threading
 from typing import TYPE_CHECKING
@@ -108,6 +109,13 @@ def _ensure_loaded() -> bool:
             model.to(device)
             model.eval()
 
+            # --- CRITICAL: prevent PyTorch CPU thread deadlock ---
+            # PyTorch spawns OpenMP threads internally. When running inside
+            # uvicorn's thread pool, this causes a deadlock that freezes the
+            # entire server. Limit PyTorch to 1 CPU thread to avoid this.
+            import torch as _torch
+            _torch.set_num_threads(1)
+
             _processor = processor
             _model = model
             _device = device
@@ -131,6 +139,15 @@ def _ensure_loaded() -> bool:
 # Public API
 # ---------------------------------------------------------------------------
 
+# Dedicated single-thread executor for FashionCLIP inference.
+# Using exactly 1 thread prevents any PyTorch internal parallelism
+# from conflicting with uvicorn's thread pool workers.
+_inference_executor = concurrent.futures.ThreadPoolExecutor(
+    max_workers=1,
+    thread_name_prefix="fashionclip_",
+)
+
+
 def get_model_and_processor():
     """
     Return (model, processor, device) or raise RuntimeError if unavailable.
@@ -146,6 +163,15 @@ def get_model_and_processor():
 def is_model_available() -> bool:
     """Return True if the model is loaded and ready (non-blocking check)."""
     return _model is not None
+
+
+def _run_in_executor(fn, *args):
+    """
+    Run a callable in the dedicated FashionCLIP executor.
+    Blocks the calling thread (safe to call from a uvicorn sync thread pool worker).
+    """
+    future = _inference_executor.submit(fn, *args)
+    return future.result(timeout=120)   # 2-minute hard timeout per call
 
 
 def get_image_embedding(image):
