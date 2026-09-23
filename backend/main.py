@@ -1,10 +1,14 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
+import logging
 import os
 import re
 import requests
+import threading
+import time
 
 
 from pathlib import Path
@@ -12,6 +16,82 @@ from pathlib import Path
 # Load backend/.env first, then root .env as fallback
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 load_dotenv()
+
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-8s  %(name)s  %(message)s",
+    datefmt="%H:%M:%S",
+)
+_logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Thread-safe TTL cache
+# ---------------------------------------------------------------------------
+
+class _TTLCache:
+    """
+    In-memory cache with per-entry TTL and bounded capacity.
+
+    Expired entries are lazily evicted on get().
+    When maxsize is reached the entry whose TTL expires soonest
+    is evicted to make room (LRU-by-expiry strategy).
+    All methods are protected by a threading.Lock.
+    """
+
+    def __init__(self, maxsize: int = 512, default_ttl: float = 3600):
+        self._store: dict = {}   # key -> (value, expires_at)
+        self._lock = threading.Lock()
+        self._maxsize = maxsize
+        self._default_ttl = default_ttl
+
+    def get(self, key: str):
+        """Return cached value or None if absent / expired."""
+        with self._lock:
+            entry = self._store.get(key)
+            if entry is None:
+                return None
+            value, expires_at = entry
+            if time.monotonic() > expires_at:
+                del self._store[key]
+                return None
+            return value
+
+    def set(self, key: str, value, ttl: float | None = None):
+        """Store value with given ttl (seconds)."""
+        if ttl is None:
+            ttl = self._default_ttl
+        with self._lock:
+            if key not in self._store and len(self._store) >= self._maxsize:
+                oldest = min(self._store, key=lambda k: self._store[k][1])
+                del self._store[oldest]
+            self._store[key] = (value, time.monotonic() + ttl)
+
+
+# Cache instances
+_product_cache = _TTLCache(maxsize=512, default_ttl=3600)   # 1 hour
+_search_cache  = _TTLCache(maxsize=256, default_ttl=1800)   # 30 minutes
+
+_PRODUCT_TTL = 3600
+_SEARCH_TTL  = 1800
+
+
+# ---------------------------------------------------------------------------
+# Cache key helpers  (normalise key only – Oxylabs payload is unchanged)
+# ---------------------------------------------------------------------------
+
+def _product_key(asin: str, domain: str, geo_location: str) -> str:
+    return f"product:{asin.strip().upper()}:{domain.strip().lower()}:{geo_location.strip().lower()}"
+
+
+def _search_key(query: str, domain: str, geo_location: str) -> str:
+    q = re.sub(r"\s+", " ", query.strip().lower())
+    return f"search:{q}:{domain.strip().lower()}:{geo_location.strip().lower()}"
 
 
 app = FastAPI(
@@ -936,6 +1016,18 @@ def get_product(
             }
         )
 
+    _key = _product_key(asin, domain, geo_location)
+
+    _hit = _product_cache.get(_key)
+    if _hit is not None:
+        _logger.info("[CACHE HIT]  /products  key=%s", _key)
+        return JSONResponse(
+            content=_hit,
+            headers={"Cache-Control": f"private, max-age={_PRODUCT_TTL}"},
+        )
+
+    _logger.info("[CACHE MISS] /products  key=%s", _key)
+
     raw_response = oxylabs_request(
 
         asin=asin,
@@ -975,7 +1067,7 @@ def get_product(
 
     )
 
-    return {
+    _body = {
 
         "status":
             "success",
@@ -983,6 +1075,14 @@ def get_product(
         **product,
 
     }
+
+    _product_cache.set(_key, _body, ttl=_PRODUCT_TTL)
+    _logger.info("[CACHE SET]  /products  key=%s  (TTL=%ds)", _key, _PRODUCT_TTL)
+
+    return JSONResponse(
+        content=_body,
+        headers={"Cache-Control": f"private, max-age={_PRODUCT_TTL}"},
+    )
 
 
 @app.get("/search")
@@ -1020,6 +1120,18 @@ def search_products(
             }
         )
 
+    _key = _search_key(query, domain, geo_location)
+
+    _hit = _search_cache.get(_key)
+    if _hit is not None:
+        _logger.info("[CACHE HIT]  /search  key=%s", _key)
+        return JSONResponse(
+            content=_hit,
+            headers={"Cache-Control": f"private, max-age={_SEARCH_TTL}"},
+        )
+
+    _logger.info("[CACHE MISS] /search  key=%s", _key)
+
     products, filters = (
         collect_search_products(
 
@@ -1045,7 +1157,7 @@ def search_products(
             }
         )
 
-    return {
+    _body = {
 
         "status":
             "success",
@@ -1063,6 +1175,14 @@ def search_products(
             products,
 
     }
+
+    _search_cache.set(_key, _body, ttl=_SEARCH_TTL)
+    _logger.info("[CACHE SET]  /search  key=%s  (TTL=%ds)", _key, _SEARCH_TTL)
+
+    return JSONResponse(
+        content=_body,
+        headers={"Cache-Control": f"private, max-age={_SEARCH_TTL}"},
+    )
 
 
 if __name__ == "__main__":

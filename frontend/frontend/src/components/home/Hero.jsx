@@ -1,6 +1,7 @@
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { fetchJsonWithCache, TTL_PRODUCT } from '../../utils/apiCache'
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
 
@@ -15,17 +16,10 @@ function Hero() {
 
     async function loadHeroProduct() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/products?asin=${HERO_ASIN}`
+        const data = await fetchJsonWithCache(
+          `${API_BASE_URL}/products?asin=${HERO_ASIN}`,
+          { ttl: TTL_PRODUCT }
         )
-
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load Amazon product: ${response.status}`
-          )
-        }
-
-        const data = await response.json()
 
         const image =
           data.image ||

@@ -14,6 +14,7 @@ import ProductSort from '../components/products/ProductSort'
 
 import useWishlist from '../hooks/useWishlist'
 import useTryOn from '../hooks/useTryOn'
+import { fetchJsonWithCache, TTL_SEARCH } from '../utils/apiCache'
 
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
@@ -201,20 +202,12 @@ function Products() {
     const timer = setTimeout(
       async () => {
         try {
-          const response = await fetch(
+          const data = await fetchJsonWithCache(
             `${API_BASE_URL}/search?query=${encodeURIComponent(
               query
-            )}`
+            )}`,
+            { ttl: TTL_SEARCH }
           )
-
-          if (!response.ok) {
-            throw new Error(
-              `Search request failed with status ${response.status}`
-            )
-          }
-
-          const data =
-            await response.json()
 
           if (
             !Array.isArray(

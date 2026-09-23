@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 
 import ProductGrid from '../ProductGrid'
 import SectionHeading from '../SectionHeading'
+import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
 
@@ -16,17 +17,14 @@ function TrendingProducts() {
 
     async function loadProducts() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/search?query=clothing`
+        const data = await fetchJsonWithCache(
+          `${API_BASE_URL}/search?query=clothing`,
+          { ttl: TTL_SEARCH }
         )
 
-        if (!response.ok) {
-          throw new Error(
-            'Failed to fetch products'
-          )
+        if (!data || !data.products) {
+          throw new Error('Failed to fetch products')
         }
-
-        const data = await response.json()
 
         if (!cancelled) {
           const amazonProducts = (

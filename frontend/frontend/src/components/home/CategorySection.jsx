@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 
 import CategoryCard from '../CategoryCard'
 import SectionHeading from '../SectionHeading'
+import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
 
@@ -116,19 +117,18 @@ function CategorySection() {
          */
         const responses = await Promise.allSettled(
           categories.map(async category => {
-            const response = await fetch(
+            const data = await fetchJsonWithCache(
               `${API_BASE_URL}/search?query=${encodeURIComponent(
                 category.query
-              )}`
+              )}`,
+              { ttl: TTL_SEARCH }
             )
 
-            if (!response.ok) {
+            if (!data || !data.products) {
               throw new Error(
-                `Search failed with status ${response.status}`
+                `Search failed for category ${category.name}`
               )
             }
-
-            const data = await response.json()
 
             const products = Array.isArray(data.products)
               ? data.products.filter(
