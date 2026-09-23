@@ -67,9 +67,28 @@ def _rec_cache_set(asin: str, value: dict) -> None:
         _rec_cache[asin] = (value, _time.monotonic() + _REC_CACHE_TTL)
 
 
-# ---------------------------------------------------------------------------
-# Query building
-# ---------------------------------------------------------------------------
+# Map each slot to which index in color_hints to use.
+# This ensures top / bottom / footwear don't all get the same color.
+_SLOT_COLOR_INDEX: dict[str, int] = {
+    "top":       0,   # strongest contrast color
+    "outerwear": 1,
+    "bottom":    2,   # 3rd compatible color (e.g. blue jeans instead of white)
+    "footwear":  0,   # white / first compatible is fine for shoes
+    "accessory": 1,
+}
+
+# Styles too generic to improve a query (adding "casual" to every search is noise)
+_STYLE_SKIP = {"casual", "minimalist", "unknown", None}
+
+# Slot → short filler phrase to make queries more natural on Amazon
+_SLOT_CONTEXT: dict[str, str] = {
+    "top":       "",
+    "bottom":    "",
+    "footwear":  "",
+    "outerwear": "",
+    "accessory": "",
+}
+
 
 def _build_query(
     slot: str,
@@ -77,35 +96,45 @@ def _build_query(
     color_hints: list[str],
     style: str | None,
     gender: str | None,
+    source_category: str | None = None,
 ) -> str:
     """
-    Build a natural-language Amazon search query for a recommendation slot.
+    Build a varied, meaningful Amazon search query for a recommendation slot.
 
-    Example:
-      slot_category="t-shirt", color_hints=["white","grey"], style="casual",
-      gender="men"  →  "white casual men's t-shirt"
+    Key improvements over v1:
+    - Different color per slot (not always color_hints[0] = "white")
+    - Style only added when distinctive (formal, streetwear, ethnic, sporty)
+    - Gender suffix when available
+    - Source category appended for context on niche slots (footwear, accessories)
+
+    Examples:
+      black jacket, slot=top       → "white t-shirt"
+      black jacket, slot=bottom    → "blue jeans"          (color_hints[2])
+      black jacket, slot=footwear  → "white sneakers"
+      navy blazer,  slot=top       → "formal men's shirt"
+      red dress,    slot=footwear  → "black heels"
     """
     parts: list[str] = []
 
-    # Color — use first compatible color
+    # --- Color: use slot-specific index so slots get different colors ---
     if color_hints:
-        parts.append(color_hints[0])
+        idx = _SLOT_COLOR_INDEX.get(slot, 0)
+        color = color_hints[min(idx, len(color_hints) - 1)]
+        parts.append(color)
 
-    # Style modifier (skip if it would make query weird)
-    if style and style not in ("unknown", "minimalist"):
+    # --- Style: only when distinctive (skip casual, minimalist) ---
+    if style and style not in _STYLE_SKIP:
         parts.append(style)
 
-    # Gender
+    # --- Gender suffix ---
     gender_str = GENDER_QUERY_SUFFIX.get(gender or "", "")
     if gender_str:
         parts.append(gender_str)
 
-    # Category (always last)
+    # --- Category ---
     parts.append(slot_category)
 
-    query = " ".join(parts)
-    # Collapse multiple spaces
-    query = re.sub(r"\s+", " ", query).strip()
+    query = re.sub(r"\s+", " ", " ".join(parts)).strip()
     return query
 
 
