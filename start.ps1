@@ -27,7 +27,7 @@ Write-Host ""
 
 # Resolve the project path inside WSL
 $winPath = $PSScriptRoot
-$wslPath = (wsl wslpath -u ($winPath -replace '\', '/')).Trim()
+$wslPath = (wsl wslpath -u ($winPath.Replace('\', '/'))).Trim()
 Write-Host "Project root (WSL): $wslPath" -ForegroundColor Gray
 
 # Run the bash start script inside WSL

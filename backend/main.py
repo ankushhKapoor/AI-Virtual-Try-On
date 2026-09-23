@@ -7,6 +7,10 @@ import re
 import requests
 
 
+from pathlib import Path
+
+# Load backend/.env first, then root .env as fallback
+load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 load_dotenv()
 
 

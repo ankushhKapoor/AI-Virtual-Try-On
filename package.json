@@ -1,0 +1,9 @@
+{
+  "name": "ai-virtual-try-on-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix frontend/frontend run dev",
+    "build": "npm --prefix frontend/frontend run build"
+  }
+}

@@ -12,3 +12,6 @@ bcrypt==5.0.0
 python-dotenv==1.2.2
 alembic==1.19.1
 httpx==0.28.1
+requests>=2.32.0
+Pillow>=10.0.0
+python-multipart>=0.0.20

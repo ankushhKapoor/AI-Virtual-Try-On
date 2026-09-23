@@ -18,6 +18,9 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
+    OXYLABS_USERNAME: str = ""
+    OXYLABS_PASSWORD: str = ""
+
     @property
     def DATABASE_URL(self) -> str:
         password = quote_plus(self.DB_PASSWORD)
@@ -28,6 +31,7 @@ class Settings(BaseSettings):
     
     class Config:
         env_file = ".env"
+        extra = "ignore"
 
 
 settings = Settings()
