@@ -112,6 +112,14 @@ app.add_middleware(
 )
 
 
+# ---------------------------------------------------------------------------
+# Recommendation router (new — FashionCLIP outfit recommendations)
+# ---------------------------------------------------------------------------
+
+from recommendation.router import router as _recommendation_router
+app.include_router(_recommendation_router)
+
+
 OXYLABS_URL = "https://realtime.oxylabs.io/v1/queries"
 
 OXYLABS_USERNAME = os.getenv("OXYLABS_USERNAME")

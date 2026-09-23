@@ -16,6 +16,7 @@ import SizeSelector from '../components/products/SizeSelector'
 import useWishlist from '../hooks/useWishlist'
 import useTryOn from '../hooks/useTryOn'
 import { fetchJsonWithCache, TTL_PRODUCT, TTL_SEARCH } from '../utils/apiCache'
+import CompleteTheLook from '../components/CompleteTheLook'
 
 
 const API_BASE_URL = 'http://127.0.0.1:8000'
@@ -989,6 +990,17 @@ function ProductDetails() {
             </section>
 
           ) : null}
+
+
+          {/* ── Complete the Look (FashionCLIP outfit recommendations) ── */}
+          {product ? (
+            <CompleteTheLook
+              product={product}
+              onWishlist={toggleWishlist}
+              onTryOn={handleRelatedTryOn}
+            />
+          ) : null}
+
 
         </div>
 
