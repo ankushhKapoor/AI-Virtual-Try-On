@@ -1,18 +1,18 @@
-# Python
+# Python & Virtual Environments
 .venv/
+venv/
+backend/.venv/
 __pycache__/
 *.py[cod]
+*$py.class
 
 # Logs
 .logs/
 
-# Models external source
+# Models & Weights
 ai/CatVTON/
-
 ai_virtual_try_on.egg-info/
 densepose_/
-
-# Model weights
 models/
 *.safetensors
 *.ckpt
@@ -20,34 +20,26 @@ models/
 *.pt
 *.bin
 
-# Inputs Outputs
+# Inputs, Outputs & Test Artifacts
 inputs/
 outputs/
 results/
-
 test_person.jpg
 test_cloth.jpg
 test_result.png
 
-# Environment
+# Environment Variables
 .env
-# .env.* files (except examples)
 .env.*
 !.env.example
 
-# IDE
+# IDE & OS files
 .vscode/
-# Backend virtual environment
-backend/.venv/
-backend/__pycache__/
+.idea/
+.DS_Store
 
-# Frontend
+# Frontend & Dependencies
 frontend/frontend/node_modules/
 frontend/node_modules/
-
-# Model API
 model_api/__pycache__/
-
-# Outputs
-outputs/
-results/
+backend/__pycache__/
