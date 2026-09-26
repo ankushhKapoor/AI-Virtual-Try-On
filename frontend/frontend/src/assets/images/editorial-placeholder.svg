@@ -1,0 +1,13 @@
+<svg width="720" height="960" viewBox="0 0 720 960" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="720" height="960" fill="#E6E4DD"/>
+  <circle cx="360" cy="245" r="104" fill="#C5A992"/>
+  <path d="M218 389C246 351 295 331 360 331C425 331 474 351 502 389L590 844H130L218 389Z" fill="#245C4B"/>
+  <path d="M218 389L130 844H280L326 436L218 389Z" fill="#1C493B"/>
+  <path d="M502 389L590 844H440L394 436L502 389Z" fill="#2F705D"/>
+  <path d="M296 339L360 431L424 339" stroke="#F7F6F2" stroke-width="8"/>
+  <path d="M243 844H477L500 920H220L243 844Z" fill="#1F2421"/>
+  <path d="M240 920H332V940H218L240 920Z" fill="#1F2421"/>
+  <path d="M388 920H480L502 940H388V920Z" fill="#1F2421"/>
+  <path d="M62 86H658M62 110H658" stroke="#F7F6F2" stroke-width="2" opacity="0.65"/>
+  <text x="62" y="78" fill="#245C4B" font-family="Arial, sans-serif" font-size="20" letter-spacing="5">VESTA / EDIT</text>
+</svg>

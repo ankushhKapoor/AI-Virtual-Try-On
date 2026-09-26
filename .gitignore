@@ -1,0 +1,45 @@
+# Python & Virtual Environments
+.venv/
+venv/
+backend/.venv/
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Logs
+.logs/
+
+# Models & Weights
+ai/CatVTON/
+ai_virtual_try_on.egg-info/
+densepose_/
+models/
+*.safetensors
+*.ckpt
+*.pth
+*.pt
+*.bin
+
+# Inputs, Outputs & Test Artifacts
+inputs/
+outputs/
+results/
+test_person.jpg
+test_cloth.jpg
+test_result.png
+
+# Environment Variables
+.env
+.env.*
+!.env.example
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+
+# Frontend & Dependencies
+frontend/frontend/node_modules/
+frontend/node_modules/
+model_api/__pycache__/
+backend/__pycache__/
