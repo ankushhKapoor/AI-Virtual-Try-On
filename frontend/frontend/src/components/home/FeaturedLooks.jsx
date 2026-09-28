@@ -67,7 +67,7 @@ function scoreProduct(product, keywords) {
     }
   )
 
-  if (product.image) {
+  if (product.image || product.image_url || product.thumbnail) {
     score += 5
   }
 
@@ -192,11 +192,11 @@ function FeaturedLooks() {
                 'INR',
 
               image:
-                product.image,
+                product.image || product.image_url || product.thumbnail || null,
 
               images:
-                product.image
-                  ? [product.image]
+                (product.image || product.image_url || product.thumbnail)
+                  ? [product.image || product.image_url || product.thumbnail]
                   : [],
 
               brand:

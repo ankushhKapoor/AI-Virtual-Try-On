@@ -19,15 +19,22 @@ import { fetchJsonWithCache, TTL_PRODUCT, TTL_SEARCH } from '../utils/apiCache'
 import CompleteTheLook from '../components/CompleteTheLook'
 
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+
 
 
 function normalizeProduct(data) {
+  const primaryImage =
+    data.image ||
+    data.image_url ||
+    data.thumbnail ||
+    null
+
   const images =
-    Array.isArray(data.images)
+    Array.isArray(data.images) && data.images.length > 0
       ? data.images.filter(Boolean)
-      : data.image
-        ? [data.image]
+      : primaryImage
+        ? [primaryImage]
         : []
 
   const sizes =
@@ -66,6 +73,8 @@ function normalizeProduct(data) {
 
     image:
       data.image ||
+      data.image_url ||
+      data.thumbnail ||
       images[0] ||
       null,
 

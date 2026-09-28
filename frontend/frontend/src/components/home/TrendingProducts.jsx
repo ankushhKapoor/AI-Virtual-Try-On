@@ -32,29 +32,34 @@ function TrendingProducts() {
           )
             .filter(
               product =>
-                product.image
+                product.image || product.image_url || product.thumbnail
             )
             .slice(0, 4)
-            .map(product => ({
-              id: product.asin,
+            .map(product => {
+              const img =
+                product.image ||
+                product.image_url ||
+                product.thumbnail ||
+                null
+              return {
+                id: product.asin,
 
-              asin: product.asin,
+                asin: product.asin,
 
-              name: product.title,
+                name: product.title,
 
-              brand:
-                product.brand || '',
+                brand:
+                  product.brand || '',
 
-              price:
-                product.price || 0,
+                price:
+                  product.price || 0,
 
-              image:
-                product.image,
+                image: img,
 
-              images:
-                product.image
-                  ? [product.image]
-                  : [],
+                images:
+                  img
+                    ? [img]
+                    : [],
 
               rating:
                 product.rating || 0,
@@ -79,7 +84,8 @@ function TrendingProducts() {
                   : product.is_sponsored
                     ? 'Sponsored'
                     : null,
-            }))
+            }
+          })
 
           setProducts(
             amazonProducts

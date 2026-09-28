@@ -84,7 +84,7 @@ function scoreProduct(product, keywords) {
     }
   })
 
-  if (product.image) {
+  if (product.image || product.image_url || product.thumbnail) {
     score += 20
   }
 
@@ -183,9 +183,15 @@ function CategorySection() {
           const selectedProduct =
             rankedProducts[0]
 
-          if (selectedProduct?.image) {
+          const catImg =
+            selectedProduct?.image ||
+            selectedProduct?.image_url ||
+            selectedProduct?.thumbnail ||
+            null
+
+          if (catImg) {
             results[category.name] = {
-              image: selectedProduct.image,
+              image: catImg,
               asin: selectedProduct.asin,
             }
           }

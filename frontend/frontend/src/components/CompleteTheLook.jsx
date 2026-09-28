@@ -19,7 +19,8 @@ import { Sparkles } from 'lucide-react'
 import ProductCard from './ProductCard'
 import LoadingSpinner from './LoadingSpinner'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+
 
 // Slot display metadata
 const SLOT_META = {
@@ -45,8 +46,8 @@ function SlotRow({ slot, category, products, onWishlist, onTryOn }) {
     price:       typeof p.price === 'number' ? p.price : (parseFloat(p.price) || 0),
     currency:    p.currency || 'INR',
     rating:      Number(p.rating) || 0,
-    image:       p.image || (Array.isArray(p.images) ? p.images[0] : null) || null,
-    images:      Array.isArray(p.images) ? p.images : p.image ? [p.image] : [],
+    image:       p.image || p.image_url || p.thumbnail || (Array.isArray(p.images) ? p.images[0] : null) || null,
+    images:      Array.isArray(p.images) ? p.images : (p.image || p.image_url || p.thumbnail) ? [p.image || p.image_url || p.thumbnail] : [],
     url:         p.url || '',
     category:    p.category || category || slot,
     isWishlisted: false,
@@ -100,7 +101,7 @@ function CompleteTheLook({ product, onWishlist, onTryOn }) {
           product: {
             asin:     product.asin,
             title:    product.title || product.name || null,
-            image:    product.image  || (product.images && product.images[0]) || null,
+            image:    product.image || product.image_url || product.thumbnail || (product.images && product.images[0]) || null,
             brand:    product.brand  || null,
             category: product.category || null,
             gender:   product.gender   || null,

@@ -32,7 +32,7 @@ export const TTL_SEARCH = 30 * 60 * 1000
 // Internals
 // ---------------------------------------------------------------------------
 
-const _STORAGE_PREFIX = '__aivto_cache__:'
+const _STORAGE_PREFIX = '__aivto_cache_v2__:'
 
 /** In-memory store:  url → { data, expiresAt } */
 const _mem = new Map()
