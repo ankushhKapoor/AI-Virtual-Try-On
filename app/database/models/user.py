@@ -7,7 +7,9 @@ from app.database.connection import Base
 class User(Base):
     __tablename__ = "users"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+
 
     name = Column(String(100), nullable=False)
 

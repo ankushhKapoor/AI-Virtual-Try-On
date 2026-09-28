@@ -144,9 +144,21 @@ def _build_query(
 
 def _search_products(query: str, domain: str = "in") -> list[dict]:
     """
-    Call the EXISTING GET /search endpoint and return the product list.
-    Benefits from the existing server-side TTL cache automatically.
+    Call search either via direct in-process call or via HTTP GET /search.
+    Direct call avoids network overhead and loopback deadlocks in single-worker environments.
     """
+    try:
+        from main import collect_search_products
+        products, _ = collect_search_products(query=query, domain=domain, geo_location="")
+        if products:
+            _logger.info(
+                "[RECOMMENDER] In-process search query=%r → %d products",
+                query, len(products),
+            )
+            return products
+    except Exception as exc:
+        _logger.debug("[RECOMMENDER] In-process search failed: %s, trying HTTP", exc)
+
     import requests as http
 
     url = f"{_BACKEND_BASE}/search"
@@ -173,6 +185,7 @@ def _search_products(query: str, domain: str = "in") -> list[dict]:
             "[RECOMMENDER] /search call failed for query=%r: %s", query, exc,
         )
         return []
+
 
 
 # ---------------------------------------------------------------------------

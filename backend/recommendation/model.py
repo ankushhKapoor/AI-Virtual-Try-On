@@ -1,16 +1,16 @@
 """
 backend/recommendation/model.py
----------------------------------
+
 FashionCLIP singleton model manager.
 
-Loads `patrickjohncyh/fashion-clip` exactly once (lazy, on first request).
-After loading, the model and processor are kept in memory for all subsequent
-inference calls.
+Responsibilities:
+- Load FashionCLIP exactly once.
+- Detect Intel XPU -> CUDA -> CPU.
+- Provide safe single/batch image and text embeddings.
+- Keep inference serialized through one dedicated executor.
 
-Device priority:
-  XPU (Intel Arc) → CUDA → CPU
-
-CPU fallback is always guaranteed.
+The recommendation system uses FashionCLIP as a semantic signal,
+not as the only outfit-compatibility mechanism.
 """
 
 from __future__ import annotations
@@ -18,22 +18,28 @@ from __future__ import annotations
 import concurrent.futures
 import logging
 import threading
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 if TYPE_CHECKING:
     import torch
+    from PIL import Image
     from transformers import CLIPModel, CLIPProcessor
 
 _logger = logging.getLogger(__name__)
 
 _MODEL_NAME = "patrickjohncyh/fashion-clip"
 
-# Module-level singletons — populated once by _ensure_loaded()
 _model: "CLIPModel | None" = None
 _processor: "CLIPProcessor | None" = None
 _device: "torch.device | None" = None
+
 _load_lock = threading.Lock()
-_load_failed = False   # Set True if loading fails; stops repeated retries
+_load_failed = False
+
+_inference_executor = concurrent.futures.ThreadPoolExecutor(
+    max_workers=1,
+    thread_name_prefix="fashionclip_",
+)
 
 
 # ---------------------------------------------------------------------------
@@ -43,7 +49,6 @@ _load_failed = False   # Set True if loading fails; stops repeated retries
 def _detect_device() -> "torch.device":
     import torch
 
-    # Intel XPU (Arc GPU) — requires intel-extension-for-pytorch
     try:
         if hasattr(torch, "xpu") and torch.xpu.is_available():
             _logger.info("[RECOMMENDATION] FashionCLIP device=xpu")
@@ -51,7 +56,6 @@ def _detect_device() -> "torch.device":
     except Exception:
         pass
 
-    # NVIDIA CUDA
     try:
         if torch.cuda.is_available():
             _logger.info("[RECOMMENDATION] FashionCLIP device=cuda")
@@ -68,11 +72,6 @@ def _detect_device() -> "torch.device":
 # ---------------------------------------------------------------------------
 
 def _ensure_loaded() -> bool:
-    """
-    Load the model+processor if not already loaded.
-    Returns True on success, False if loading previously failed.
-    Thread-safe.
-    """
     global _model, _processor, _device, _load_failed
 
     if _model is not None:
@@ -82,16 +81,15 @@ def _ensure_loaded() -> bool:
         return False
 
     with _load_lock:
-        # Double-check inside lock
         if _model is not None:
             return True
+
         if _load_failed:
             return False
 
         try:
             _logger.info(
-                "[RECOMMENDATION] Loading FashionCLIP (%s) — first request "
-                "(model will be cached by HuggingFace)...",
+                "[RECOMMENDATION] Loading FashionCLIP (%s)...",
                 _MODEL_NAME,
             )
 
@@ -106,15 +104,12 @@ def _ensure_loaded() -> bool:
             )
 
             model = CLIPModel.from_pretrained(_MODEL_NAME)
+
             model.to(device)
             model.eval()
 
-            # --- CRITICAL: prevent PyTorch CPU thread deadlock ---
-            # PyTorch spawns OpenMP threads internally. When running inside
-            # uvicorn's thread pool, this causes a deadlock that freezes the
-            # entire server. Limit PyTorch to 1 CPU thread to avoid this.
-            import torch as _torch
-            _torch.set_num_threads(1)
+            # Avoid excessive CPU threading / uvicorn interaction.
+            torch.set_num_threads(1)
 
             _processor = processor
             _model = model
@@ -124,87 +119,124 @@ def _ensure_loaded() -> bool:
                 "[RECOMMENDATION] FashionCLIP loaded successfully on %s",
                 device,
             )
+
             return True
 
         except Exception as exc:
             _load_failed = True
+
             _logger.error(
-                "[RECOMMENDATION] Failed to load FashionCLIP: %s", exc,
+                "[RECOMMENDATION] FashionCLIP failed to load: %s",
+                exc,
                 exc_info=True,
             )
+
             return False
 
 
 # ---------------------------------------------------------------------------
-# Public API
+# Public model access
 # ---------------------------------------------------------------------------
 
-# Dedicated single-thread executor for FashionCLIP inference.
-# Using exactly 1 thread prevents any PyTorch internal parallelism
-# from conflicting with uvicorn's thread pool workers.
-_inference_executor = concurrent.futures.ThreadPoolExecutor(
-    max_workers=1,
-    thread_name_prefix="fashionclip_",
-)
-
-
 def get_model_and_processor():
-    """
-    Return (model, processor, device) or raise RuntimeError if unavailable.
-    """
     if not _ensure_loaded():
         raise RuntimeError(
             "FashionCLIP model is not available. "
-            "Check logs for the original error."
+            "Check backend logs for the original error."
         )
+
     return _model, _processor, _device
 
 
 def is_model_available() -> bool:
-    """Return True if the model is loaded and ready (non-blocking check)."""
     return _model is not None
 
 
+# ---------------------------------------------------------------------------
+# Executor
+# ---------------------------------------------------------------------------
+
 def _run_in_executor(fn, *args):
-    """
-    Run a callable in the dedicated FashionCLIP executor.
-    Blocks the calling thread (safe to call from a uvicorn sync thread pool worker).
-    """
     future = _inference_executor.submit(fn, *args)
-    return future.result(timeout=120)   # 2-minute hard timeout per call
+    return future.result(timeout=120)
 
 
-def get_image_embedding(image):
-    """
-    Return a normalised image embedding tensor for `image` (PIL.Image).
-    Shape: (1, embedding_dim)
-    """
+# ---------------------------------------------------------------------------
+# Internal embedding implementations
+# ---------------------------------------------------------------------------
+
+def _image_embeddings_impl(images):
     import torch
 
     model, processor, device = get_model_and_processor()
-    inputs = processor(images=image, return_tensors="pt").to(device)
-    with torch.no_grad():
-        feats = model.get_image_features(**inputs)
-        feats = feats / feats.norm(dim=-1, keepdim=True)
-    return feats.cpu()
 
-
-def get_text_embedding(text: str):
-    """
-    Return a normalised text embedding tensor for `text`.
-    Shape: (1, embedding_dim)
-    """
-    import torch
-
-    model, processor, device = get_model_and_processor()
     inputs = processor(
-        text=[text],
+        images=list(images),
+        return_tensors="pt",
+    ).to(device)
+
+    with torch.inference_mode():
+        features = model.get_image_features(**inputs)
+        features = features / features.norm(dim=-1, keepdim=True)
+
+    return features.cpu()
+
+
+def _text_embeddings_impl(texts):
+    import torch
+
+    model, processor, device = get_model_and_processor()
+
+    inputs = processor(
+        text=list(texts),
         return_tensors="pt",
         padding=True,
         truncation=True,
         max_length=77,
     ).to(device)
-    with torch.no_grad():
-        feats = model.get_text_features(**inputs)
-        feats = feats / feats.norm(dim=-1, keepdim=True)
-    return feats.cpu()
+
+    with torch.inference_mode():
+        features = model.get_text_features(**inputs)
+        features = features / features.norm(dim=-1, keepdim=True)
+
+    return features.cpu()
+
+
+# ---------------------------------------------------------------------------
+# Public embeddings API
+# ---------------------------------------------------------------------------
+
+def get_image_embedding(image):
+    """Return normalized image embedding with shape (1, embedding_dim)."""
+    return get_image_embeddings([image])
+
+
+def get_image_embeddings(images):
+    """Return normalized batch image embeddings."""
+    images = list(images)
+
+    if not images:
+        raise ValueError("At least one image is required.")
+
+    return _run_in_executor(
+        _image_embeddings_impl,
+        images,
+    )
+
+
+def get_text_embedding(text: str):
+    """Return normalized text embedding with shape (1, embedding_dim)."""
+    return get_text_embeddings([text])
+
+
+def get_text_embeddings(texts: Sequence[str]):
+    """Return normalized batch text embeddings."""
+    texts = list(texts)
+
+    if not texts:
+        raise ValueError("At least one text is required.")
+
+    return _run_in_executor(
+        _text_embeddings_impl,
+        texts,
+    )

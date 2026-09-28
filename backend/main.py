@@ -12,10 +12,19 @@ import time
 
 
 from pathlib import Path
+import sys
+
+_backend_dir = str(Path(__file__).resolve().parent)
+_project_root = str(Path(__file__).resolve().parent.parent)
+if _backend_dir not in sys.path:
+    sys.path.insert(0, _backend_dir)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
 
 # Load backend/.env first, then root .env as fallback
 load_dotenv(dotenv_path=Path(__file__).parent / ".env")
 load_dotenv()
+
 
 
 # ---------------------------------------------------------------------------
@@ -105,6 +114,12 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:5175",
+        "http://127.0.0.1:5175",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -118,6 +133,28 @@ app.add_middleware(
 
 from recommendation.router import router as _recommendation_router
 app.include_router(_recommendation_router)
+
+# ---------------------------------------------------------------------------
+# Auth, User, Admin routers & Database Init
+# ---------------------------------------------------------------------------
+import sys
+_project_root = str(Path(__file__).resolve().parent.parent)
+if _project_root not in sys.path:
+    sys.path.insert(0, _project_root)
+
+try:
+    from app.routes.auth import router as _auth_router
+    from app.routes.users import router as _users_router
+    from app.routes.admin import router as _admin_router
+    from app.database.connection import create_all_tables as _create_all_tables
+    app.include_router(_auth_router)
+    app.include_router(_users_router)
+    app.include_router(_admin_router)
+    _create_all_tables()
+    _logger.info("Auth, user, and admin routes loaded successfully.")
+except Exception as _e:
+    _logger.warning("Could not initialize auth/admin routes: %s", _e)
+
 
 
 OXYLABS_URL = "https://realtime.oxylabs.io/v1/queries"
