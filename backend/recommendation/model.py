@@ -1,16 +1,14 @@
 """
 backend/recommendation/model.py
 
-FashionCLIP singleton model manager.
+Fast FashionCLIP model manager.
 
 Responsibilities:
 - Load FashionCLIP exactly once.
-- Detect Intel XPU -> CUDA -> CPU.
-- Provide safe single/batch image and text embeddings.
-- Keep inference serialized through one dedicated executor.
-
-The recommendation system uses FashionCLIP as a semantic signal,
-not as the only outfit-compatibility mechanism.
+- Detect XPU -> CUDA -> CPU.
+- Serialize model inference through one executor.
+- Support fast batched image/text similarity.
+- Keep image and text embedding helpers available.
 """
 
 from __future__ import annotations
@@ -24,6 +22,7 @@ if TYPE_CHECKING:
     import torch
     from PIL import Image
     from transformers import CLIPModel, CLIPProcessor
+
 
 _logger = logging.getLogger(__name__)
 
@@ -43,36 +42,39 @@ _inference_executor = concurrent.futures.ThreadPoolExecutor(
 
 
 # ---------------------------------------------------------------------------
-# Device detection
+# Device
 # ---------------------------------------------------------------------------
 
-def _detect_device() -> "torch.device":
+def _detect_device():
     import torch
 
     try:
         if hasattr(torch, "xpu") and torch.xpu.is_available():
-            _logger.info("[RECOMMENDATION] FashionCLIP device=xpu")
+            _logger.info("[FASHIONCLIP] Using Intel XPU")
             return torch.device("xpu")
     except Exception:
         pass
 
     try:
         if torch.cuda.is_available():
-            _logger.info("[RECOMMENDATION] FashionCLIP device=cuda")
+            _logger.info("[FASHIONCLIP] Using CUDA")
             return torch.device("cuda")
     except Exception:
         pass
 
-    _logger.info("[RECOMMENDATION] FashionCLIP device=cpu")
+    _logger.info("[FASHIONCLIP] Using CPU")
     return torch.device("cpu")
 
 
 # ---------------------------------------------------------------------------
-# Model loading
+# Loading
 # ---------------------------------------------------------------------------
 
 def _ensure_loaded() -> bool:
-    global _model, _processor, _device, _load_failed
+    global _model
+    global _processor
+    global _device
+    global _load_failed
 
     if _model is not None:
         return True
@@ -89,7 +91,7 @@ def _ensure_loaded() -> bool:
 
         try:
             _logger.info(
-                "[RECOMMENDATION] Loading FashionCLIP (%s)...",
+                "[FASHIONCLIP] Loading model: %s",
                 _MODEL_NAME,
             )
 
@@ -103,20 +105,23 @@ def _ensure_loaded() -> bool:
                 clean_up_tokenization_spaces=True,
             )
 
-            model = CLIPModel.from_pretrained(_MODEL_NAME)
+            model = CLIPModel.from_pretrained(
+                _MODEL_NAME,
+            )
 
             model.to(device)
             model.eval()
 
-            # Avoid excessive CPU threading / uvicorn interaction.
-            torch.set_num_threads(1)
+            # Keep CPU inference predictable.
+            if device.type == "cpu":
+                torch.set_num_threads(1)
 
             _processor = processor
             _model = model
             _device = device
 
             _logger.info(
-                "[RECOMMENDATION] FashionCLIP loaded successfully on %s",
+                "[FASHIONCLIP] Model loaded successfully on %s",
                 device,
             )
 
@@ -126,7 +131,7 @@ def _ensure_loaded() -> bool:
             _load_failed = True
 
             _logger.error(
-                "[RECOMMENDATION] FashionCLIP failed to load: %s",
+                "[FASHIONCLIP] Model loading failed: %s",
                 exc,
                 exc_info=True,
             )
@@ -134,14 +139,10 @@ def _ensure_loaded() -> bool:
             return False
 
 
-# ---------------------------------------------------------------------------
-# Public model access
-# ---------------------------------------------------------------------------
-
 def get_model_and_processor():
     if not _ensure_loaded():
         raise RuntimeError(
-            "FashionCLIP model is not available. "
+            "FashionCLIP model is unavailable. "
             "Check backend logs for the original error."
         )
 
@@ -162,7 +163,7 @@ def _run_in_executor(fn, *args):
 
 
 # ---------------------------------------------------------------------------
-# Internal embedding implementations
+# Image embeddings
 # ---------------------------------------------------------------------------
 
 def _image_embeddings_impl(images):
@@ -177,10 +178,36 @@ def _image_embeddings_impl(images):
 
     with torch.inference_mode():
         features = model.get_image_features(**inputs)
-        features = features / features.norm(dim=-1, keepdim=True)
+
+        features = features / features.norm(
+            dim=-1,
+            keepdim=True,
+        )
 
     return features.cpu()
 
+
+def get_image_embeddings(images):
+    images = list(images)
+
+    if not images:
+        raise ValueError(
+            "At least one image is required."
+        )
+
+    return _run_in_executor(
+        _image_embeddings_impl,
+        images,
+    )
+
+
+def get_image_embedding(image):
+    return get_image_embeddings([image])
+
+
+# ---------------------------------------------------------------------------
+# Text embeddings
+# ---------------------------------------------------------------------------
 
 def _text_embeddings_impl(texts):
     import torch
@@ -197,46 +224,112 @@ def _text_embeddings_impl(texts):
 
     with torch.inference_mode():
         features = model.get_text_features(**inputs)
-        features = features / features.norm(dim=-1, keepdim=True)
+
+        features = features / features.norm(
+            dim=-1,
+            keepdim=True,
+        )
 
     return features.cpu()
 
 
-# ---------------------------------------------------------------------------
-# Public embeddings API
-# ---------------------------------------------------------------------------
+def get_text_embeddings(texts: Sequence[str]):
+    texts = list(texts)
 
-def get_image_embedding(image):
-    """Return normalized image embedding with shape (1, embedding_dim)."""
-    return get_image_embeddings([image])
-
-
-def get_image_embeddings(images):
-    """Return normalized batch image embeddings."""
-    images = list(images)
-
-    if not images:
-        raise ValueError("At least one image is required.")
+    if not texts:
+        raise ValueError(
+            "At least one text is required."
+        )
 
     return _run_in_executor(
-        _image_embeddings_impl,
-        images,
+        _text_embeddings_impl,
+        texts,
     )
 
 
 def get_text_embedding(text: str):
-    """Return normalized text embedding with shape (1, embedding_dim)."""
     return get_text_embeddings([text])
 
 
-def get_text_embeddings(texts: Sequence[str]):
-    """Return normalized batch text embeddings."""
+# ---------------------------------------------------------------------------
+# FAST image -> text similarity
+# ---------------------------------------------------------------------------
+
+def _image_text_similarity_impl(
+    image,
+    texts: list[str],
+):
+    """
+    One model execution for:
+        image embedding
+        +
+        all candidate text embeddings
+
+    This is considerably faster than running four separate
+    zero-shot classification calls.
+    """
+
+    import torch
+
+    model, processor, device = get_model_and_processor()
+
+    image_inputs = processor(
+        images=[image],
+        return_tensors="pt",
+    ).to(device)
+
+    text_inputs = processor(
+        text=texts,
+        return_tensors="pt",
+        padding=True,
+        truncation=True,
+        max_length=77,
+    ).to(device)
+
+    with torch.inference_mode():
+        image_features = model.get_image_features(
+            **image_inputs
+        )
+
+        text_features = model.get_text_features(
+            **text_inputs
+        )
+
+        image_features = image_features / image_features.norm(
+            dim=-1,
+            keepdim=True,
+        )
+
+        text_features = text_features / text_features.norm(
+            dim=-1,
+            keepdim=True,
+        )
+
+        scores = image_features @ text_features.T
+
+    return scores[0].cpu()
+
+
+def get_image_text_similarity(
+    image,
+    texts: Sequence[str],
+):
+    """
+    Return cosine-style FashionCLIP similarity scores.
+
+    All text candidates are evaluated against the image in one
+    serialized model execution.
+    """
+
     texts = list(texts)
 
     if not texts:
-        raise ValueError("At least one text is required.")
+        raise ValueError(
+            "At least one text candidate is required."
+        )
 
     return _run_in_executor(
-        _text_embeddings_impl,
+        _image_text_similarity_impl,
+        image,
         texts,
     )
