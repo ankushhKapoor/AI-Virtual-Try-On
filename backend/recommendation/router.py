@@ -27,12 +27,11 @@ def _merge_attributes(
     """
     Merge product metadata with classifier output.
 
-    Explicit product metadata is preferred when available.
+    Explicit product metadata takes priority when available.
     """
 
     merged = dict(classified or {})
 
-    # Product-level metadata takes priority when present.
     for key in (
         "category",
         "color",
@@ -47,11 +46,9 @@ def _merge_attributes(
         if value:
             merged[key] = value
 
-    # Keep title available for downstream recommendation logic.
     if product.get("title"):
         merged["title"] = product["title"]
 
-    # Keep image information available.
     if product.get("image"):
         merged["image"] = product["image"]
 
@@ -65,6 +62,52 @@ def _merge_attributes(
 
 
 # ---------------------------------------------------------------------------
+# Request Payload Helper
+# ---------------------------------------------------------------------------
+
+def _unwrap_product_payload(
+    payload: Dict[str, Any],
+) -> Dict[str, Any]:
+    """
+    Accept both of these request formats:
+
+    1. Direct product object:
+
+        {
+            "asin": "...",
+            "title": "...",
+            "image": "..."
+        }
+
+    2. Wrapped product object:
+
+        {
+            "product": {
+                "asin": "...",
+                "title": "...",
+                "image": "..."
+            }
+        }
+
+    Supporting both keeps the API backward-compatible with
+    the existing frontend.
+    """
+
+    if not isinstance(payload, dict):
+        raise HTTPException(
+            status_code=400,
+            detail="Request body must be a JSON object.",
+        )
+
+    wrapped_product = payload.get("product")
+
+    if isinstance(wrapped_product, dict):
+        return wrapped_product
+
+    return payload
+
+
+# ---------------------------------------------------------------------------
 # Recommendation Logic
 # ---------------------------------------------------------------------------
 
@@ -72,7 +115,8 @@ def get_recommendations(
     product: Dict[str, Any],
 ) -> Dict[str, Any]:
     """
-    Classify the input product and generate outfit recommendations.
+    Classify the selected product and generate complementary
+    outfit recommendations.
     """
 
     if not isinstance(product, dict):
@@ -87,24 +131,38 @@ def get_recommendations(
         or product.get("thumbnail")
     )
 
-    # Run classifier using the image when available.
+    # ---------------------------------------------------------------
+    # FashionCLIP classification
+    # ---------------------------------------------------------------
+
     classified = classify_product(
         image_url=image_url,
         title=product.get("title", ""),
     )
 
-    # Combine classifier output with product metadata.
+    # ---------------------------------------------------------------
+    # Merge classifier output with explicit product metadata
+    # ---------------------------------------------------------------
+
     attributes = _merge_attributes(
         product,
         classified,
     )
 
-    # Generate recommendations.
-    #
-    # Keep the call compatible with the current recommender
-    # implementation.
+    # ---------------------------------------------------------------
+    # Generate recommendations
+    # ---------------------------------------------------------------
+
+    domain = (
+        product.get("domain")
+        or product.get("amazon_domain")
+        or "in"
+    )
+
     recommendations = build_recommendations(
         attributes=attributes,
+        source_product=product,
+        domain=domain,
     )
 
     return {
@@ -120,19 +178,17 @@ def get_recommendations(
 
 @router.post("")
 def recommendation_endpoint(
-    product: Dict[str, Any],
+    payload: Dict[str, Any],
 ):
     """
     Generate outfit recommendations for a product.
 
-    Request body can be the product object directly, for example:
-
-    {
-        "asin": "B0XXXXXXX",
-        "title": "Women's Black Top",
-        "image": "https://..."
-    }
+    Both direct and wrapped request formats are supported.
     """
+
+    product = _unwrap_product_payload(
+        payload
+    )
 
     if not product:
         raise HTTPException(
@@ -141,13 +197,20 @@ def recommendation_endpoint(
         )
 
     try:
-        return get_recommendations(product)
+
+        return get_recommendations(
+            product
+        )
 
     except HTTPException:
         raise
 
     except Exception as exc:
+
         raise HTTPException(
             status_code=500,
-            detail=f"Recommendation generation failed: {str(exc)}",
+            detail=(
+                "Recommendation generation failed: "
+                f"{str(exc)}"
+            ),
         )
