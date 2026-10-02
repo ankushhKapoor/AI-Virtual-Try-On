@@ -2,7 +2,7 @@
 
 This module implements the **OLAP Data Warehouse (Star Schema)**, the **ETL Pipeline**, and the **Data Mining Layer** for the AI Virtual Try-On platform. It operates as an independent analytical service reading from the operational OLTP database (`virtual_tryon`) and loading into a dedicated analytical warehouse database (`virtual_tryon_dwh`).
 
-> **Note on Scope**: Per architectural design specifications, user clustering / K-Means has been explicitly excluded from this module.
+For the complete, extensive project guide with Excel datasets and dashboard integration, refer to [DWM_README.md](../DWM_README.md).
 
 ---
 
@@ -41,19 +41,23 @@ graph TD
 
     subgraph Mining ["Data Mining Layer (dwm/mining/)"]
         Apriori["association_rules.py\n(Apriori Recommendation Rules)"]
+        KMeans["kmeans_clustering.py\n(User Segmentation Clustering)"]
         Correlation["correlation_analysis.py\n(Failure & Quality Analysis)"]
         Rollups["rollups.py\n(Daily & Monthly Time-Series Rollups)"]
 
         Fact --> Apriori
+        Fact --> KMeans
         Fact --> Correlation
         Fact --> Rollups
         
         RulesTable["mining_association_rules"]
+        ProfilesTable["mining_kmeans_cluster_profiles"]
         CorrTable["mining_quality_correlations"]
         DailyTable["agg_tryon_daily"]
         MonthlyTable["agg_tryon_monthly"]
 
         Apriori --> RulesTable
+        KMeans --> ProfilesTable
         Correlation --> CorrTable
         Rollups --> DailyTable
         Rollups --> MonthlyTable
@@ -85,6 +89,7 @@ dwm/
 └── mining/
     ├── __init__.py              # Data mining package exports
     ├── association_rules.py     # Pure-Python Apriori algorithm discovering co-tried products
+    ├── kmeans_clustering.py     # K-Means user segmentation with dynamic K & persona labelling
     ├── correlation_analysis.py  # Model failure / quality correlation across dimensions
     └── rollups.py               # Daily and monthly pre-aggregated OLAP time-series rollups
 ```
@@ -104,8 +109,8 @@ dwm/
   - `device_key` (`BIGINT`, FK → `dim_device.device_key`).
   - `outcome_key` (`BIGINT`, FK → `dim_outcome.outcome_key`).
   - `processing_time_ms` (`INT`): Total latency in milliseconds.
-  - `quality_score` (`DECIMAL(4,2)`): Model synthetic output quality metric.
-  - `user_rating` (`INT`): Explicit customer rating (1-5), if given.
+  - `quality_score` (`DECIMAL(4,2)`): Model synthetic output quality metric ($0.00$ to $1.00$).
+  - `user_rating` (`INT`): Explicit customer rating ($1 - 5$), if given.
   - `retry_count` (`INT`): Number of attempts before completion.
   - `saved_after_tryon` (`BOOLEAN`): Whether customer wishlisted/saved look.
 
@@ -130,92 +135,46 @@ dwm/
 
 ---
 
-## 4. How to Run the Pipeline & Mining Jobs
+## 4. The 4 Data Mining Techniques
 
-Make sure the virtual environment is activated:
+1. **Association Rule Mining (Apriori)**:
+   - Module: `dwm/mining/association_rules.py`
+   - Purpose: Discovers frequently tried-together apparel itemsets for bundling recommendations.
+2. **Clustering (K-Means User Segmentation)**:
+   - Module: `dwm/mining/kmeans_clustering.py`
+   - Purpose: Partitions user base into behavioral personas (*Power Shoppers VIPs*, *Engaged Explorers*, *Occasional Trial*, *At-Risk / Sensitive*) across try-on volume, success rate, quality, and wishlist rate.
+3. **Correlation Analysis**:
+   - Module: `dwm/mining/correlation_analysis.py`
+   - Purpose: Pinpoints root causes of AI model failures across devices, upload methods, fabric types, and peak hours.
+4. **OLAP Time-Series Rollups**:
+   - Module: `dwm/mining/rollups.py`
+   - Purpose: Pre-aggregates daily and monthly analytical summaries for rapid executive dashboards.
+
+---
+
+## 5. How to Run
+
+### Run Standalone Mining & Pipeline Scripts
 ```powershell
-# Windows
-.\venv\Scripts\Activate.ps1
+# Run ETL Pipeline
+.\venv\Scripts\python.exe dwm/etl/run_pipeline.py
 
-# Linux / macOS
-source venv/bin/activate
+# Run Apriori
+.\venv\Scripts\python.exe dwm/mining/association_rules.py
+
+# Run K-Means Clustering
+.\venv\Scripts\python.exe dwm/mining/kmeans_clustering.py
+
+# Run Correlation Analysis
+.\venv\Scripts\python.exe dwm/mining/correlation_analysis.py
+
+# Refresh Rollups
+.\venv\Scripts\python.exe dwm/mining/rollups.py
 ```
 
-### Step 1: (Optional) Seed Synthetic Demo Data in OLTP
-If starting with an empty database, seed realistic users, products, and try-on jobs:
-```bash
-python scripts/seed_demo_data.py
+### Run the Interactive Admin Web Dashboard
+Launch the web interface using:
+```powershell
+.\run_web.bat
 ```
-
-### Step 2: Initialize DWH & Run the ETL Pipeline
-Run incremental ETL (reads only new jobs since the last watermark):
-```bash
-python dwm/etl/run_pipeline.py
-```
-
-To force a full historical re-extraction:
-```bash
-python dwm/etl/run_pipeline.py --full-refresh
-```
-
-### Step 3: Run Apriori Association Rule Mining
-Generates "frequently tried together" product recommendation rules:
-```bash
-python dwm/mining/association_rules.py
-```
-*Results are written to `virtual_tryon_dwh.mining_association_rules`.*
-
-### Step 4: Run Failure Correlation Analysis
-Analyzes why the model fails across devices, categories, price brackets, and time:
-```bash
-python dwm/mining/correlation_analysis.py
-```
-*Results are written to `virtual_tryon_dwh.mining_quality_correlations`.*
-
-### Step 5: Refresh OLAP Time-Series Rollups
-Pre-computes daily and monthly usage summaries for executive and admin dashboards:
-```bash
-python dwm/mining/rollups.py
-```
-*Results are written to `virtual_tryon_dwh.agg_tryon_daily` and `agg_tryon_monthly`.*
-
----
-
-## 5. Automation & Scheduling (Cron / Celery)
-
-The pipeline and mining jobs are structured as pure Python entrypoints and can easily be automated:
-
-```python
-from dwm.etl import run_etl_pipeline
-from dwm.mining import (
-    generate_and_save_association_rules,
-    generate_and_save_correlations,
-    refresh_all_rollups
-)
-
-def nightly_analytics_job():
-    # 1. Sync latest operational data
-    run_etl_pipeline(full_refresh=False)
-    # 2. Update rollups
-    refresh_all_rollups()
-    # 3. Recompute mining models
-    generate_and_save_association_rules(min_support=0.05, min_confidence=0.2, min_lift=1.0)
-    generate_and_save_correlations()
-```
-
----
-
-## 6. Upstream Dependencies & Field Gaps to Communicate to Teammates
-
-For the analytics warehouse to transition from proxy fallbacks to true production telemetry, the following items must be provided upstream:
-
-1. **`vton_jobs` Table Extensions**:
-   - `quality_score`: Upstream AI inference engine (`ankush-model`) needs to write the visual quality metric (e.g. SSIM / LPIPS / FID proxy score).
-   - `user_rating`: Frontend customer feedback modal rating (1-5 stars) needs an API endpoint to record into `vton_jobs`.
-   - `retry_count`: Track execution retry attempts per job.
-   - `device_type` & `upload_method`: Capture client metadata (`Mobile`/`Desktop`, `Camera`/`Gallery`) at try-on initiation.
-   - `failure_reason`: When status is `FAILED`, record the specific failure reason (e.g. `Face Occlusion`, `Pose Distortion`, `CUDA Out of Memory`, `Timeout`).
-2. **Product Taxonomy (`products` table)**:
-   - Provide `color` and `pattern` as explicit database fields rather than deriving them from title heuristics.
-3. **Persisted Wishlist / Saved Looks**:
-   - The "saved after try-on" signal is currently stored in client-side `localStorage` on frontend branches (`rakshita-frontend`). An API endpoint is needed to persist saved looks to MySQL so ETL can populate `saved_after_tryon`.
+Navigate to `http://localhost:5173/admin/login` (Login: `admin@example.com` / *(Configured Admin Password)*) and click **"DWM Data Mining Hub"**.

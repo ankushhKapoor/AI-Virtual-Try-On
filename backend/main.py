@@ -1,4 +1,4 @@
-﻿from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
@@ -139,14 +139,16 @@ try:
     from app.routes.auth import router as _auth_router
     from app.routes.users import router as _users_router
     from app.routes.admin import router as _admin_router
+    from app.routes.dwm import router as _dwm_router
     from app.database.connection import create_all_tables as _create_all_tables
     app.include_router(_auth_router)
     app.include_router(_users_router)
     app.include_router(_admin_router)
+    app.include_router(_dwm_router)
     _create_all_tables()
-    _logger.info("Auth, user, and admin routes loaded successfully.")
+    _logger.info("Auth, user, admin, and DWM analytics routes loaded successfully.")
 except Exception as _e:
-    _logger.warning("Could not initialize auth/admin routes: %s", _e)
+    _logger.warning("Could not initialize auth/admin/dwm routes: %s", _e)
 
 
 
