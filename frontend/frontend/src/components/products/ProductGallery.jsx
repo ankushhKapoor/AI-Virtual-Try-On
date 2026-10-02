@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight, ImageOff } from 'lucide-react'
 import { useState } from 'react'
 import SafeImage from '../SafeImage'
+import { resolveBackendUrl } from '../../services/urls'
 
 function ProductGallery({ product = {} }) {
   const fallbackImage = product.image || product.image_url || product.thumbnail || null
@@ -42,7 +43,7 @@ function ProductGallery({ product = {} }) {
               }`}
               aria-label={`Show product image ${index + 1}`}
             >
-              <img src={image} alt="" className="size-20 object-cover sm:size-[4.5rem]" />
+              <img src={resolveBackendUrl(image)} alt="" className="size-20 object-cover sm:size-[4.5rem]" />
             </button>
           ))}
         </div>

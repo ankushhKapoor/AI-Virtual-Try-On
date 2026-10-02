@@ -1,5 +1,6 @@
 import { ImageOff } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { resolveBackendUrl } from '../services/urls'
 
 /**
  * SafeImage – renders an <img> that gracefully falls back to an icon
@@ -30,7 +31,7 @@ function SafeImage({ src, alt, className = '', fallbackClassName = '' }) {
 
   return (
     <img
-      src={src}
+      src={resolveBackendUrl(src)}
       alt={alt || 'Product image'}
       referrerPolicy="no-referrer"
       onError={() => setFailed(true)}

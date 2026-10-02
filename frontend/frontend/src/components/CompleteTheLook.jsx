@@ -19,7 +19,7 @@ import { Sparkles } from 'lucide-react'
 import ProductCard from './ProductCard'
 import LoadingSpinner from './LoadingSpinner'
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+import { API_BASE_URL } from '../services/urls'
 
 
 // Slot display metadata

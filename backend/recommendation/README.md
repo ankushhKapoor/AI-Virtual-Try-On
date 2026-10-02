@@ -26,7 +26,7 @@ router.py  ──→  classifier.py  ──→  FashionCLIP (patrickjohncyh/fash
                      │
                      ▼ search queries per slot
                      │
-               GET /search  (EXISTING endpoint)
+               shared product-search service
                      │
                      ▼
                Existing TTL cache + Oxylabs
@@ -95,8 +95,8 @@ For each outfit slot, `recommender.py` builds a natural-language search query:
 color + style + gender + category  →  "white casual men's t-shirt"
 ```
 
-It then calls the **existing** `GET /search` endpoint on the same FastAPI server.
-This reuses:
+It calls the same `search_products_data()` function used by `GET /search`.
+This avoids an HTTP request back into the server and reuses:
 - The existing Oxylabs integration (unchanged)
 - The existing server-side TTL cache (`_search_cache`, 30 min TTL)
 

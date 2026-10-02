@@ -10,9 +10,8 @@ import ProcessingAnimation from '../components/tryon/ProcessingAnimation'
 import ProcessingSteps from '../components/tryon/ProcessingSteps'
 import TryOnProgress from '../components/tryon/TryOnProgress'
 import useTryOn from '../hooks/useTryOn'
+import { API_BASE_URL, MODEL_BASE_URL } from '../services/urls'
 
-const MODEL_API_URL = (import.meta.env.VITE_MODEL_API_URL || 'http://127.0.0.1:8001').replace(/\/$/, '')
-const BACKEND_API_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
 
 function Processing() {
   const navigate = useNavigate()
@@ -75,12 +74,12 @@ function Processing() {
         setProgress(40)
         let response
         try {
-          response = await fetch(MODEL_API_URL + '/tryon', {
+          response = await fetch(MODEL_BASE_URL + '/tryon', {
             method: 'POST',
             body: formData,
           })
         } catch {
-          response = await fetch(BACKEND_API_URL + '/tryon', {
+          response = await fetch(API_BASE_URL + '/tryon', {
             method: 'POST',
             body: formData,
           })

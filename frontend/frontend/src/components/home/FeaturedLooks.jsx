@@ -5,7 +5,7 @@ import OutfitCard from '../OutfitCard'
 import SectionHeading from '../SectionHeading'
 import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../../services/urls'
 
 const lookQueries = [
   {

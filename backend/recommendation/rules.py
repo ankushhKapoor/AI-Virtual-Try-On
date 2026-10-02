@@ -1,1066 +1,228 @@
-"""
-Recommendation rules.
+﻿"""
+backend/recommendation/rules.py
+--------------------------------
+Outfit compatibility rules — single source of truth.
 
-This file defines:
-- canonical clothing categories
-- aliases
-- outfit slots
-- complements
-- style preferences
-- color compatibility
+All mappings live here. To extend:
+  - Add new keys to CATEGORY_COMPLEMENTS
+  - Add new entries to SLOT_CATEGORIES
+  - Add new color entries to COLOR_COMPATIBILITY
+  - Add new style entries to STYLE_CATEGORY_HINTS
+
+No if/else trees — just dict lookups.
 """
 
 from __future__ import annotations
 
-import re
-
-
-# ============================================================
-# CATEGORY NORMALIZATION
-# ============================================================
-
-CATEGORY_ALIASES: dict[str, str] = {
-    # Tops
-    "tee": "t-shirt",
-    "tees": "t-shirt",
-    "tshirt": "t-shirt",
-    "t shirts": "t-shirt",
-    "t shirt": "t-shirt",
-    "graphic tee": "t-shirt",
-
-    "button down": "shirt",
-    "button-down": "shirt",
-    "button down shirt": "shirt",
-    "formal shirt": "shirt",
-    "casual shirt": "shirt",
-    "dress shirt": "shirt",
-
-    "crop top": "crop top",
-    "tank": "tank top",
-    "tanktop": "tank top",
-    "camisole top": "camisole",
-
-    # Indian / ethnic
-    "kurti": "kurti",
-    "kurtis": "kurti",
-    "kurta": "kurta",
-
-    "kurta set": "kurta set",
-    "kurti set": "kurti set",
-    "kurtis set": "kurti set",
-    "salwar set": "salwar suit",
-    "salwar kameez": "salwar suit",
-    "salwar suit": "salwar suit",
-    "suit set": "salwar suit",
-
-    "lehenga set": "lehenga set",
-    "lehenga choli": "lehenga set",
-    "sharara set": "ethnic set",
-    "gharara set": "ethnic set",
-    "ethnic set": "ethnic set",
-
-    "coord set": "co-ord set",
-    "co ord set": "co-ord set",
-    "co-ord set": "co-ord set",
-    "coordinated set": "co-ord set",
-    "two piece set": "co-ord set",
-    "two-piece set": "co-ord set",
-    "three piece set": "co-ord set",
-    "three-piece set": "co-ord set",
-
-    # Bottoms
-    "denim": "jeans",
-    "denim jeans": "jeans",
-
-    "pant": "pants",
-    "trouser": "trousers",
-
-    "cargo pant": "cargo pants",
-    "cargo pants": "cargo pants",
-
-    "track pant": "track pants",
-    "track pants": "track pants",
-
-    "jogger": "joggers",
-
-    "palazzo pant": "palazzo",
-    "palazzo pants": "palazzo",
-
-    "dhoti pant": "dhoti pants",
-    "dhoti pants": "dhoti pants",
-
-    # Outerwear
-    "windbreaker": "jacket",
-    "bomber": "jacket",
-    "puffer": "jacket",
-
-    "overcoat": "coat",
-
-    # Footwear
-    "running shoe": "running shoes",
-    "running shoes": "running shoes",
-    "sneaker": "sneakers",
-
-    "loafer": "loafers",
-
-    "boot": "boots",
-
-    "flat": "flats",
-    "flat shoes": "flats",
-
-    "jutti": "juttis",
-    "juttis": "juttis",
-    "mojari": "mojaris",
-    "mojaris": "mojaris",
-
-    "formal shoe": "formal shoes",
-    "formal shoes": "formal shoes",
-
-    # Accessories
-    "hand bag": "handbag",
-    "purse": "handbag",
-    "tote": "bag",
-    "tote bag": "bag",
-
-    "cap": "hat",
-    "sun hat": "hat",
-
-    "earrings": "earrings",
-    "earring": "earrings",
-
-    "necklace": "necklace",
-    "bracelet": "bracelet",
-
-    "scarf": "scarf",
-    "dupatta": "dupatta",
-}
-
-
-def normalize_category(category: str | None) -> str | None:
-    if not category:
-        return None
-
-    value = re.sub(
-        r"\s+",
-        " ",
-        str(category).strip().lower(),
-    )
-
-    if not value:
-        return None
-
-    if value in CATEGORY_ALIASES:
-        return CATEGORY_ALIASES[value]
-
-    # Important compound categories first.
-    compound_patterns = [
-        (r"\bkurta\s*set\b", "kurta set"),
-        (r"\bkurti\s*set\b", "kurti set"),
-        (r"\bsalwar\s*(suit|set|kameez)\b", "salwar suit"),
-        (r"\blehenga\s*(set|choli)\b", "lehenga set"),
-        (r"\b(sharara|gharara)\s*set\b", "ethnic set"),
-        (r"\bco[- ]?ord(?:inated)?\s*set\b", "co-ord set"),
-        (r"\b(two|three)[ -]?piece\s*set\b", "co-ord set"),
-    ]
-
-    for pattern, canonical in compound_patterns:
-        if re.search(pattern, value, re.I):
-            return canonical
-
-    return value
-
-
-# ============================================================
-# FULL OUTFIT / SET CATEGORIES
-# ============================================================
-
-SET_CATEGORIES = {
-    "kurta set",
-    "kurti set",
-    "salwar suit",
-    "lehenga set",
-    "ethnic set",
-    "co-ord set",
-}
-
-
-FULL_BODY_CATEGORIES = {
-    "dress",
-    "gown",
-    "shirt dress",
-    "jumpsuit",
-    "romper",
-    "playsuit",
-    "saree",
-    "lehenga",
-    "anarkali",
-    "kaftan",
-}
-
-
-# ============================================================
-# SOURCE CATEGORY -> RECOMMENDATION SLOTS
-# ============================================================
+# ---------------------------------------------------------------------------
+# Category → which outfit slots are recommended
+# ---------------------------------------------------------------------------
+# Each key is a FashionCLIP category label.
+# Each value is an ordered list of slot names to fill.
 
 CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
-    # ---------------- TOPS ----------------
-
-    "t-shirt": [
-        "bottom",
-        "footwear",
-    ],
-
-    "shirt": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "blouse": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "crop top": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "tank top": [
-        "bottom",
-        "footwear",
-    ],
-
-    "camisole": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "tunic": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "polo": [
-        "bottom",
-        "footwear",
-    ],
-
-    "bodysuit": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    # ---------------- INDIAN / ETHNIC ----------------
-
-    "kurta": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    "kurti": [
-        "bottom",
-        "footwear",
-        "accessory",
-    ],
-
-    # A set already contains top + bottom.
-    "kurta set": [
-        "footwear",
-        "accessory",
-    ],
-
-    "kurti set": [
-        "footwear",
-        "accessory",
-    ],
-
-    "salwar suit": [
-        "footwear",
-        "accessory",
-    ],
-
-    "lehenga set": [
-        "footwear",
-        "accessory",
-    ],
-
-    "ethnic set": [
-        "footwear",
-        "accessory",
-    ],
-
-    "saree": [
-        "footwear",
-        "accessory",
-    ],
-
-    "anarkali": [
-        "footwear",
-        "accessory",
-    ],
-
-    # ---------------- FULL BODY ----------------
-
-    "dress": [
-        "footwear",
-        "accessory",
-    ],
-
-    "gown": [
-        "footwear",
-        "accessory",
-    ],
-
-    "shirt dress": [
-        "footwear",
-        "accessory",
-    ],
-
-    "jumpsuit": [
-        "footwear",
-        "accessory",
-    ],
-
-    "romper": [
-        "footwear",
-        "accessory",
-    ],
-
-    "playsuit": [
-        "footwear",
-        "accessory",
-    ],
-
-    "kaftan": [
-        "footwear",
-        "accessory",
-    ],
-
-    # ---------------- OUTERWEAR ----------------
-
-    "jacket": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "blazer": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "coat": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "cardigan": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "hoodie": [
-        "bottom",
-        "footwear",
-    ],
-
-    "sweatshirt": [
-        "bottom",
-        "footwear",
-    ],
-
-    "sweater": [
-        "bottom",
-        "footwear",
-    ],
-
-    "vest": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "shrug": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    # ---------------- BOTTOMS ----------------
-
-    "jeans": [
-        "top",
-        "footwear",
-    ],
-
-    "trousers": [
-        "top",
-        "footwear",
-    ],
-
-    "pants": [
-        "top",
-        "footwear",
-    ],
-
-    "chinos": [
-        "top",
-        "footwear",
-    ],
-
-    "cargo pants": [
-        "top",
-        "footwear",
-    ],
-
-    "track pants": [
-        "top",
-        "footwear",
-    ],
-
-    "joggers": [
-        "top",
-        "footwear",
-    ],
-
-    "shorts": [
-        "top",
-        "footwear",
-    ],
-
-    "skirt": [
-        "top",
-        "footwear",
-        "accessory",
-    ],
-
-    "leggings": [
-        "top",
-        "footwear",
-    ],
-
-    "palazzo": [
-        "top",
-        "footwear",
-    ],
-
-    "dhoti pants": [
-        "top",
-        "footwear",
-    ],
-
-    # ---------------- FOOTWEAR ----------------
-
-    "sneakers": [
-        "top",
-        "bottom",
-    ],
-
-    "running shoes": [
-        "top",
-        "bottom",
-    ],
-
-    "shoes": [
-        "top",
-        "bottom",
-    ],
-
-    "formal shoes": [
-        "top",
-        "bottom",
-    ],
-
-    "loafers": [
-        "top",
-        "bottom",
-    ],
-
-    "boots": [
-        "top",
-        "bottom",
-    ],
-
-    "sandals": [
-        "top",
-        "bottom",
-    ],
-
-    "heels": [
-        "top",
-        "bottom",
-    ],
-
-    "flats": [
-        "top",
-        "bottom",
-    ],
-
-    "juttis": [
-        "top",
-        "bottom",
-    ],
-
-    "mojaris": [
-        "top",
-        "bottom",
-    ],
-
-    # ---------------- ACCESSORIES ----------------
-
-    "bag": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "handbag": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "watch": [
-        "top",
-        "bottom",
-    ],
-
-    "belt": [
-        "top",
-        "bottom",
-    ],
-
-    "hat": [
-        "top",
-        "bottom",
-    ],
-
-    "sunglasses": [
-        "top",
-        "bottom",
-    ],
-
-    "earrings": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
-
-    "necklace": [
-        "top",
-        "bottom",
-    ],
-
-    "bracelet": [
-        "top",
-        "bottom",
-    ],
-
-    "scarf": [
-        "top",
-        "bottom",
-    ],
-
-    "dupatta": [
-        "top",
-        "bottom",
-        "footwear",
-    ],
+    # Tops
+    "t-shirt":      ["bottom", "footwear"],
+    "shirt":        ["bottom", "footwear"],
+    "blouse":       ["bottom", "footwear", "accessory"],
+    "top":          ["bottom", "footwear"],
+    "polo":         ["bottom", "footwear"],
+
+    # Outerwear
+    "jacket":       ["top", "bottom", "footwear"],
+    "blazer":       ["top", "bottom", "footwear"],
+    "coat":         ["top", "bottom", "footwear"],
+    "hoodie":       ["bottom", "footwear"],
+    "sweatshirt":   ["bottom", "footwear"],
+    "cardigan":     ["top", "bottom", "footwear"],
+    "sweater":      ["bottom", "footwear"],
+
+    # Bottoms
+    "jeans":        ["top", "footwear"],
+    "trousers":     ["top", "footwear"],
+    "pants":        ["top", "footwear"],
+    "shorts":       ["top", "footwear"],
+    "skirt":        ["top", "footwear", "accessory"],
+    "leggings":     ["top", "footwear"],
+    "chinos":       ["top", "footwear"],
+    "joggers":      ["top", "footwear"],
+
+    # Full-body
+    "dress":        ["footwear", "accessory"],
+    "jumpsuit":     ["footwear", "accessory"],
+    "kurta":        ["bottom", "footwear"],
+    "ethnic wear":  ["footwear", "accessory"],
+    "saree":        ["footwear", "accessory"],
+
+    # Footwear — recommend a full outfit
+    "sneakers":     ["top", "bottom"],
+    "shoes":        ["top", "bottom"],
+    "boots":        ["top", "bottom"],
+    "sandals":      ["top", "bottom"],
+    "heels":        ["top", "bottom"],
+    "loafers":      ["top", "bottom"],
+    "formal shoes": ["top", "bottom"],
+
+    # Accessories
+    "bag":          ["top", "bottom", "footwear"],
+    "handbag":      ["top", "bottom", "footwear"],
+    "watch":        ["top", "bottom"],
+    "belt":         ["top", "bottom"],
+    "hat":          ["top", "bottom"],
+    "sunglasses":   ["top", "bottom"],
+    "accessories":  ["top", "bottom", "footwear"],
 }
 
-
-# ============================================================
-# SLOT -> SEARCHABLE CATEGORIES
-# ============================================================
+# ---------------------------------------------------------------------------
+# Slot → candidate category labels (first is the default / most likely)
+# ---------------------------------------------------------------------------
 
 SLOT_CATEGORIES: dict[str, list[str]] = {
-    "top": [
-        "shirt",
-        "t-shirt",
-        "polo",
-        "blouse",
-        "crop top",
-        "tank top",
-        "tunic",
-        "kurta",
-        "kurti",
-        "sweater",
-        "sweatshirt",
-        "hoodie",
-    ],
-
-    "bottom": [
-        "jeans",
-        "trousers",
-        "chinos",
-        "pants",
-        "cargo pants",
-        "joggers",
-        "track pants",
-        "shorts",
-        "skirt",
-        "leggings",
-        "palazzo",
-        "dhoti pants",
-        "salwar",
-    ],
-
-    "footwear": [
-        "sneakers",
-        "running shoes",
-        "loafers",
-        "formal shoes",
-        "shoes",
-        "boots",
-        "sandals",
-        "heels",
-        "flats",
-        "juttis",
-        "mojaris",
-    ],
-
-    "accessory": [
-        "handbag",
-        "bag",
-        "watch",
-        "belt",
-        "sunglasses",
-        "hat",
-        "earrings",
-        "necklace",
-        "bracelet",
-        "scarf",
-        "dupatta",
-    ],
+    "top":       ["t-shirt", "shirt", "blouse", "top", "polo", "sweatshirt"],
+    "bottom":    ["jeans", "trousers", "chinos", "shorts", "skirt", "joggers"],
+    "footwear":  ["sneakers", "shoes", "boots", "sandals", "loafers", "heels"],
+    "accessory": ["bag", "handbag", "watch", "belt", "sunglasses"],
+    "outerwear": ["jacket", "blazer", "coat", "cardigan", "hoodie"],
 }
 
-
-# ============================================================
-# STYLE PREFERENCES
-# ============================================================
+# ---------------------------------------------------------------------------
+# Style → preferred categories per slot
+# ---------------------------------------------------------------------------
 
 STYLE_SLOT_PREFERENCES: dict[str, dict[str, list[str]]] = {
     "casual": {
-        "top": [
-            "t-shirt",
-            "shirt",
-            "polo",
-        ],
-        "bottom": [
-            "jeans",
-            "chinos",
-            "joggers",
-            "shorts",
-        ],
-        "footwear": [
-            "sneakers",
-            "running shoes",
-        ],
+        "top":      ["t-shirt", "polo", "sweatshirt"],
+        "bottom":   ["jeans", "chinos", "shorts", "joggers"],
+        "footwear": ["sneakers", "sandals"],
     },
-
-    "smart casual": {
-        "top": [
-            "shirt",
-            "polo",
-        ],
-        "bottom": [
-            "chinos",
-            "trousers",
-            "jeans",
-        ],
-        "footwear": [
-            "loafers",
-            "sneakers",
-        ],
-    },
-
     "formal": {
-        "top": [
-            "shirt",
-            "blouse",
-        ],
-        "bottom": [
-            "trousers",
-            "chinos",
-        ],
-        "footwear": [
-            "formal shoes",
-            "loafers",
-            "heels",
-        ],
+        "top":      ["shirt", "blouse"],
+        "bottom":   ["trousers", "chinos"],
+        "footwear": ["formal shoes", "loafers", "heels"],
+        "outerwear": ["blazer", "coat"],
     },
-
-    "business casual": {
-        "top": [
-            "shirt",
-            "blouse",
-            "polo",
-        ],
-        "bottom": [
-            "chinos",
-            "trousers",
-        ],
-        "footwear": [
-            "loafers",
-            "formal shoes",
-        ],
+    "smart casual": {
+        "top":      ["shirt", "polo", "blouse"],
+        "bottom":   ["chinos", "trousers", "dark jeans"],
+        "footwear": ["loafers", "sneakers", "heels"],
     },
-
     "streetwear": {
-        "top": [
-            "t-shirt",
-            "hoodie",
-            "sweatshirt",
-        ],
-        "bottom": [
-            "cargo pants",
-            "joggers",
-            "jeans",
-        ],
-        "footwear": [
-            "sneakers",
-            "boots",
-        ],
+        "top":      ["t-shirt", "hoodie", "sweatshirt"],
+        "bottom":   ["jeans", "joggers", "shorts"],
+        "footwear": ["sneakers", "boots"],
     },
-
     "sporty": {
-        "top": [
-            "t-shirt",
-            "polo",
-        ],
-        "bottom": [
-            "joggers",
-            "track pants",
-            "shorts",
-            "leggings",
-        ],
-        "footwear": [
-            "running shoes",
-            "sneakers",
-        ],
+        "top":      ["t-shirt", "polo", "sweatshirt"],
+        "bottom":   ["shorts", "joggers", "leggings"],
+        "footwear": ["sneakers"],
     },
-
     "ethnic": {
-        "top": [
-            "kurta",
-            "kurti",
-            "blouse",
-        ],
-        "bottom": [
-            "palazzo",
-            "salwar",
-            "skirt",
-        ],
-        "footwear": [
-            "juttis",
-            "mojaris",
-            "sandals",
-        ],
-        "accessory": [
-            "handbag",
-            "earrings",
-            "necklace",
-        ],
+        "top":      ["kurta", "blouse"],
+        "bottom":   ["trousers", "jeans", "skirt"],
+        "footwear": ["sandals", "shoes"],
     },
-
     "party": {
-        "top": [
-            "blouse",
-            "shirt",
-            "crop top",
-        ],
-        "bottom": [
-            "skirt",
-            "trousers",
-            "jeans",
-        ],
-        "footwear": [
-            "heels",
-            "boots",
-            "loafers",
-        ],
-        "accessory": [
-            "handbag",
-            "earrings",
-            "necklace",
-        ],
+        "top":      ["top", "blouse", "shirt"],
+        "bottom":   ["jeans", "skirt", "trousers"],
+        "footwear": ["heels", "boots", "sneakers"],
+        "accessory": ["bag", "handbag"],
+    },
+    "business casual": {
+        "top":      ["shirt", "blouse", "polo"],
+        "bottom":   ["chinos", "trousers"],
+        "footwear": ["loafers", "formal shoes", "heels"],
+        "outerwear": ["blazer"],
+    },
+    "minimalist": {
+        "top":      ["t-shirt", "shirt", "top"],
+        "bottom":   ["trousers", "jeans", "chinos"],
+        "footwear": ["sneakers", "loafers"],
     },
 }
 
-
-# ============================================================
-# COLORS
-# ============================================================
+# ---------------------------------------------------------------------------
+# Color compatibility — what colors pair well with each detected color
+# ---------------------------------------------------------------------------
 
 COLOR_COMPATIBILITY: dict[str, list[str]] = {
-    "black": [
-        "white",
-        "grey",
-        "beige",
-        "blue",
-        "olive",
-        "cream",
-    ],
-
-    "white": [
-        "black",
-        "blue",
-        "grey",
-        "beige",
-        "navy",
-        "olive",
-    ],
-
-    "grey": [
-        "white",
-        "black",
-        "navy",
-        "blue",
-        "burgundy",
-    ],
-
-    "navy": [
-        "white",
-        "beige",
-        "grey",
-        "light blue",
-        "camel",
-    ],
-
-    "blue": [
-        "white",
-        "black",
-        "grey",
-        "beige",
-        "brown",
-    ],
-
-    "olive": [
-        "beige",
-        "white",
-        "black",
-        "navy",
-        "brown",
-    ],
-
-    "green": [
-        "beige",
-        "white",
-        "brown",
-        "navy",
-        "black",
-    ],
-
-    "beige": [
-        "white",
-        "brown",
-        "black",
-        "navy",
-        "olive",
-    ],
-
-    "brown": [
-        "cream",
-        "beige",
-        "white",
-        "navy",
-        "olive",
-    ],
-
-    "cream": [
-        "brown",
-        "beige",
-        "navy",
-        "black",
-        "camel",
-    ],
-
-    "red": [
-        "black",
-        "white",
-        "navy",
-        "grey",
-        "beige",
-    ],
-
-    "maroon": [
-        "white",
-        "beige",
-        "black",
-        "grey",
-    ],
-
-    "burgundy": [
-        "white",
-        "grey",
-        "beige",
-        "black",
-    ],
-
-    "pink": [
-        "white",
-        "grey",
-        "black",
-        "navy",
-        "beige",
-    ],
-
-    "yellow": [
-        "white",
-        "black",
-        "navy",
-        "grey",
-    ],
-
-    "orange": [
-        "white",
-        "black",
-        "navy",
-        "beige",
-    ],
-
-    "purple": [
-        "white",
-        "grey",
-        "black",
-        "beige",
-    ],
-
-    "camel": [
-        "white",
-        "navy",
-        "beige",
-        "black",
-        "cream",
-    ],
+    "black":   ["white", "grey", "beige", "blue", "red", "olive", "cream"],
+    "white":   ["black", "blue", "grey", "beige", "brown", "navy", "olive"],
+    "grey":    ["white", "black", "navy", "blue", "burgundy", "pink"],
+    "navy":    ["white", "beige", "grey", "light blue", "camel"],
+    "blue":    ["white", "black", "grey", "beige", "brown"],
+    "red":     ["white", "black", "navy", "grey", "beige"],
+    "green":   ["white", "beige", "brown", "navy", "black"],
+    "olive":   ["white", "beige", "brown", "black", "navy"],
+    "beige":   ["white", "brown", "black", "navy", "olive", "camel"],
+    "brown":   ["white", "beige", "cream", "navy", "olive"],
+    "cream":   ["brown", "beige", "navy", "black", "camel"],
+    "pink":    ["white", "grey", "black", "navy", "beige"],
+    "yellow":  ["white", "black", "navy", "grey"],
+    "orange":  ["white", "black", "navy", "beige"],
+    "purple":  ["white", "grey", "black", "beige"],
+    "camel":   ["white", "navy", "beige", "black", "cream"],
+    "maroon":  ["white", "beige", "black", "grey"],
+    "burgundy": ["white", "grey", "beige", "black"],
 }
 
+# Neutral fallback when color is not detected
+DEFAULT_COMPATIBLE_COLORS = ["white", "black", "grey", "beige"]
 
-DEFAULT_COMPATIBLE_COLORS = [
-    "black",
-    "white",
-    "beige",
-    "grey",
-]
+# ---------------------------------------------------------------------------
+# Gender keyword hints for query building
+# ---------------------------------------------------------------------------
 
-
-# ============================================================
-# GENDER
-# ============================================================
-
-GENDER_QUERY_SUFFIX = {
-    "men": "men's",
-    "women": "women's",
-    "unisex": "",
+GENDER_QUERY_SUFFIX: dict[str, str] = {
+    "men":     "men's",
+    "women":   "women's",
+    "unisex":  "",
+    "unknown": "",
+    "":        "",
 }
 
-
-# ============================================================
-# HELPERS
-# ============================================================
-
-def resolve_complements(
-    category: str | None,
-) -> list[str]:
-    category = normalize_category(category)
-
-    if not category:
-        return [
-            "top",
-            "bottom",
-            "footwear",
-        ]
-
-    if category in CATEGORY_COMPLEMENTS:
-        return list(CATEGORY_COMPLEMENTS[category])
-
-    # Unknown set-like products should not get another top/bottom.
-    if category in SET_CATEGORIES:
-        return [
-            "footwear",
-            "accessory",
-        ]
-
-    if category in FULL_BODY_CATEGORIES:
-        return [
-            "footwear",
-            "accessory",
-        ]
-
-    return [
-        "top",
-        "bottom",
-        "footwear",
-    ]
-
+# ---------------------------------------------------------------------------
+# Helper: resolve which categories to use for a given slot, style, and base category
+# ---------------------------------------------------------------------------
 
 def resolve_slot_categories(
     slot: str,
     style: str | None,
-    source_category: str | None,
+    base_category: str | None,
 ) -> list[str]:
-    source_category = normalize_category(
-        source_category
-    )
+    """
+    Return an ordered list of category preferences for a slot,
+    using style preferences where available, falling back to
+    the generic SLOT_CATEGORIES.
+    """
+    # Try style-specific preferences first
+    if style and style in STYLE_SLOT_PREFERENCES:
+        style_cats = STYLE_SLOT_PREFERENCES[style].get(slot)
+        if style_cats:
+            return style_cats
 
-    candidates: list[str] = []
-
-    if style:
-        style_key = style.strip().lower()
-
-        style_candidates = (
-            STYLE_SLOT_PREFERENCES
-            .get(style_key, {})
-            .get(slot, [])
-        )
-
-        candidates.extend(style_candidates)
-
-    candidates.extend(
-        SLOT_CATEGORIES.get(slot, [slot])
-    )
-
-    # Never recommend the exact same category as the source.
-    if source_category:
-        candidates = [
-            category
-            for category in candidates
-            if normalize_category(category)
-            != source_category
-        ]
-
-    # Preserve order while removing duplicates.
-    result = []
-
-    for category in candidates:
-        if category not in result:
-            result.append(category)
-
-    return result or SLOT_CATEGORIES.get(
-        slot,
-        [slot],
-    )
+    # Fall back to generic slot categories
+    return SLOT_CATEGORIES.get(slot, [slot])
 
 
-def resolve_compatible_colors(
-    color: str | None,
-) -> list[str]:
+def resolve_compatible_colors(color: str | None) -> list[str]:
+    """Return a list of colors that pair well with the given color."""
     if not color:
         return DEFAULT_COMPATIBLE_COLORS
+    c = color.strip().lower()
+    return COLOR_COMPATIBILITY.get(c, DEFAULT_COMPATIBLE_COLORS)
 
-    color = color.strip().lower()
 
-    return COLOR_COMPATIBILITY.get(
-        color,
-        DEFAULT_COMPATIBLE_COLORS,
-    )
+def resolve_complements(category: str | None) -> list[str]:
+    """Return the outfit slots for a given detected clothing category."""
+    if not category:
+        return ["top", "bottom", "footwear"]
+    c = category.strip().lower()
+    # Direct match
+    if c in CATEGORY_COMPLEMENTS:
+        return CATEGORY_COMPLEMENTS[c]
+    # Partial match (e.g. "denim jacket" → "jacket")
+    for key, slots in CATEGORY_COMPLEMENTS.items():
+        if key in c:
+            return slots
+    # Default
+    return ["top", "bottom", "footwear"]

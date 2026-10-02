@@ -16,25 +16,31 @@ A full-stack AI-powered virtual try-on application. Browse Amazon clothing produ
 ## Architecture
 
 ```
-Browser (localhost:5173)
+Browser (localhost or LAN address :5173)
     |
-    |-- GET /search, /products --> Backend API (port 8000)
-    |                                FastAPI + Oxylabs --> Amazon
+    |-- /api/*   --> Vite proxy --> Backend API (configured by BACKEND_URL)
+    |                              FastAPI + Oxylabs --> Amazon
     |
-    |-- POST /tryon -----------> Model API (port 8001)
-                                    FastAPI + CatVTON (GPU)
-                                    Downloads clothing image
-                                    Runs diffusion model
-                                    Returns base64 PNG
+    |-- /model/* --> Vite proxy --> Model API (configured by MODEL_API_URL)
+                                   FastAPI + CatVTON (GPU)
+                                   Downloads clothing image
+                                   Runs diffusion model
+                                   Returns base64 PNG
 ```
+
+Frontend requests stay on the page's origin, so localhost and LAN access use
+the same API paths. Copy `.env.example` to `.env` to configure service targets,
+ports, database settings, and credentials. No frontend source edits or LAN IP
+entry are needed. `FRONTEND_ORIGINS` is only needed if a browser calls a service
+directly instead of going through the Vite proxy.
 
 ### Three Services
 
 | Service | Port | Runtime | Purpose |
 |---------|------|---------|---------|
-| **Frontend** | 5173 | Node / npm | React 19 + Vite 8 + TailwindCSS 4 |
-| **Backend API** | 8000 | Python venv / pip | Product search via Oxylabs/Amazon |
-| **Model API** | 8001 | Python / uv | CatVTON virtual try-on AI (CUDA) |
+| **Frontend** | `FRONTEND_PORT` (5173) | Node / npm | React 19 + Vite 8 + TailwindCSS 4 |
+| **Backend API** | `BACKEND_URL` (8000) | Python venv / pip | Product search via Oxylabs/Amazon |
+| **Model API** | `MODEL_API_URL` (8001) | Python / uv | CatVTON virtual try-on AI (CUDA) |
 
 ---
 
@@ -62,7 +68,12 @@ Before running for the first time, make sure you have:
 git clone https://github.com/ankushhKapoor/AI-Virtual-Try-On.git
 cd AI-Virtual-Try-On
 git switch dev1
+cp .env.example .env
 ```
+
+Edit `.env` for your database and service credentials. `BACKEND_URL` and
+`MODEL_API_URL` also set the service ports and Vite proxy targets; `FRONTEND_PORT`
+sets the Vite port. These defaults work on a fresh local setup.
 
 ### 2. Clone CatVTON (AI model — required)
 
@@ -78,8 +89,7 @@ git clone https://github.com/Zheng-Chong/CatVTON.git ai/CatVTON
 ### 3. Set up Oxylabs credentials
 
 ```bash
-cp backend/.env.example backend/.env
-# Open backend/.env and fill in your credentials:
+# Open the root .env and fill in your credentials:
 #   OXYLABS_USERNAME=your_username
 #   OXYLABS_PASSWORD=your_password
 ```

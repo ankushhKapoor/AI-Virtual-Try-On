@@ -1,4 +1,4 @@
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+import { API_BASE_URL } from './urls'
 
 class ApiError extends Error {
   constructor(status, message) {
@@ -9,7 +9,7 @@ class ApiError extends Error {
 }
 
 async function request(path, { method = 'GET', params, accessToken } = {}) {
-  const url = new URL(`${API_BASE_URL}${path}`)
+  const url = new URL(`${API_BASE_URL}${path}`, window.location.origin)
   if (params) Object.entries(params).forEach(([key, value]) => url.searchParams.set(key, value))
 
   let response

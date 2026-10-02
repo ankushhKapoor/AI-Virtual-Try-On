@@ -1,4 +1,4 @@
-"""
+﻿"""
 backend/recommendation/recommender.py
 ---------------------------------------
 Core recommendation logic.
@@ -7,12 +7,11 @@ Given clothing attributes (from the classifier), this module:
   1. Determines which outfit slots to fill (using rules.py)
   2. Selects the best category for each slot
   3. Builds a natural-language search query for each slot
-  4. Calls the EXISTING /search endpoint to get real Amazon products
+  4. Calls the shared product-search service to get Amazon products
   5. Returns structured recommendations
 
-The existing /search endpoint (same FastAPI app) is called via an internal
-HTTP request so all existing caching and Oxylabs integration is reused
-automatically.
+The API route and recommendation service share the same search function,
+including its existing cache and Oxylabs integration.
 """
 
 from __future__ import annotations
@@ -36,9 +35,6 @@ _logger = logging.getLogger(__name__)
 
 # Number of products to retrieve per outfit slot
 PRODUCTS_PER_SLOT = 4
-
-# Internal base URL for calling the existing /search endpoint
-_BACKEND_BASE = "http://127.0.0.1:8000"
 
 # Recommendation-level cache (in-process, avoids repeated attribute lookups)
 # Key: ASIN; Value: full recommendation response dict
@@ -139,53 +135,32 @@ def _build_query(
 
 
 # ---------------------------------------------------------------------------
-# Internal: call existing /search endpoint
+# Internal: use the shared product-search service
 # ---------------------------------------------------------------------------
 
 def _search_products(query: str, domain: str = "in") -> list[dict]:
-    """
-    Call search either via direct in-process call or via HTTP GET /search.
-    Direct call avoids network overhead and loopback deadlocks in single-worker environments.
-    """
     try:
-        from main import collect_search_products
-        products, _ = collect_search_products(query=query, domain=domain, geo_location="")
-        if products:
-            _logger.info(
-                "[RECOMMENDER] In-process search query=%r → %d products",
-                query, len(products),
-            )
-            return products
-    except Exception as exc:
-        _logger.debug("[RECOMMENDER] In-process search failed: %s, trying HTTP", exc)
+        import sys
 
-    import requests as http
+        # Uvicorn may load this app as either backend.main or main. Reuse the
+        # loaded module so recommendations share the API's search cache.
+        app_module = sys.modules.get("backend.main") or sys.modules.get("main")
+        if app_module is None:
+            from backend import main as app_module
 
-    url = f"{_BACKEND_BASE}/search"
-    params = {"query": query, "domain": domain}
-
-    try:
-        resp = http.get(url, params=params, timeout=30)
-        if not resp.ok:
-            _logger.warning(
-                "[RECOMMENDER] /search returned %d for query=%r",
-                resp.status_code, query,
-            )
-            return []
-        data = resp.json()
+        data = app_module.search_products_data(query, domain, "")
         products = data.get("products", [])
         _logger.info(
-            "[RECOMMENDER] /search query=%r → %d products",
+            "[RECOMMENDER] shared search query=%r → %d products",
             query, len(products),
         )
         return products
 
     except Exception as exc:
         _logger.error(
-            "[RECOMMENDER] /search call failed for query=%r: %s", query, exc,
+            "[RECOMMENDER] shared search failed for query=%r: %s", query, exc,
         )
         return []
-
 
 
 # ---------------------------------------------------------------------------
@@ -285,7 +260,7 @@ def build_recommendations(
             slot, slot_cat, query,
         )
 
-        # Fetch products (reuses existing /search + existing cache)
+        # Fetch products through the shared search service and its cache.
         try:
             products = _search_products(query, domain=domain)
             products = _score_products(products, slot_cat, color_hints)

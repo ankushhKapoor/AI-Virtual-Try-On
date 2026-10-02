@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { fetchJsonWithCache, TTL_PRODUCT } from '../../utils/apiCache'
 
-const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '')
+import { API_BASE_URL, resolveBackendUrl } from '../../services/urls'
 
 const HERO_ASIN = 'B0GLGKGCB4'
 const FALLBACK_HERO_IMAGE = 'https://m.media-amazon.com/images/I/81stfgnFx4L._SL1500_.jpg'
@@ -187,7 +187,7 @@ function Hero() {
               ) : heroImage ? (
 
                 <img
-                  src={heroImage}
+                  src={resolveBackendUrl(heroImage)}
                   alt="Amazon fashion product"
                   className="absolute inset-0 h-full w-full object-cover object-center"
                   loading="eager"
