@@ -1,0 +1,11 @@
+id,name,email,password_hash,created_at,try_on_count,image_path,is_active,updated_at,last_login_at
+1,Aarav Sharma,aarav@example.com,$2b$12$85bBw7T9CN.ZNqLYG.AN6uxt1x93FGehrpQjF1v/pijIVomU3mmWq,2026-08-20 12:43:47,8,,1,2026-09-18 18:14:27,
+2,Diya Patel,diya@example.com,$2b$12$YuRpBq/sFdaBiNH4cIoeWeCZUXpyXXDt7m0yOPZjpMhr8Pna5Heju,2026-08-24 12:43:47,9,,1,2026-09-18 18:14:27,
+3,Rohan Mehta,rohan@example.com,$2b$12$iwr9VmjPCrJAv.xa5Ot0zuNJZmHMpDXfuLBZylq0cEt6VZeEkZ6UC,2026-08-25 12:43:47,6,,1,2026-09-18 18:14:27,
+4,Ananya Iyer,ananya@example.com,$2b$12$dfxYulJHhmJDwG.q5y6LJO8Q7XNPJX6cNOwju2fb/nx9kbhd4uzYu,2026-08-25 12:43:47,13,,1,2026-09-18 18:14:27,
+5,Kabir Verma,kabir@example.com,$2b$12$dmCEipVKWmQvOA/kv.qYvezYTLtLLFZzvzUIdb3jB8cUVf45uafX6,2026-08-22 12:43:47,9,,1,2026-09-18 18:14:27,
+6,Ishita Rao,ishita@example.com,$2b$12$JU6G5kSM83pZg7shzUq6G.BhciVR21BSIgMpE7aGr0weFK93ThSzS,2026-09-03 12:43:48,15,,1,2026-09-18 18:14:27,
+7,Vivaan Gupta,vivaan@example.com,$2b$12$CfJdMC4bpTSYhX2.tR7qeegekvyhNeZCA9Qx2MoP.tmSSIdn.QcjC,2026-08-14 12:43:48,13,,1,2026-09-18 18:14:27,
+8,Meera Nair,meera@example.com,$2b$12$gHCljcu2tOhNJKbnPeSCAOhlTbeyFqMi2l1yy40Am7tK9yMs6ig.6,2026-08-04 12:43:48,9,,1,2026-09-18 18:14:27,
+9,Aditya Joshi,aditya@example.com,$2b$12$1nkmkNIQe1BidTj3BLozkeUbv.IQFmeWhfH29nNSBWGgQehCjjrWW,2026-08-14 12:43:48,13,,1,2026-09-18 18:14:27,
+10,Rhea Sengupta,rhea@example.com,$2b$12$70zTFdSCno9emWI7KmT61OvsPrWO9Av3AO0GwlQpRosjljX6OcWqG,2026-07-27 12:43:48,10,,1,2026-09-18 18:14:27,

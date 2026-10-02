@@ -1,0 +1,26 @@
+product_key,product_id,amazon_product_id,title,category,color,pattern,price,currency,price_bracket,product_url,image_url,created_at
+1,1,B08DENIM01,Casual Blue Denim Jacket,Jackets,Blue,Denim,2499.0,INR,Premium (>2000),https://www.amazon.in/dp/B08DENIM01,https://images-amazon.mock/images/B08DENIM01.jpg,2025-01-11 10:00:00
+2,2,B08SHIRT02,Slim Fit White Formal Shirt,Shirts,White,Solid,1299.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08SHIRT02,https://images-amazon.mock/images/B08SHIRT02.jpg,2025-01-12 10:00:00
+3,3,B08TSHRT03,Classic Black Cotton T-Shirt,T-Shirts,Black,Solid,499.0,INR,Budget (<500),https://www.amazon.in/dp/B08TSHRT03,https://images-amazon.mock/images/B08TSHRT03.jpg,2025-01-13 10:00:00
+4,4,B08DRESS04,Floral Print Summer Midi Dress,Dresses,Yellow,Floral,1899.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08DRESS04,https://images-amazon.mock/images/B08DRESS04.jpg,2025-01-14 10:00:00
+5,5,B08CHINO05,Dark Navy Chino Trousers,Pants,Navy,Solid,1599.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08CHINO05,https://images-amazon.mock/images/B08CHINO05.jpg,2025-01-15 10:00:00
+6,6,B08HOOD006,Red Oversized Graphic Hoodie,Hoodies,Red,Graphic,1799.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08HOOD006,https://images-amazon.mock/images/B08HOOD006.jpg,2025-01-16 10:00:00
+7,7,B08POLO007,Striped Cotton Polo T-Shirt,T-Shirts,Navy,Striped,899.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08POLO007,https://images-amazon.mock/images/B08POLO007.jpg,2025-01-17 10:00:00
+8,8,B08JEANS08,High-Waist Distressed Blue Jeans,Jeans,Blue,Denim,1999.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08JEANS08,https://images-amazon.mock/images/B08JEANS08.jpg,2025-01-18 10:00:00
+9,9,B08BLAZR09,Beige Linen Casual Blazer,Blazers,Beige,Solid,3499.0,INR,Premium (>2000),https://www.amazon.in/dp/B08BLAZR09,https://images-amazon.mock/images/B08BLAZR09.jpg,2025-01-19 10:00:00
+10,10,B08MAXI010,Green Bohemian Maxi Dress,Dresses,Green,Printed,2199.0,INR,Premium (>2000),https://www.amazon.in/dp/B08MAXI010,https://images-amazon.mock/images/B08MAXI010.jpg,2025-01-20 10:00:00
+11,11,B08YELW011,Yellow Solid Round Neck Tee,T-Shirts,Yellow,Solid,399.0,INR,Budget (<500),https://www.amazon.in/dp/B08YELW011,https://images-amazon.mock/images/B08YELW011.jpg,2025-01-21 10:00:00
+12,12,B08FLAN012,Checked Grey Flannel Shirt,Shirts,Grey,Checked,1499.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08FLAN012,https://images-amazon.mock/images/B08FLAN012.jpg,2025-01-22 10:00:00
+13,13,B08KURTA13,Embroidered Maroon Silk Kurta,Ethnic Wear,Maroon,Embroidered,2899.0,INR,Premium (>2000),https://www.amazon.in/dp/B08KURTA13,https://images-amazon.mock/images/B08KURTA13.jpg,2025-01-23 10:00:00
+14,14,B08NEHRU14,Ethnic Navy Blue Nehru Jacket,Ethnic Wear,Navy,Solid,2299.0,INR,Premium (>2000),https://www.amazon.in/dp/B08NEHRU14,https://images-amazon.mock/images/B08NEHRU14.jpg,2025-01-24 10:00:00
+15,15,B08JOGG015,Charcoal Grey Slim Fit Joggers,Pants,Grey,Solid,999.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08JOGG015,https://images-amazon.mock/images/B08JOGG015.jpg,2025-01-25 10:00:00
+16,16,B08SKIRT16,Pleated Black A-Line Midi Skirt,Skirts,Black,Solid,1199.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08SKIRT16,https://images-amazon.mock/images/B08SKIRT16.jpg,2025-01-26 10:00:00
+17,17,B08CROP017,Pastel Pink Knitted Crop Top,Tops,Pink,Solid,699.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08CROP017,https://images-amazon.mock/images/B08CROP017.jpg,2025-01-27 10:00:00
+18,18,B08CARGO18,Olive Green Utility Cargo Pants,Pants,Green,Solid,1799.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08CARGO18,https://images-amazon.mock/images/B08CARGO18.jpg,2025-01-28 10:00:00
+19,19,B08BOMBR19,Classic Black Leather Bomber Jacket,Jackets,Black,Solid,4599.0,INR,Premium (>2000),https://www.amazon.in/dp/B08BOMBR19,https://images-amazon.mock/images/B08BOMBR19.jpg,2025-01-29 10:00:00
+20,20,B08OXFRD20,Sky Blue Oxford Button-Down Shirt,Shirts,Blue,Solid,1399.0,INR,Mid-Range (500-2000),https://www.amazon.in/dp/B08OXFRD20,https://images-amazon.mock/images/B08OXFRD20.jpg,2025-01-30 10:00:00
+21,21,B08VNTG021,Vintage Wash Denim Overshirt,Jackets,Blue,Denim,2199.0,INR,Premium (>2000),https://www.amazon.in/dp/B08VNTG021,https://images-amazon.mock/images/B08VNTG021.jpg,2025-01-31 10:00:00
+22,22,B08SLKDR22,Emerald Green Satin Slip Dress,Dresses,Green,Solid,2599.0,INR,Premium (>2000),https://www.amazon.in/dp/B08SLKDR22,https://images-amazon.mock/images/B08SLKDR22.jpg,2025-02-01 10:00:00
+23,23,B08WTEE023,Pure White Organic Cotton Tee,T-Shirts,White,Solid,449.0,INR,Budget (<500),https://www.amazon.in/dp/B08WTEE023,https://images-amazon.mock/images/B08WTEE023.jpg,2025-02-02 10:00:00
+24,24,B08TRNCH24,Double Breasted Camel Trench Coat,Jackets,Beige,Solid,5499.0,INR,Premium (>2000),https://www.amazon.in/dp/B08TRNCH24,https://images-amazon.mock/images/B08TRNCH24.jpg,2025-02-03 10:00:00
+25,25,B08ANARK25,Royal Blue Printed Anarkali Suit,Ethnic Wear,Blue,Printed,3199.0,INR,Premium (>2000),https://www.amazon.in/dp/B08ANARK25,https://images-amazon.mock/images/B08ANARK25.jpg,2025-02-04 10:00:00

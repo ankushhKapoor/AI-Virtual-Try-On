@@ -1,0 +1,5 @@
+cluster_id,cluster_name,user_count,pct_of_userbase,avg_tryons_per_user,avg_success_rate_pct,avg_quality_score,avg_wishlist_rate_pct,segment_description,recommended_marketing_action
+1,Power Shoppers (High Frequency VIPs),256,21.33,23.9,86.51,0.8,29.07,Highest try-on volume and frequent wishlist additions. Key drivers of conversion.,"Offer VIP early-access to new collections, loyalty perks & one-click checkout."
+3,Engaged Fashion Explorers,233,19.42,4.7,95.65,0.87,60.28,Steady consistent try-on sessions across multiple apparel categories with high satisfaction.,Deliver personalized Apriori cross-category bundle recommendations.
+0,Occasional / Trial Users,578,48.17,4.0,91.48,0.86,15.55,Low try-on counts (1-2 attempts). Typically new signups testing platform capabilities.,"Send onboarding tutorial, trending outfit previews, and first-order incentives."
+2,At-Risk / Sensitive Users,133,11.08,3.6,50.14,0.53,13.76,Users who experienced higher AI try-on failure rates or poor lighting rejections.,Trigger guided photo re-upload assistance modal and send retry apology coupons.

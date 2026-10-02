@@ -1,0 +1,8 @@
+outcome_key,success_or_fail,failure_reason
+1,SUCCESS,None
+2,FAILURE,Face Occlusion
+3,FAILURE,Pose Distortion
+4,FAILURE,Low Resolution Garment
+5,FAILURE,Garment Segmentation Error
+6,FAILURE,CUDA Out of Memory
+7,FAILURE,Inference Timeout

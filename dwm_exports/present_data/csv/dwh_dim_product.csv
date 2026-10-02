@@ -1,0 +1,13 @@
+product_key,product_id,amazon_product_id,category,color,pattern,price_bracket,updated_at
+1,1,B08DENIM01,Jackets,Blue,Denim,Premium (>2000),2026-09-18 18:14:56
+2,2,B08SHIRT02,Shirts,White,Solid/Standard,Mid-Range (500-2000),2026-09-18 18:14:56
+3,3,B08TSHRT03,T-Shirts,Black,Solid/Standard,Budget (<500),2026-09-18 18:14:56
+4,4,B08DRESS04,Dresses,Unknown/Unspecified,Floral,Mid-Range (500-2000),2026-09-18 18:14:56
+5,5,B08CHINO05,Pants,Navy,Solid/Standard,Mid-Range (500-2000),2026-09-18 18:14:56
+6,6,B08HOOD006,Hoodies,Red,Graphic,Mid-Range (500-2000),2026-09-18 18:14:56
+7,7,B08POLO007,T-Shirts,Unknown/Unspecified,Striped,Mid-Range (500-2000),2026-09-18 18:14:56
+8,8,B08JEANS08,Jeans,Blue,Solid/Standard,Mid-Range (500-2000),2026-09-18 18:14:56
+9,9,B08BLAZR09,Blazers,Beige,Solid/Standard,Premium (>2000),2026-09-18 18:14:56
+10,10,B08MAXI010,Dresses,Green,Solid/Standard,Premium (>2000),2026-09-18 18:14:56
+11,11,B08YELW011,T-Shirts,Yellow,Solid,Budget (<500),2026-09-18 18:14:56
+12,12,B08FLAN012,Shirts,Grey,Checked,Mid-Range (500-2000),2026-09-18 18:14:56
