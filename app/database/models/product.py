@@ -4,7 +4,8 @@ from sqlalchemy import (
     String,
     Text,
     Numeric,
-    DateTime
+    DateTime,
+    Integer
 )
 from sqlalchemy.sql import func
 
@@ -15,10 +16,12 @@ class Product(Base):
     __tablename__ = "products"
 
     id = Column(
-        BigInteger,
+        Integer,
         primary_key=True,
         autoincrement=True
     )
+
+
 
     amazon_product_id = Column(
         String(100),

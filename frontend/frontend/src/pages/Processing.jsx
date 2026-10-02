@@ -10,12 +10,12 @@ import ProcessingAnimation from '../components/tryon/ProcessingAnimation'
 import ProcessingSteps from '../components/tryon/ProcessingSteps'
 import TryOnProgress from '../components/tryon/TryOnProgress'
 import useTryOn from '../hooks/useTryOn'
+import { API_BASE_URL, MODEL_BASE_URL } from '../services/urls'
 
-const MODEL_API_URL = 'http://127.0.0.1:8001'
 
 function Processing() {
   const navigate = useNavigate()
-  const { userPhoto, selectedProduct, addLook, updateLook } = useTryOn()
+  const { userPhoto, selectedProduct, addLook, updateLook, setProcessingState, setProcessingError } = useTryOn()
   const [progress, setProgress] = useState(10)
   const [apiError, setApiError] = useState(null)
   const resultId = useRef('tryon-' + Date.now())
@@ -26,9 +26,11 @@ function Processing() {
     if (calledRef.current) return undefined
     calledRef.current = true
 
+    const prodId = selectedProduct.id || selectedProduct.asin || 'product'
+
     addLook({
       id: resultId.current,
-      productId: selectedProduct.id,
+      productId: prodId,
       product: selectedProduct,
       userPhoto,
       resultImage: null,
@@ -36,6 +38,7 @@ function Processing() {
       saved: false,
       favorite: false,
     })
+
     setProgress(20)
 
     async function runTryOn() {
@@ -69,11 +72,20 @@ function Processing() {
         formData.append('seed', '42')
 
         setProgress(40)
-        const response = await fetch(MODEL_API_URL + '/tryon', {
-          method: 'POST',
-          body: formData,
-        })
+        let response
+        try {
+          response = await fetch(MODEL_BASE_URL + '/tryon', {
+            method: 'POST',
+            body: formData,
+          })
+        } catch {
+          response = await fetch(API_BASE_URL + '/tryon', {
+            method: 'POST',
+            body: formData,
+          })
+        }
         setProgress(85)
+
 
         if (!response.ok) {
           const errData = await response.json().catch(() => ({ detail: response.statusText }))

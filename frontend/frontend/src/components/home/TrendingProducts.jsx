@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom'
 
 import ProductGrid from '../ProductGrid'
 import SectionHeading from '../SectionHeading'
+import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../../services/urls'
 
 function TrendingProducts() {
   const [products, setProducts] = useState([])
@@ -16,17 +17,14 @@ function TrendingProducts() {
 
     async function loadProducts() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/search?query=clothing`
+        const data = await fetchJsonWithCache(
+          `${API_BASE_URL}/search?query=clothing`,
+          { ttl: TTL_SEARCH }
         )
 
-        if (!response.ok) {
-          throw new Error(
-            'Failed to fetch products'
-          )
+        if (!data || !data.products) {
+          throw new Error('Failed to fetch products')
         }
-
-        const data = await response.json()
 
         if (!cancelled) {
           const amazonProducts = (
@@ -34,29 +32,34 @@ function TrendingProducts() {
           )
             .filter(
               product =>
-                product.image
+                product.image || product.image_url || product.thumbnail
             )
             .slice(0, 4)
-            .map(product => ({
-              id: product.asin,
+            .map(product => {
+              const img =
+                product.image ||
+                product.image_url ||
+                product.thumbnail ||
+                null
+              return {
+                id: product.asin,
 
-              asin: product.asin,
+                asin: product.asin,
 
-              name: product.title,
+                name: product.title,
 
-              brand:
-                product.brand || '',
+                brand:
+                  product.brand || '',
 
-              price:
-                product.price || 0,
+                price:
+                  product.price || 0,
 
-              image:
-                product.image,
+                image: img,
 
-              images:
-                product.image
-                  ? [product.image]
-                  : [],
+                images:
+                  img
+                    ? [img]
+                    : [],
 
               rating:
                 product.rating || 0,
@@ -81,7 +84,8 @@ function TrendingProducts() {
                   : product.is_sponsored
                     ? 'Sponsored'
                     : null,
-            }))
+            }
+          })
 
           setProducts(
             amazonProducts

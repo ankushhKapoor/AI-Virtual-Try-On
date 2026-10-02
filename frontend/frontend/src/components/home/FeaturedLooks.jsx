@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom'
 
 import OutfitCard from '../OutfitCard'
 import SectionHeading from '../SectionHeading'
+import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../../services/urls'
 
 const lookQueries = [
   {
@@ -66,7 +67,7 @@ function scoreProduct(product, keywords) {
     }
   )
 
-  if (product.image) {
+  if (product.image || product.image_url || product.thumbnail) {
     score += 5
   }
 
@@ -104,23 +105,20 @@ function FeaturedLooks() {
           }
 
           try {
-            const response =
-              await fetch(
+            const data =
+              await fetchJsonWithCache(
                 `${API_BASE_URL}/search?query=${encodeURIComponent(
                   look.query
-                )}`
+                )}`,
+                { ttl: TTL_SEARCH }
               )
 
-            if (!response.ok) {
+            if (!data || !data.products) {
               console.error(
                 `Failed to fetch ${look.name}`
               )
-
               continue
             }
-
-            const data =
-              await response.json()
 
             const products =
               Array.isArray(
@@ -194,11 +192,11 @@ function FeaturedLooks() {
                 'INR',
 
               image:
-                product.image,
+                product.image || product.image_url || product.thumbnail || null,
 
               images:
-                product.image
-                  ? [product.image]
+                (product.image || product.image_url || product.thumbnail)
+                  ? [product.image || product.image_url || product.thumbnail]
                   : [],
 
               brand:

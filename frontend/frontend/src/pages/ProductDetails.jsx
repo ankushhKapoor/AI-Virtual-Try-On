@@ -15,17 +15,26 @@ import SizeSelector from '../components/products/SizeSelector'
 
 import useWishlist from '../hooks/useWishlist'
 import useTryOn from '../hooks/useTryOn'
+import { fetchJsonWithCache, TTL_PRODUCT, TTL_SEARCH } from '../utils/apiCache'
+import CompleteTheLook from '../components/CompleteTheLook'
 
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../services/urls'
+
 
 
 function normalizeProduct(data) {
+  const primaryImage =
+    data.image ||
+    data.image_url ||
+    data.thumbnail ||
+    null
+
   const images =
-    Array.isArray(data.images)
+    Array.isArray(data.images) && data.images.length > 0
       ? data.images.filter(Boolean)
-      : data.image
-        ? [data.image]
+      : primaryImage
+        ? [primaryImage]
         : []
 
   const sizes =
@@ -64,6 +73,8 @@ function normalizeProduct(data) {
 
     image:
       data.image ||
+      data.image_url ||
+      data.thumbnail ||
       images[0] ||
       null,
 
@@ -202,25 +213,13 @@ function ProductDetails() {
             .toUpperCase()
 
 
-        const response =
-          await fetch(
+        const data =
+          await fetchJsonWithCache(
             `${API_BASE_URL}/products?asin=${encodeURIComponent(
               asin
-            )}`
+            )}`,
+            { ttl: TTL_PRODUCT }
           )
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            `Product request failed with status ${response.status}`
-          )
-
-        }
-
-
-        const data =
-          await response.json()
 
 
         if (
@@ -288,52 +287,43 @@ function ProductDetails() {
 
         try {
 
-          const relatedResponse =
-            await fetch(
+          const relatedData =
+            await fetchJsonWithCache(
               `${API_BASE_URL}/search?query=${encodeURIComponent(
                 relatedQuery
-              )}`
+              )}`,
+              { ttl: TTL_SEARCH }
             )
 
 
-          if (
-            relatedResponse.ok
-          ) {
-
-            const relatedData =
-              await relatedResponse.json()
-
-
-            const related =
-              Array.isArray(
-                relatedData.products
-              )
-                ? relatedData.products
-                    .filter(
-                      item =>
-                        item.asin &&
-                        item.asin !==
-                          amazonProduct.asin &&
-                        item.title &&
-                        item.image
-                    )
-                    .slice(0, 4)
-                    .map(
-                      item =>
-                        normalizeProduct(
-                          item
-                        )
-                    )
-                : []
+          const related =
+            Array.isArray(
+              relatedData.products
+            )
+              ? relatedData.products
+                  .filter(
+                    item =>
+                      item.asin &&
+                      item.asin !==
+                        amazonProduct.asin &&
+                      item.title &&
+                      item.image
+                  )
+                  .slice(0, 4)
+                  .map(
+                    item =>
+                      normalizeProduct(
+                        item
+                      )
+                  )
+              : []
 
 
-            if (!cancelled) {
+          if (!cancelled) {
 
-              setRelatedProducts(
-                related
-              )
-
-            }
+            setRelatedProducts(
+              related
+            )
 
           }
 
@@ -1009,6 +999,17 @@ function ProductDetails() {
             </section>
 
           ) : null}
+
+
+          {/* ── Complete the Look (FashionCLIP outfit recommendations) ── */}
+          {product ? (
+            <CompleteTheLook
+              product={product}
+              onWishlist={toggleWishlist}
+              onTryOn={handleRelatedTryOn}
+            />
+          ) : null}
+
 
         </div>
 

@@ -1,10 +1,12 @@
 import { ArrowRight, Sparkles } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { fetchJsonWithCache, TTL_PRODUCT } from '../../utils/apiCache'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL, resolveBackendUrl } from '../../services/urls'
 
 const HERO_ASIN = 'B0GLGKGCB4'
+const FALLBACK_HERO_IMAGE = 'https://m.media-amazon.com/images/I/81stfgnFx4L._SL1500_.jpg'
 
 function Hero() {
   const [heroImage, setHeroImage] = useState(null)
@@ -15,23 +17,44 @@ function Hero() {
 
     async function loadHeroProduct() {
       try {
-        const response = await fetch(
-          `${API_BASE_URL}/products?asin=${HERO_ASIN}`
-        )
+        let image = null
 
-        if (!response.ok) {
-          throw new Error(
-            `Failed to load Amazon product: ${response.status}`
+        // 1. Try single product endpoint
+        try {
+          const data = await fetchJsonWithCache(
+            `${API_BASE_URL}/products?asin=${HERO_ASIN}`,
+            { ttl: TTL_PRODUCT }
           )
+
+          image =
+            data?.image ||
+            data?.image_url ||
+            data?.thumbnail ||
+            (Array.isArray(data?.images)
+              ? data.images.find(Boolean)
+              : null)
+        } catch (err) {
+          console.warn('Hero product fetch failed, trying search fallback:', err)
         }
 
-        const data = await response.json()
+        // 2. If not found or empty, fallback to /search
+        if (!image) {
+          try {
+            const searchData = await fetchJsonWithCache(
+              `${API_BASE_URL}/search?query=clothing`,
+              { ttl: TTL_PRODUCT }
+            )
+            const first = searchData?.products?.find(
+              (p) => p.image || p.image_url || p.thumbnail
+            )
+            image = first?.image || first?.image_url || first?.thumbnail || null
+          } catch (searchErr) {
+            console.warn('Hero search fallback failed:', searchErr)
+          }
+        }
 
-        const image =
-          data.image ||
-          (Array.isArray(data.images)
-            ? data.images.find(Boolean)
-            : null)
+        // 3. Fallback to verified Amazon fashion image
+        image = image || FALLBACK_HERO_IMAGE
 
         if (!cancelled && image) {
           setHeroImage(image)
@@ -41,6 +64,9 @@ function Hero() {
           'Failed to load Hero Amazon product:',
           error
         )
+        if (!cancelled) {
+          setHeroImage(FALLBACK_HERO_IMAGE)
+        }
       } finally {
         if (!cancelled) {
           setLoading(false)
@@ -161,11 +187,16 @@ function Hero() {
               ) : heroImage ? (
 
                 <img
-                  src={heroImage}
+                  src={resolveBackendUrl(heroImage)}
                   alt="Amazon fashion product"
                   className="absolute inset-0 h-full w-full object-cover object-center"
                   loading="eager"
                   referrerPolicy="no-referrer"
+                  onError={() => {
+                    if (heroImage !== FALLBACK_HERO_IMAGE) {
+                      setHeroImage(FALLBACK_HERO_IMAGE)
+                    }
+                  }}
                 />
 
               ) : (

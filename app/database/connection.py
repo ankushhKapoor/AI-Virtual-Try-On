@@ -1,15 +1,31 @@
+from pathlib import Path
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from app.database.core.config import settings
 
+_db_path = (Path(__file__).resolve().parents[2] / "app.db").resolve()
+_sqlite_url = f"sqlite:///{_db_path}".replace("\\", "/")
 
 DATABASE_URL = settings.DATABASE_URL
 
-engine = create_engine(
-    DATABASE_URL,
-    pool_pre_ping=True
-)
+try:
+    engine = create_engine(
+        DATABASE_URL,
+        pool_pre_ping=True
+    )
+    # Quick connectivity test
+    with engine.connect() as _conn:
+        pass
+except Exception:
+    # Graceful fallback to SQLite when local MySQL is unreachable
+    engine = create_engine(
+        _sqlite_url,
+        connect_args={"check_same_thread": False},
+        pool_pre_ping=True
+    )
+
+
 
 SessionLocal = sessionmaker(
     autocommit=False,

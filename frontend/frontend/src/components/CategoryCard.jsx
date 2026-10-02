@@ -1,10 +1,11 @@
 import { ArrowUpRight } from 'lucide-react'
+import { resolveBackendUrl } from '../services/urls'
 
 function CategoryCard({ image, name, description, onClick, visualClass = 'bg-accent-soft', className = '' }) {
   const content = (
     <>
       <div className={`aspect-[4/3] overflow-hidden bg-canvas ${visualClass}`}>
-        {image ? <img src={image} alt={name} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> : <div className="h-full w-full bg-inherit" aria-hidden="true" />}
+        {image ? <img src={resolveBackendUrl(image)} alt={name} referrerPolicy="no-referrer" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]" /> : <div className="h-full w-full bg-inherit" aria-hidden="true" />}
       </div>
       <div className="flex items-start justify-between gap-3 p-4">
         <div>

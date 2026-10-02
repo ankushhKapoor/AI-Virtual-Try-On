@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 
 import CategoryCard from '../CategoryCard'
 import SectionHeading from '../SectionHeading'
+import { fetchJsonWithCache, TTL_SEARCH } from '../../utils/apiCache'
 
-const API_BASE_URL = 'http://127.0.0.1:8000'
+import { API_BASE_URL } from '../../services/urls'
 
 const categories = [
   {
@@ -83,7 +84,7 @@ function scoreProduct(product, keywords) {
     }
   })
 
-  if (product.image) {
+  if (product.image || product.image_url || product.thumbnail) {
     score += 20
   }
 
@@ -116,19 +117,18 @@ function CategorySection() {
          */
         const responses = await Promise.allSettled(
           categories.map(async category => {
-            const response = await fetch(
+            const data = await fetchJsonWithCache(
               `${API_BASE_URL}/search?query=${encodeURIComponent(
                 category.query
-              )}`
+              )}`,
+              { ttl: TTL_SEARCH }
             )
 
-            if (!response.ok) {
+            if (!data || !data.products) {
               throw new Error(
-                `Search failed with status ${response.status}`
+                `Search failed for category ${category.name}`
               )
             }
-
-            const data = await response.json()
 
             const products = Array.isArray(data.products)
               ? data.products.filter(
@@ -183,9 +183,15 @@ function CategorySection() {
           const selectedProduct =
             rankedProducts[0]
 
-          if (selectedProduct?.image) {
+          const catImg =
+            selectedProduct?.image ||
+            selectedProduct?.image_url ||
+            selectedProduct?.thumbnail ||
+            null
+
+          if (catImg) {
             results[category.name] = {
-              image: selectedProduct.image,
+              image: catImg,
               asin: selectedProduct.asin,
             }
           }

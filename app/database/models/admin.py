@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, DateTime, Boolean
+from sqlalchemy import Column, BigInteger, String, DateTime, Boolean, Integer
 from sqlalchemy.sql import func
 
 from app.database.connection import Base
@@ -7,7 +7,9 @@ from app.database.connection import Base
 class Admin(Base):
     __tablename__ = "admins"
 
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+
+
 
     name = Column(String(100), nullable=False)
 
