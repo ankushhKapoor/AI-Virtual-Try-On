@@ -5,6 +5,9 @@ A full-stack AI-powered virtual try-on application. Browse Amazon clothing produ
 ---
 
 ## What It Does
+---
+
+## What It Does
 
 1. **Browse Products** — Fetches live clothing from Amazon India via the Oxylabs scraping API
 2. **Upload Your Photo** — Take or upload a photo of yourself
@@ -39,8 +42,8 @@ directly instead of going through the Vite proxy.
 | Service | Port | Runtime | Purpose |
 |---------|------|---------|---------|
 | **Frontend** | `FRONTEND_PORT` (5173) | Node / npm | React 19 + Vite 8 + TailwindCSS 4 |
-| **Backend API** | `BACKEND_URL` (8000) | Python venv / pip | Product search via Oxylabs/Amazon |
-| **Model API** | `MODEL_API_URL` (8001) | Python / uv | CatVTON virtual try-on AI (CUDA) |
+| **Backend API** | `BACKEND_URL` (8000) | Root Python environment / uv | Database, product search, and recommendations |
+| **Model API** | `MODEL_API_URL` (8001) | Root Python environment / uv | CatVTON virtual try-on AI (CUDA) |
 
 ---
 
@@ -52,7 +55,7 @@ Before running for the first time, make sure you have:
 |------|---------|---------|
 | **WSL2 + Ubuntu** | Linux environment on Windows | [docs.microsoft.com/wsl](https://docs.microsoft.com/wsl) |
 | **Python 3.12** | Backend + model runtime | `sudo apt install python3.12` |
-| **uv** | Model API dependency manager | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
+| **uv** | Single Python environment and dependency manager | `curl -LsSf https://astral.sh/uv/install.sh \| sh` |
 | **Node.js 18+** | Frontend | `sudo apt install nodejs npm` |
 | **NVIDIA GPU + CUDA** | Required for CatVTON inference | GPU with 6 GB+ VRAM |
 | **Oxylabs account** | Amazon product scraping | [oxylabs.io](https://oxylabs.io) (free trial available) |
@@ -96,27 +99,22 @@ git clone https://github.com/Zheng-Chong/CatVTON.git ai/CatVTON
 
 No quotes needed around the values.
 
-### 4. Install uv dependencies (model API)
+### 4. Create the single root Python environment
 
 ```bash
 uv sync
 ```
 
-This installs PyTorch (CUDA), diffusers, transformers, FastAPI, and all model deps.
+This creates `./.venv` at the repository root. It installs every Python dependency for
+the database, backend API, recommendation service, scripts, and model API.
+Do not create or activate a virtual environment in a subdirectory.
 
 > First run downloads PyTorch (~2 GB). This is automatic.
 
 ### 5. Install frontend npm packages
 
 ```bash
-npm --prefix frontend/frontend install
-```
-
-### 6. Install backend pip packages
-
-```bash
-python3 -m venv backend/.venv
-backend/.venv/bin/pip install -r backend/requirements.txt
+npm --prefix frontend install
 ```
 
 ---
@@ -132,9 +130,9 @@ bash start.sh
 ```
 
 This single command:
-- Checks for `uv`, `npm`, backend `.env`
-- Creates `backend/.venv` and installs pip deps if missing
-- Installs `node_modules` if missing
+- Checks for `uv`, `npm`, and the root `.env`
+- Synchronizes the one root `.venv` with `uv sync --locked`
+- Installs the root npm workspace dependencies if missing
 - Starts all 3 services with **live output in the terminal** (prefixed by service name)
 - Opens everything on `0.0.0.0` so Windows browsers can reach it
 - Press `Ctrl+C` to cleanly stop all services
@@ -154,7 +152,7 @@ Open three separate WSL terminals:
 **Terminal 1 — Backend API:**
 ```bash
 cd AI-Virtual-Try-On
-backend/.venv/bin/uvicorn backend.main:app --host 0.0.0.0 --port 8000
+uv run uvicorn backend.main:app --host 0.0.0.0 --port 8000
 ```
 
 **Terminal 2 — Model API:**
@@ -165,7 +163,7 @@ uv run uvicorn model_api.main:app --host 0.0.0.0 --port 8001
 
 **Terminal 3 — Frontend:**
 ```bash
-cd AI-Virtual-Try-On/frontend/frontend
+cd AI-Virtual-Try-On/frontend
 npm run dev
 ```
 
@@ -196,11 +194,9 @@ AI-Virtual-Try-On/
 │
 ├── backend/
 │   ├── main.py               # FastAPI Amazon/Oxylabs API (port 8000)
-│   ├── requirements.txt      # pip deps (fastapi, uvicorn, requests, dotenv)
-│   ├── .env                  # Your Oxylabs credentials (gitignored)
-│   └── .env.example          # Template
+│   └── recommendation/       # FashionCLIP recommendation service
 │
-├── frontend/frontend/
+├── frontend/
 │   ├── src/
 │   │   ├── pages/            # Home, Products, ProductDetails, UploadPhoto,
 │   │   │                     # TryOn, Processing, TryOnResult, ...
@@ -212,7 +208,8 @@ AI-Virtual-Try-On/
 │   ├── vite.config.js        # Vite config (host: 0.0.0.0, port: 5173)
 │   └── package.json
 │
-├── pyproject.toml            # uv project config (torch, diffusers, etc.)
+├── .venv/                    # The one uv-managed Python environment (gitignored)
+├── pyproject.toml            # All Python dependencies (database, backend, AI model)
 ├── start.sh                  # One-command startup script (bash/WSL)
 ├── start.ps1                 # One-command startup script (PowerShell)
 └── .gitignore
@@ -226,10 +223,8 @@ AI-Virtual-Try-On/
 
 | Step | Automatic? | Notes |
 |------|-----------|-------|
-| Backend venv creation | ✅ Auto | Created if `backend/.venv` missing |
-| Backend pip install | ✅ Auto | Runs if venv missing |
-| npm install | ✅ Auto | Runs if `node_modules` missing |
-| uv dependencies | ❌ Manual | Run `uv sync` once before first `bash start.sh` |
+| Root uv environment | ✅ Auto | `uv sync --locked` creates/updates `./.venv` |
+| npm install | ✅ Auto | Runs in `frontend/` if its `node_modules` is missing |
 | CatVTON clone | ❌ Manual | Run `git clone ... ai/CatVTON` once |
 | Model weights download | ✅ Auto | Downloads on first `/tryon` request (~5 GB) |
 | Oxylabs `.env` | ❌ Manual | Copy `.env.example` → `.env`, add credentials |
@@ -269,4 +264,4 @@ If no GPU is available, the model API returns a `503` and the rest of the app st
 | Model API | FastAPI, Uvicorn, CatVTON, PyTorch (CUDA), diffusers |
 | AI Model | CatVTON (flow-matching diffusion, VITON-HD) |
 | Product Data | Oxylabs Amazon Scraper API |
-| Package mgmt | `uv` (model), `pip` (backend), `npm` (frontend) |
+| Package mgmt | `uv` (all Python services), `npm` (root frontend workspace) |

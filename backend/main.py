@@ -999,6 +999,16 @@ def home():
     }
 
 
+@app.get("/health")
+def health():
+    """Lightweight readiness probe used by the all-in-one launcher."""
+    return {
+        "status": "ok",
+        "service": "backend",
+        "recommendations_enabled": True,
+    }
+
+
 @app.get("/products")
 def get_product(
 

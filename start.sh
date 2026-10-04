@@ -2,9 +2,9 @@
 # ============================================================
 # AI Virtual Try-On -- Start Script
 # Services:
-#   Backend API  (Oxylabs/Amazon)  port 8000  (pip venv)
-#   Model API    (CatVTON)         port 8001  (uv)
-#   Frontend     (React/Vite)      port 5173  (npm)
+#   Backend API  (database, Oxylabs, recommendations) port 8000 (root uv env)
+#   Model API    (CatVTON)                             port 8001 (root uv env)
+#   Frontend     (React/Vite)                          port 5173 (frontend/)
 # ============================================================
 set -euo pipefail
 
@@ -12,8 +12,9 @@ set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 
 PROJECT_ROOT="$(dirname "$(realpath "$0")")"
-BACKEND_DIR="$PROJECT_ROOT/backend"
-FRONTEND_DIR="$PROJECT_ROOT/frontend/frontend"
+# Keep uv's cache in the repository so the launcher never depends on a
+# user-specific cache directory. The cache is gitignored.
+export UV_CACHE_DIR="$PROJECT_ROOT/.uv-cache"
 LOG_DIR="$PROJECT_ROOT/.logs"
 mkdir -p "$LOG_DIR"
 
@@ -52,6 +53,31 @@ ok()   { echo -e "${GREEN}[OK]${RESET} $*"; }
 warn() { echo -e "${YELLOW}[WARN]${RESET} $*"; }
 err()  { echo -e "${RED}[ERROR]${RESET} $*" >&2; }
 
+reset_log() {
+  local log_file="$1"
+  : > "$log_file"
+  printf '[%s] launcher: starting service\n' "$(date --iso-8601=seconds)" >> "$log_file"
+}
+
+wait_for_health() {
+  local service_name="$1"
+  local service_url="$2"
+  local log_file="$3"
+  local attempt
+
+  for attempt in $(seq 1 30); do
+    if curl --fail --silent --show-error --max-time 2 "$service_url/health" >/dev/null; then
+      ok "$service_name health check passed -> $service_url/health"
+      return 0
+    fi
+    sleep 1
+  done
+
+  err "$service_name did not become healthy. Last log lines:"
+  tail -n 40 "$log_file" >&2 || true
+  return 1
+}
+
 PIDS=()
 cleanup() {
   echo ""
@@ -64,56 +90,56 @@ cleanup() {
 }
 trap cleanup EXIT INT TERM
 
-# -- 1. Backend (Amazon/Oxylabs API, pip venv, port 8000) ------------------
-log "Starting Backend API (port $BACKEND_PORT)..."
-if [ ! -f "$PROJECT_ROOT/.env" ] && [ ! -f "$BACKEND_DIR/.env" ]; then
-  warn "No .env file found -- copy .env.example to .env and configure credentials"
-fi
-
-BACKEND_VENV="$BACKEND_DIR/.venv"
-if [ ! -d "$BACKEND_VENV" ]; then
-  log "Setting up backend virtual environment..."
-  python3 -m venv "$BACKEND_VENV"
-  "$BACKEND_VENV/bin/pip" install -q --upgrade pip
-  "$BACKEND_VENV/bin/pip" install -q -r "$BACKEND_DIR/requirements.txt"
-  ok "Backend venv ready"
-fi
-
-( cd "$PROJECT_ROOT" && "$BACKEND_VENV/bin/uvicorn" backend.main:app \
-  --host 0.0.0.0 --port "$BACKEND_PORT" \
-  2>&1 | tee "$LOG_DIR/backend.log" | sed "s/^/[backend] /" ) &
-PIDS+=($!)
-ok "Backend API started -> $BACKEND_URL"
-
-# -- 2. Model API (CatVTON / uv, port 8001) --------------------------------
-log "Starting Model API (port $MODEL_PORT)..."
+# -- Shared Python environment ------------------------------------------------
 if ! command -v uv &>/dev/null; then
   err "uv not found. Install: curl -LsSf https://astral.sh/uv/install.sh | sh"
   exit 1
 fi
 
-( cd "$PROJECT_ROOT" && uv run uvicorn model_api.main:app \
+log "Synchronizing the root uv environment..."
+( cd "$PROJECT_ROOT" && uv sync --locked )
+ok "Root .venv is ready"
+
+# -- 1. Backend (database, Amazon/Oxylabs, recommendations; port 8000) ------
+log "Starting Backend API (port $BACKEND_PORT)..."
+if [ ! -f "$PROJECT_ROOT/.env" ]; then
+  warn "No .env file found -- copy .env.example to .env and configure credentials"
+fi
+
+reset_log "$LOG_DIR/backend.log"
+( cd "$PROJECT_ROOT" && PYTHONUNBUFFERED=1 stdbuf -oL -eL uv run --locked uvicorn backend.main:app \
+  --host 0.0.0.0 --port "$BACKEND_PORT" \
+  2>&1 | stdbuf -oL -eL tee -a "$LOG_DIR/backend.log" | stdbuf -oL -eL sed "s/^/[backend] /" ) &
+PIDS+=($!)
+ok "Backend API started -> $BACKEND_URL"
+
+# -- 2. Model API (CatVTON; root uv environment, port 8001) -----------------
+log "Starting Model API (port $MODEL_PORT)..."
+reset_log "$LOG_DIR/model_api.log"
+( cd "$PROJECT_ROOT" && PYTHONUNBUFFERED=1 stdbuf -oL -eL uv run --locked uvicorn model_api.main:app \
     --host 0.0.0.0 --port "$MODEL_PORT" \
-    2>&1 | tee "$LOG_DIR/model_api.log" | sed "s/^/[model ] /" ) &
+    2>&1 | stdbuf -oL -eL tee -a "$LOG_DIR/model_api.log" | stdbuf -oL -eL sed "s/^/[model ] /" ) &
 PIDS+=($!)
 ok "Model API started  -> $MODEL_API_URL"
 
-# -- 3. Frontend (React/Vite / npm, port 5173) -----------------------------
+# -- 3. Frontend (React/Vite / frontend, port 5173) -------------------------
 log "Starting Frontend dev server (port $FRONTEND_PORT)..."
-if [ ! -d "$FRONTEND_DIR/node_modules" ]; then
+if [ ! -d "$PROJECT_ROOT/frontend/node_modules" ]; then
   log "Installing npm dependencies (first run)..."
-  npm --prefix "$FRONTEND_DIR" install
+  ( cd "$PROJECT_ROOT/frontend" && npm install )
   ok "npm install complete"
 fi
 
-( npm --prefix "$FRONTEND_DIR" run dev \
+reset_log "$LOG_DIR/frontend.log"
+( cd "$PROJECT_ROOT/frontend" && stdbuf -oL -eL npm run dev -- \
     -- --port "$FRONTEND_PORT" \
-    2>&1 | tee "$LOG_DIR/frontend.log" | sed "s/^/[vite  ] /" ) &
+    2>&1 | stdbuf -oL -eL tee -a "$LOG_DIR/frontend.log" | stdbuf -oL -eL sed "s/^/[vite  ] /" ) &
 PIDS+=($!)
 ok "Frontend started   -> http://localhost:$FRONTEND_PORT"
 
 # -- Summary ---------------------------------------------------------------
-sleep 2
+wait_for_health "Backend API" "$BACKEND_URL" "$LOG_DIR/backend.log"
+wait_for_health "Model API" "$MODEL_API_URL" "$LOG_DIR/model_api.log"
 echo ""
 echo -e "${GREEN}================================================${RESET}"
 echo -e "${GREEN}  AI Virtual Try-On -- All Services Running     ${RESET}"

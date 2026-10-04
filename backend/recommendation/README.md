@@ -120,8 +120,8 @@ in-process cache (no FashionCLIP inference, no Oxylabs calls).
 ## Starting the Backend
 
 ```bash
-cd backend
-uv run uvicorn main:app --reload --host 127.0.0.1 --port 8000
+cd AI-Virtual-Try-On
+uv run --locked uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 On first request the FashionCLIP model (~600 MB) is downloaded from HuggingFace
@@ -215,7 +215,7 @@ backend/recommendation/
     recommender.py     Query builder + /search caller + result scorer
     router.py          POST /recommendations FastAPI router
 
-frontend/frontend/src/components/
+frontend/src/components/
     CompleteTheLook.jsx    "Complete the Look" UI section
 ```
 
