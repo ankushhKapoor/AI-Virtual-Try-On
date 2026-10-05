@@ -32,4 +32,4 @@ Write-Host "Project root (WSL): $wslPath" -ForegroundColor Gray
 
 # Run the bash start script inside WSL
 Write-Host "Launching start.sh inside WSL..." -ForegroundColor Yellow
-wsl bash -c "cd '$wslPath' && bash start.sh"
+wsl bash -lc "cd '$wslPath' && bash start.sh"

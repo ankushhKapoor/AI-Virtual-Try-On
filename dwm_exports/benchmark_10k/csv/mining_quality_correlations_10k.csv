@@ -1,0 +1,21 @@
+dimension_name,dimension_value,total_events,success_rate,avg_quality_score,avg_processing_time_ms,correlation_with_failure
+Device & Method,Mobile (Camera),4880,0.8221,0.7683,9264,0.1779
+Device & Method,Mobile (Gallery),2509,0.9255,0.8444,9350,0.0745
+Device & Method,Desktop (Gallery),1261,0.9088,0.8329,9465,0.0912
+Device & Method,Desktop (URL),470,0.9191,0.8416,9491,0.0809
+Device & Method,Tablet (Camera),491,0.9165,0.8376,9426,0.0835
+Device & Method,Tablet (Gallery),389,0.946,0.8633,9459,0.054
+Product Category,Blazers,500,0.854,0.7926,10256,0.146
+Product Category,Dresses,1024,0.8789,0.8086,10328,0.1211
+Product Category,Ethnic Wear,1129,0.8795,0.8099,8800,0.1205
+Product Category,Hoodies,481,0.8773,0.8137,9026,0.1227
+Product Category,Jackets,1202,0.8669,0.8032,10409,0.1331
+Product Category,Jeans,927,0.8781,0.8061,8994,0.1219
+Product Category,Pants,1436,0.8733,0.8071,9007,0.1267
+Product Category,Shirts,1080,0.8694,0.8037,9023,0.1306
+Product Category,Skirts,520,0.8308,0.7789,8932,0.1692
+Product Category,T-Shirts,1179,0.8889,0.8178,8931,0.1111
+Product Category,Tops,522,0.8793,0.8083,8986,0.1207
+Price Bracket,Budget (<500),1111,0.892,0.8193,8930,0.108
+Price Bracket,Mid-Range (500-2000),5516,0.8704,0.8044,9121,0.1296
+Price Bracket,Premium (>2000),3373,0.871,0.8046,9825,0.129

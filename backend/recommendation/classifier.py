@@ -1,4 +1,4 @@
-"""
+﻿"""
 backend/recommendation/classifier.py
 --------------------------------------
 Uses FashionCLIP to classify a clothing item from its image URL and/or title.

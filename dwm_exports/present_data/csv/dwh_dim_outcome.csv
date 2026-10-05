@@ -1,0 +1,3 @@
+outcome_key,success_or_fail,failure_reason
+1,FAILURE,Model Inference Error
+2,SUCCESS,None

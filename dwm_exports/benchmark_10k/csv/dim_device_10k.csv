@@ -1,0 +1,7 @@
+device_key,device_type,upload_method
+1,Mobile,Camera
+2,Mobile,Gallery
+3,Desktop,Gallery
+4,Desktop,URL
+5,Tablet,Camera
+6,Tablet,Gallery

@@ -1,4 +1,4 @@
-"""
+﻿"""
 backend/recommendation/rules.py
 --------------------------------
 Outfit compatibility rules — single source of truth.

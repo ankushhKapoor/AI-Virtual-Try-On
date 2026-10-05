@@ -15,10 +15,29 @@ from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from PIL import Image
+from dotenv import load_dotenv
 
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
+load_dotenv(PROJECT_ROOT / '.env')
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+# Hugging Face's normal user cache is deliberately the default. It is shared
+# across project restarts, so previously downloaded CatVTON weights are reused
+# without creating a second multi-GB copy inside this repository. Set
+# MODEL_CACHE_DIR only when an explicit custom cache location is required.
+_configured_cache_dir = os.getenv('MODEL_CACHE_DIR')
+if _configured_cache_dir:
+    MODEL_CACHE_DIR = Path(_configured_cache_dir).expanduser()
+    if not MODEL_CACHE_DIR.is_absolute():
+        MODEL_CACHE_DIR = PROJECT_ROOT / MODEL_CACHE_DIR
+    MODEL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault('HF_HOME', str(MODEL_CACHE_DIR))
+    os.environ.setdefault('HF_HUB_CACHE', str(MODEL_CACHE_DIR / 'hub'))
+else:
+    MODEL_CACHE_DIR = Path(os.getenv('HF_HUB_CACHE', '~/.cache/huggingface/hub')).expanduser()
+
+from app.networking import frontend_origins, service_port
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -31,12 +50,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        'http://localhost:5173',
-        'http://127.0.0.1:5173',
-        'http://localhost:3000',
-        'http://127.0.0.1:3000',
-    ],
+    allow_origins=frontend_origins(),
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
@@ -53,6 +67,7 @@ def get_service():
     if _service_error is not None:
         raise RuntimeError(_service_error)
     try:
+        logger.info('Loading CatVTON; Hugging Face cache: %s', MODEL_CACHE_DIR)
         from ai.catvton_service import CatVTONService
         _service = CatVTONService()
         logger.info('CatVTON service loaded successfully')
@@ -185,7 +200,7 @@ if __name__ == '__main__':
     import uvicorn
     uvicorn.run(
         'model_api.main:app',
-        host='127.0.0.1',
-        port=8001,
+        host='0.0.0.0',
+        port=service_port('MODEL_API_URL', 'http://127.0.0.1:8001'),
         reload=False,
     )

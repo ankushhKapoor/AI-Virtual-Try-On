@@ -1,0 +1,9 @@
+id,antecedent_products,consequent_products,antecedent_categories,consequent_categories,support,confidence,lift,item_count
+1,Casual Blue Denim Jacket [B08DENIM01],Classic Black Cotton T-Shirt [B08TSHRT03],Jackets,T-Shirts,0.0845,0.742,3.821,2
+2,"Classic Black Cotton T-Shirt [B08TSHRT03], High-Waist Distressed Blue Jeans [B08JEANS08]",Casual Blue Denim Jacket [B08DENIM01],"T-Shirts, Jeans",Jackets,0.0612,0.8145,4.195,3
+3,Slim Fit White Formal Shirt [B08SHIRT02],Dark Navy Chino Trousers [B08CHINO05],Shirts,Pants,0.091,0.698,3.512,2
+4,"Dark Navy Chino Trousers [B08CHINO05], Slim Fit White Formal Shirt [B08SHIRT02]",Beige Linen Casual Blazer [B08BLAZR09],"Pants, Shirts",Blazers,0.054,0.725,4.65,3
+5,Floral Print Summer Midi Dress [B08DRESS04],Green Bohemian Maxi Dress [B08MAXI010],Dresses,Dresses,0.073,0.641,3.24,2
+6,Embroidered Maroon Silk Kurta [B08KURTA13],Ethnic Navy Blue Nehru Jacket [B08NEHRU14],Ethnic Wear,Ethnic Wear,0.068,0.783,5.12,2
+7,Red Oversized Graphic Hoodie [B08HOOD006],Charcoal Grey Slim Fit Joggers [B08JOGG015],Hoodies,Pants,0.059,0.71,3.98,2
+8,Pastel Pink Knitted Crop Top [B08CROP017],Pleated Black A-Line Midi Skirt [B08SKIRT16],Tops,Skirts,0.051,0.665,4.31,2

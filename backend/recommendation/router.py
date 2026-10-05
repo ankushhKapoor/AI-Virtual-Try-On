@@ -1,4 +1,4 @@
-"""
+﻿"""
 backend/recommendation/router.py
 ----------------------------------
 FastAPI APIRouter that exposes:
@@ -62,8 +62,8 @@ def get_recommendations(
       1. Check in-process recommendation cache (ASIN-keyed, 30 min TTL)
       2. Classify the product via FashionCLIP (or title fallback)
       3. Determine outfit slots from compatibility rules
-      4. For each slot: build a search query → call existing /search
-         (which itself uses the server-side TTL cache + Oxylabs)
+      4. For each slot: build a search query → call the shared product-search
+         service (which uses the server-side TTL cache + Oxylabs)
       5. Return structured recommendations
 
     If the model or any individual slot fails the other slots are still
@@ -155,7 +155,7 @@ def get_recommendations(
         }
 
     # ------------------------------------------------------------------
-    # 3 + 4. Build recommendations (calls existing /search internally)
+    # 3 + 4. Build recommendations using the shared product-search service.
     # ------------------------------------------------------------------
     try:
         recommendations = build_recommendations(

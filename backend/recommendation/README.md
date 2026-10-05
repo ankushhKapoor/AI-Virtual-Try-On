@@ -26,7 +26,7 @@ router.py  ──→  classifier.py  ──→  FashionCLIP (patrickjohncyh/fash
                      │
                      ▼ search queries per slot
                      │
-               GET /search  (EXISTING endpoint)
+               shared product-search service
                      │
                      ▼
                Existing TTL cache + Oxylabs
@@ -95,8 +95,8 @@ For each outfit slot, `recommender.py` builds a natural-language search query:
 color + style + gender + category  →  "white casual men's t-shirt"
 ```
 
-It then calls the **existing** `GET /search` endpoint on the same FastAPI server.
-This reuses:
+It calls the same `search_products_data()` function used by `GET /search`.
+This avoids an HTTP request back into the server and reuses:
 - The existing Oxylabs integration (unchanged)
 - The existing server-side TTL cache (`_search_cache`, 30 min TTL)
 
@@ -120,8 +120,8 @@ in-process cache (no FashionCLIP inference, no Oxylabs calls).
 ## Starting the Backend
 
 ```bash
-cd backend
-uv run uvicorn main:app --reload --host 127.0.0.1 --port 8000
+cd AI-Virtual-Try-On
+uv run --locked uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
 On first request the FashionCLIP model (~600 MB) is downloaded from HuggingFace
@@ -215,7 +215,7 @@ backend/recommendation/
     recommender.py     Query builder + /search caller + result scorer
     router.py          POST /recommendations FastAPI router
 
-frontend/frontend/src/components/
+frontend/src/components/
     CompleteTheLook.jsx    "Complete the Look" UI section
 ```
 

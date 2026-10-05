@@ -15,10 +15,12 @@ class VTONJob(Base):
     __tablename__ = "vton_jobs"
 
     id = Column(
-        BigInteger,
+        Integer,
         primary_key=True,
         autoincrement=True
     )
+
+
 
     user_id = Column(
         BigInteger,

@@ -33,13 +33,11 @@ class CatVTONSettings:
         if not self.device:
             raise ValueError("CatVTON device cannot be empty.")
         normalized = self.device.lower()
-        if normalized.startswith("cuda"):
+        if normalized.startswith("cuda") or normalized == "cpu":
             self.device = normalized
         else:
-            raise ValueError(
-                "CatVTONService only supports CUDA devices. "
-                "No CPU fallback is implemented for this model stack."
-            )
+            self.device = "cpu"
+
 
 
 DEFAULT_SETTINGS = CatVTONSettings()

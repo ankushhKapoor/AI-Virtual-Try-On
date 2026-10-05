@@ -1,4 +1,4 @@
-"""
+﻿"""
 backend/recommendation/model.py
 ---------------------------------
 FashionCLIP singleton model manager.
