@@ -175,6 +175,73 @@ def _search_key(query: str, domain: str, geo_location: str) -> str:
     return f"search:{q}:{domain.strip().lower()}:{geo_location.strip().lower()}"
 
 
+# Products are displayed to every visitor, so this exclusion is deliberately
+# applied on the server rather than relying on search terms or the frontend.
+# It covers adult, child, and gender-specific labels alike.
+_INTIMATE_APPAREL_PATTERN = re.compile(
+    r"\b(?:"
+    r"underwear|underwears|undergarment(?:s)?|lingerie|bra(?:s|lette)?|brassiere|"
+    r"pant(?:y|ies)|brief(?:s)?|boxer(?:s|\s+briefs)?|trunk(?:s)?|thong(?:s)?|"
+    r"g[ -]?string|jockstrap|athletic\s+supporter|cup\s+supporter|"
+    r"shapewear|body\s*shaper|compression\s+(?:shorts|briefs|underwear)|"
+    r"slip(?:s)?|petticoat(?:s)?|camisole(?:s)?|teddy(?:ies)?|"
+    r"hipster(?:s)?|boyshorts?|boy\s+shorts?|"
+    r"undershirt(?:s)?|under\s+shirt(?:s)?|singlet(?:s)?|"
+    r"(?:cotton\s+|sleeveless\s+|inner\s+)?vest(?:s)?|"
+    r"diaper(?:s)?|napp(?:y|ies)|training\s+pants"
+    r")\b",
+    re.IGNORECASE,
+)
+
+_SUPPORTIVE_INNERWEAR_PATTERN = re.compile(
+    r"\b(?:"
+    r"front\s+support|"
+    r"(?:light|medium|firm|high)\s+compression|"
+    r"compression\s+(?:tee|t-?shirt|shirt|top|wear)|"
+    r"cuddle\s+tee"
+    r")\b",
+    re.IGNORECASE,
+)
+
+
+def _product_text(value) -> str:
+    """Flatten product metadata into searchable text without assuming a schema."""
+    if isinstance(value, str):
+        return value
+    if isinstance(value, dict):
+        return " ".join(_product_text(item) for item in value.values())
+    if isinstance(value, (list, tuple, set)):
+        return " ".join(_product_text(item) for item in value)
+    return ""
+
+
+def is_restricted_intimate_product(product: dict) -> bool:
+    """True when product metadata identifies underwear or another undergarment."""
+    if not isinstance(product, dict):
+        return False
+    metadata = (
+        product.get("title"),
+        product.get("brand"),
+        product.get("category"),
+        product.get("categories"),
+        product.get("category_path"),
+        product.get("product_overview"),
+    )
+    product_text = _product_text(metadata)
+    return bool(
+        _INTIMATE_APPAREL_PATTERN.search(product_text)
+        or _SUPPORTIVE_INNERWEAR_PATTERN.search(product_text)
+    )
+
+
+def filter_allowed_products(products: list[dict]) -> list[dict]:
+    """Remove restricted intimate apparel from fresh and persisted search data."""
+    return [
+        product for product in products
+        if isinstance(product, dict) and not is_restricted_intimate_product(product)
+    ]
+
+
 app = FastAPI(
     title="Amazon Product API",
     version="1.0.0"
@@ -660,6 +727,11 @@ def normalize_search_product(
     if not isinstance(product, dict):
         return None
 
+    # Oxylabs may place the category only in nested metadata, so inspect its
+    # original response before reducing it to the public search schema.
+    if is_restricted_intimate_product(product):
+        return None
+
     asin = product.get("asin")
     title = product.get("title")
 
@@ -716,7 +788,7 @@ def normalize_search_product(
 
         numeric_price = None
 
-    return {
+    normalized = {
 
         "asin": asin,
 
@@ -777,6 +849,8 @@ def normalize_search_product(
                 "sales_volume"
             ),
     }
+
+    return None if is_restricted_intimate_product(normalized) else normalized
 
 
 def collect_search_products(
@@ -1141,6 +1215,8 @@ def get_product(
     _hit = _product_cache.get(_key)
     if _hit is not None:
         _logger.info("[CACHE HIT]  /products  key=%s", _key)
+        if is_restricted_intimate_product(_hit):
+            raise HTTPException(status_code=404, detail="Product is not available.")
         return JSONResponse(
             content=_hit,
             headers={"Cache-Control": f"private, max-age={_PRODUCT_TTL}"},
@@ -1196,6 +1272,9 @@ def get_product(
 
     }
 
+    if is_restricted_intimate_product(_body):
+        raise HTTPException(status_code=404, detail="Product is not available.")
+
     _product_cache.set(_key, _body, ttl=_PRODUCT_TTL)
     _logger.info("[CACHE SET]  /products  key=%s  (TTL=%ds)", _key, _PRODUCT_TTL)
 
@@ -1228,7 +1307,12 @@ def search_products_data(
     cached = _search_cache.get(key)
     if cached is not None:
         _logger.info("[CACHE HIT] /search key=%s", key)
-        return cached
+        cached_products = filter_allowed_products(cached.get("products", []))
+        return {
+            **cached,
+            "count": len(cached_products),
+            "products": cached_products,
+        }
 
     _logger.info("[CACHE MISS] /search key=%s", key)
     products, filters = collect_search_products(
@@ -1236,6 +1320,7 @@ def search_products_data(
         domain=domain,
         geo_location=geo_location,
     )
+    products = filter_allowed_products(products)
 
     body = {
         "status": "success",
