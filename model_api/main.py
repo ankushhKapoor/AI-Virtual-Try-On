@@ -22,6 +22,21 @@ load_dotenv(PROJECT_ROOT / '.env')
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+# Hugging Face's normal user cache is deliberately the default. It is shared
+# across project restarts, so previously downloaded CatVTON weights are reused
+# without creating a second multi-GB copy inside this repository. Set
+# MODEL_CACHE_DIR only when an explicit custom cache location is required.
+_configured_cache_dir = os.getenv('MODEL_CACHE_DIR')
+if _configured_cache_dir:
+    MODEL_CACHE_DIR = Path(_configured_cache_dir).expanduser()
+    if not MODEL_CACHE_DIR.is_absolute():
+        MODEL_CACHE_DIR = PROJECT_ROOT / MODEL_CACHE_DIR
+    MODEL_CACHE_DIR.mkdir(parents=True, exist_ok=True)
+    os.environ.setdefault('HF_HOME', str(MODEL_CACHE_DIR))
+    os.environ.setdefault('HF_HUB_CACHE', str(MODEL_CACHE_DIR / 'hub'))
+else:
+    MODEL_CACHE_DIR = Path(os.getenv('HF_HUB_CACHE', '~/.cache/huggingface/hub')).expanduser()
+
 from app.networking import frontend_origins, service_port
 
 logger = logging.getLogger(__name__)
@@ -52,6 +67,7 @@ def get_service():
     if _service_error is not None:
         raise RuntimeError(_service_error)
     try:
+        logger.info('Loading CatVTON; Hugging Face cache: %s', MODEL_CACHE_DIR)
         from ai.catvton_service import CatVTONService
         _service = CatVTONService()
         logger.info('CatVTON service loaded successfully')

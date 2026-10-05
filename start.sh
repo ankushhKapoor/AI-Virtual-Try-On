@@ -12,9 +12,6 @@ set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 
 PROJECT_ROOT="$(dirname "$(realpath "$0")")"
-# Keep uv's cache in the repository so the launcher never depends on a
-# user-specific cache directory. The cache is gitignored.
-export UV_CACHE_DIR="$PROJECT_ROOT/.uv-cache"
 LOG_DIR="$PROJECT_ROOT/.logs"
 mkdir -p "$LOG_DIR"
 

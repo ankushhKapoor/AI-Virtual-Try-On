@@ -4,11 +4,13 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 import logging
+import json
 import os
 import re
 import requests
 import threading
 import time
+import tempfile
 
 
 from pathlib import Path
@@ -47,19 +49,78 @@ _logger = logging.getLogger(__name__)
 
 class _TTLCache:
     """
-    In-memory cache with per-entry TTL and bounded capacity.
+    Disk-backed cache with per-entry TTL and bounded capacity.
 
-    Expired entries are lazily evicted on get().
+    Entries are written under the project `.cache/` directory, so product and
+    search responses survive a backend restart. Expired entries are lazily
+    evicted on get().
     When maxsize is reached the entry whose TTL expires soonest
     is evicted to make room (LRU-by-expiry strategy).
     All methods are protected by a threading.Lock.
     """
 
-    def __init__(self, maxsize: int = 512, default_ttl: float = 3600):
-        self._store: dict = {}   # key -> (value, expires_at)
+    def __init__(
+        self,
+        cache_file: Path,
+        maxsize: int = 512,
+        default_ttl: float = 86400,
+    ):
+        self._store: dict = {}   # key -> (value, expires_at as Unix timestamp)
         self._lock = threading.Lock()
         self._maxsize = maxsize
         self._default_ttl = default_ttl
+        self._cache_file = cache_file
+        self._cache_file.parent.mkdir(parents=True, exist_ok=True)
+        self._load()
+
+    def _load(self) -> None:
+        """Restore valid responses from a previous backend process."""
+        if not self._cache_file.exists():
+            return
+        try:
+            raw_store = json.loads(self._cache_file.read_text(encoding="utf-8"))
+            if not isinstance(raw_store, dict):
+                return
+            now = time.time()
+            self._store = {
+                key: (entry["value"], float(entry["expires_at"]))
+                for key, entry in raw_store.items()
+                if isinstance(entry, dict)
+                and "value" in entry
+                and float(entry.get("expires_at", 0)) > now
+            }
+            if self._store:
+                _logger.info(
+                    "[CACHE RESTORED] %d valid entries from %s",
+                    len(self._store),
+                    self._cache_file.name,
+                )
+        except (OSError, ValueError, TypeError) as exc:
+            _logger.warning("Could not read cache file %s: %s", self._cache_file, exc)
+            self._store = {}
+
+    def _persist(self) -> None:
+        """Atomically persist cache data without exposing a partial JSON file."""
+        payload = {
+            key: {"value": value, "expires_at": expires_at}
+            for key, (value, expires_at) in self._store.items()
+        }
+        try:
+            with tempfile.NamedTemporaryFile(
+                mode="w",
+                encoding="utf-8",
+                dir=self._cache_file.parent,
+                delete=False,
+            ) as temporary:
+                json.dump(payload, temporary, ensure_ascii=False, separators=(",", ":"))
+                temporary_path = Path(temporary.name)
+            temporary_path.replace(self._cache_file)
+        except (OSError, TypeError) as exc:
+            _logger.warning("Could not persist cache file %s: %s", self._cache_file, exc)
+            try:
+                temporary_path.unlink(missing_ok=True)
+            except UnboundLocalError:
+                pass
 
     def get(self, key: str):
         """Return cached value or None if absent / expired."""
@@ -68,8 +129,9 @@ class _TTLCache:
             if entry is None:
                 return None
             value, expires_at = entry
-            if time.monotonic() > expires_at:
+            if time.time() > expires_at:
                 del self._store[key]
+                self._persist()
                 return None
             return value
 
@@ -81,15 +143,23 @@ class _TTLCache:
             if key not in self._store and len(self._store) >= self._maxsize:
                 oldest = min(self._store, key=lambda k: self._store[k][1])
                 del self._store[oldest]
-            self._store[key] = (value, time.monotonic() + ttl)
+            self._store[key] = (value, time.time() + ttl)
+            self._persist()
 
 
-# Cache instances
-_product_cache = _TTLCache(maxsize=512, default_ttl=3600)   # 1 hour
-_search_cache  = _TTLCache(maxsize=256, default_ttl=1800)   # 30 minutes
+# Cache responses for 24 hours, including across backend restarts. Override the
+# duration with BACKEND_CACHE_TTL_SECONDS when a shorter cache is needed.
+_CACHE_DIR = Path(_project_root) / ".cache"
+_BACKEND_CACHE_TTL = int(os.getenv("BACKEND_CACHE_TTL_SECONDS", "86400"))
+_PRODUCT_TTL = _BACKEND_CACHE_TTL
+_SEARCH_TTL = _BACKEND_CACHE_TTL
 
-_PRODUCT_TTL = 3600
-_SEARCH_TTL  = 1800
+_product_cache = _TTLCache(
+    _CACHE_DIR / "products.json", maxsize=512, default_ttl=_PRODUCT_TTL
+)
+_search_cache = _TTLCache(
+    _CACHE_DIR / "searches.json", maxsize=256, default_ttl=_SEARCH_TTL
+)
 
 
 # ---------------------------------------------------------------------------

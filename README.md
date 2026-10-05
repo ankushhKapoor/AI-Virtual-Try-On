@@ -45,6 +45,10 @@ directly instead of going through the Vite proxy.
 | **Backend API** | `BACKEND_URL` (8000) | Root Python environment / uv | Database, product search, and recommendations |
 | **Model API** | `MODEL_API_URL` (8001) | Root Python environment / uv | CatVTON virtual try-on AI (CUDA) |
 
+Backend product and search responses are persisted in `.cache/` for 24 hours.
+Restarting the backend during that period reuses those responses instead of
+calling Oxylabs again. Set `BACKEND_CACHE_TTL_SECONDS` in `.env` to change it.
+
 ---
 
 ## Prerequisites
@@ -88,6 +92,9 @@ git clone https://github.com/Zheng-Chong/CatVTON.git ai/CatVTON
 ```
 
 > Model weights (~5 GB) download automatically from Hugging Face on first run.
+> They are then kept in Hugging Face's normal local cache and reused by later
+> model API restarts. The model still needs to be loaded back into GPU memory
+> when its Python process is stopped and started again.
 
 ### 3. Set up Oxylabs credentials
 
