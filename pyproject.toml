@@ -14,6 +14,7 @@ dependencies = [
     "huggingface-hub>=1.28.0",
     "matplotlib>=3.11.1",
     "numpy>=2.5.2",
+    "openpyxl>=3.1.5",
     "omegaconf>=2.3.1",
     "opencv-python>=5.0.0.93",
     "peft>=0.20.0",

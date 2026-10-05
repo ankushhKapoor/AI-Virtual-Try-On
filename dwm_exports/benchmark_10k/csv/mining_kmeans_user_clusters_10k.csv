@@ -1,0 +1,1201 @@
+user_id,name,email,total_tryons,success_rate,avg_quality_score,wishlist_rate,cluster_id,cluster_name
+1,Akshay Iyer,akshay.iyer1@example.com,46,0.8261,0.7646,0.3261,1,Power Shoppers (High Frequency VIPs)
+2,Tanvi Nair,tanvi.nair2@example.com,35,0.8571,0.8126,0.2857,1,Power Shoppers (High Frequency VIPs)
+3,Sanjana Iyer,sanjana.iyer3@example.com,37,0.8108,0.7665,0.2703,1,Power Shoppers (High Frequency VIPs)
+4,Harsh Mehta,harsh.mehta4@example.com,34,0.8529,0.8082,0.1765,1,Power Shoppers (High Frequency VIPs)
+5,Rohan Sharma,rohan.sharma5@example.com,28,0.8571,0.8036,0.1429,1,Power Shoppers (High Frequency VIPs)
+6,Rahul Deshmukh,rahul.deshmukh6@example.com,32,0.7812,0.7266,0.2188,1,Power Shoppers (High Frequency VIPs)
+7,Sakshi Gupta,sakshi.gupta7@example.com,34,0.8529,0.7647,0.1471,1,Power Shoppers (High Frequency VIPs)
+8,Harsh Bose,harsh.bose8@example.com,32,0.9688,0.8641,0.25,1,Power Shoppers (High Frequency VIPs)
+9,Bhavna Joshi,bhavna.joshi9@example.com,52,0.8846,0.8238,0.2692,1,Power Shoppers (High Frequency VIPs)
+10,Rishi Bose,rishi.bose10@example.com,43,0.814,0.7677,0.2326,1,Power Shoppers (High Frequency VIPs)
+11,Rhea Gupta,rhea.gupta11@example.com,31,0.9032,0.8165,0.2581,1,Power Shoppers (High Frequency VIPs)
+12,Ishita Chopra,ishita.chopra12@example.com,29,0.8276,0.7703,0.1034,1,Power Shoppers (High Frequency VIPs)
+13,Karan Menon,karan.menon13@example.com,25,0.88,0.8288,0.2,1,Power Shoppers (High Frequency VIPs)
+14,Amit Malhotra,amit.malhotra14@example.com,19,0.9474,0.8821,0.3684,1,Power Shoppers (High Frequency VIPs)
+15,Aakash Mehta,aakash.mehta15@example.com,22,0.8636,0.8245,0.1364,1,Power Shoppers (High Frequency VIPs)
+16,Akshay Menon,akshay.menon16@example.com,33,0.9091,0.8403,0.303,1,Power Shoppers (High Frequency VIPs)
+17,Vikram Singhania,vikram.singhania17@example.com,53,0.8679,0.7974,0.2075,1,Power Shoppers (High Frequency VIPs)
+18,Yash Nair,yash.nair18@example.com,32,0.75,0.7256,0.2188,1,Power Shoppers (High Frequency VIPs)
+19,Rahul Das,rahul.das19@example.com,33,0.7879,0.7433,0.3333,1,Power Shoppers (High Frequency VIPs)
+20,Tanvi Malhotra,tanvi.malhotra20@example.com,39,0.8974,0.8254,0.4103,1,Power Shoppers (High Frequency VIPs)
+21,Arjun Reddy,arjun.reddy21@example.com,25,0.8,0.7408,0.28,1,Power Shoppers (High Frequency VIPs)
+22,Yash Joshi,yash.joshi22@example.com,35,0.8857,0.8166,0.3143,1,Power Shoppers (High Frequency VIPs)
+23,Tara Mehta,tara.mehta23@example.com,21,0.9048,0.8176,0.2857,1,Power Shoppers (High Frequency VIPs)
+24,Arjun Choudhury,arjun.choudhury24@example.com,55,0.8364,0.768,0.2909,1,Power Shoppers (High Frequency VIPs)
+25,Neha Chopra,neha.chopra25@example.com,47,0.8298,0.7809,0.2128,1,Power Shoppers (High Frequency VIPs)
+26,Rishi Choudhury,rishi.choudhury26@example.com,34,0.8235,0.7706,0.2941,1,Power Shoppers (High Frequency VIPs)
+27,Dev Mishra,dev.mishra27@example.com,30,0.9667,0.8743,0.2667,1,Power Shoppers (High Frequency VIPs)
+28,Rohan Pandey,rohan.pandey28@example.com,36,0.9167,0.855,0.1944,1,Power Shoppers (High Frequency VIPs)
+29,Tanvi Mehta,tanvi.mehta29@example.com,43,0.8372,0.7767,0.3256,1,Power Shoppers (High Frequency VIPs)
+30,Payal Kapoor,payal.kapoor30@example.com,33,0.9697,0.8797,0.3939,1,Power Shoppers (High Frequency VIPs)
+31,Anushka Chopra,anushka.chopra31@example.com,25,0.92,0.8204,0.36,1,Power Shoppers (High Frequency VIPs)
+32,Rhea Joshi,rhea.joshi32@example.com,42,0.8333,0.7755,0.2381,1,Power Shoppers (High Frequency VIPs)
+33,Sanjana Choudhury,sanjana.choudhury33@example.com,34,0.7647,0.7047,0.1176,1,Power Shoppers (High Frequency VIPs)
+34,Sanjana Bhat,sanjana.bhat34@example.com,45,0.8444,0.7747,0.2889,1,Power Shoppers (High Frequency VIPs)
+35,Simran Reddy,simran.reddy35@example.com,43,0.9535,0.8786,0.3721,1,Power Shoppers (High Frequency VIPs)
+36,Manish Kulkarni,manish.kulkarni36@example.com,25,0.88,0.8088,0.36,1,Power Shoppers (High Frequency VIPs)
+37,Meera Verma,meera.verma37@example.com,23,0.9565,0.8861,0.2609,1,Power Shoppers (High Frequency VIPs)
+38,Nandini Bose,nandini.bose38@example.com,28,0.8929,0.8361,0.3214,1,Power Shoppers (High Frequency VIPs)
+39,Aakash Chopra,aakash.chopra39@example.com,15,0.6667,0.66,0.2667,1,Power Shoppers (High Frequency VIPs)
+40,Divya Joshi,divya.joshi40@example.com,43,0.907,0.8435,0.3953,1,Power Shoppers (High Frequency VIPs)
+41,Nandini Trivedi,nandini.trivedi41@example.com,46,0.8043,0.7483,0.2174,1,Power Shoppers (High Frequency VIPs)
+42,Harsh Saxena,harsh.saxena42@example.com,32,0.9375,0.8425,0.375,1,Power Shoppers (High Frequency VIPs)
+43,Ritu Iyer,ritu.iyer43@example.com,28,0.9286,0.8604,0.3571,1,Power Shoppers (High Frequency VIPs)
+44,Arjun Malhotra,arjun.malhotra44@example.com,26,0.8077,0.7523,0.3077,1,Power Shoppers (High Frequency VIPs)
+45,Amit Joshi,amit.joshi45@example.com,46,0.913,0.8352,0.2609,1,Power Shoppers (High Frequency VIPs)
+46,Manish Mukherjee,manish.mukherjee46@example.com,23,0.8261,0.7874,0.3478,1,Power Shoppers (High Frequency VIPs)
+47,Priya Mishra,priya.mishra47@example.com,41,0.878,0.8059,0.2927,1,Power Shoppers (High Frequency VIPs)
+48,Kunal Gupta,kunal.gupta48@example.com,32,0.8438,0.7866,0.25,1,Power Shoppers (High Frequency VIPs)
+49,Deepak Rao,deepak.rao49@example.com,34,0.8824,0.7915,0.3529,1,Power Shoppers (High Frequency VIPs)
+50,Aarav Menon,aarav.menon50@example.com,45,0.7556,0.7276,0.2667,1,Power Shoppers (High Frequency VIPs)
+51,Diya Iyer,diya.iyer51@example.com,35,0.8857,0.8089,0.3143,1,Power Shoppers (High Frequency VIPs)
+52,Kavya Patel,kavya.patel52@example.com,44,0.8864,0.8091,0.25,1,Power Shoppers (High Frequency VIPs)
+53,Ishita Mehta,ishita.mehta53@example.com,33,0.8788,0.8085,0.2121,1,Power Shoppers (High Frequency VIPs)
+54,Deepak Choudhury,deepak.choudhury54@example.com,24,0.8333,0.7654,0.2917,1,Power Shoppers (High Frequency VIPs)
+55,Yash Kulkarni,yash.kulkarni55@example.com,35,0.8,0.7534,0.3143,1,Power Shoppers (High Frequency VIPs)
+56,Siddharth Deshmukh,siddharth.deshmukh56@example.com,33,0.9394,0.8733,0.2424,1,Power Shoppers (High Frequency VIPs)
+57,Sneha Mukherjee,sneha.mukherjee57@example.com,30,0.9667,0.8803,0.4333,1,Power Shoppers (High Frequency VIPs)
+58,Rishi Gupta,rishi.gupta58@example.com,31,0.9032,0.831,0.1935,1,Power Shoppers (High Frequency VIPs)
+59,Yash Agarwal,yash.agarwal59@example.com,43,0.907,0.8491,0.3023,1,Power Shoppers (High Frequency VIPs)
+60,Divya Malhotra,divya.malhotra60@example.com,22,0.8182,0.7791,0.2727,1,Power Shoppers (High Frequency VIPs)
+61,Rahul Mehta,rahul.mehta61@example.com,25,0.88,0.802,0.48,1,Power Shoppers (High Frequency VIPs)
+62,Bhavna Choudhury,bhavna.choudhury62@example.com,35,0.9143,0.8377,0.2,1,Power Shoppers (High Frequency VIPs)
+63,Rahul Sharma,rahul.sharma63@example.com,26,0.8846,0.8108,0.3077,1,Power Shoppers (High Frequency VIPs)
+64,Akshay Patel,akshay.patel64@example.com,39,0.8974,0.8333,0.359,1,Power Shoppers (High Frequency VIPs)
+65,Rohan Das,rohan.das65@example.com,20,0.75,0.7055,0.3,1,Power Shoppers (High Frequency VIPs)
+66,Manish Nair,manish.nair66@example.com,32,0.9375,0.8403,0.3125,1,Power Shoppers (High Frequency VIPs)
+67,Anushka Gupta,anushka.gupta67@example.com,38,0.8421,0.7934,0.2368,1,Power Shoppers (High Frequency VIPs)
+68,Amit Mukherjee,amit.mukherjee68@example.com,25,0.96,0.8792,0.2,1,Power Shoppers (High Frequency VIPs)
+69,Gaurav Nair,gaurav.nair69@example.com,40,0.875,0.8085,0.3,1,Power Shoppers (High Frequency VIPs)
+70,Vikram Iyer,vikram.iyer70@example.com,33,0.8182,0.757,0.1818,1,Power Shoppers (High Frequency VIPs)
+71,Isha Reddy,isha.reddy71@example.com,42,0.9286,0.8481,0.3571,1,Power Shoppers (High Frequency VIPs)
+72,Neha Das,neha.das72@example.com,26,0.8462,0.7788,0.1538,1,Power Shoppers (High Frequency VIPs)
+73,Tara Agarwal,tara.agarwal73@example.com,31,0.9032,0.8319,0.3548,1,Power Shoppers (High Frequency VIPs)
+74,Simran Trivedi,simran.trivedi74@example.com,39,0.7179,0.6733,0.2564,1,Power Shoppers (High Frequency VIPs)
+75,Kavya Gupta,kavya.gupta75@example.com,30,0.8,0.7737,0.2667,1,Power Shoppers (High Frequency VIPs)
+76,Sameer Verma,sameer.verma76@example.com,40,0.925,0.8387,0.225,1,Power Shoppers (High Frequency VIPs)
+77,Tanvi Malhotra,tanvi.malhotra77@example.com,24,0.7917,0.7408,0.25,1,Power Shoppers (High Frequency VIPs)
+78,Sameer Pandey,sameer.pandey78@example.com,49,0.8367,0.7841,0.2245,1,Power Shoppers (High Frequency VIPs)
+79,Ananya Agarwal,ananya.agarwal79@example.com,28,0.8929,0.815,0.2857,1,Power Shoppers (High Frequency VIPs)
+80,Ishita Mukherjee,ishita.mukherjee80@example.com,37,0.973,0.8716,0.2432,1,Power Shoppers (High Frequency VIPs)
+81,Varun Kulkarni,varun.kulkarni81@example.com,34,0.9118,0.8335,0.3824,1,Power Shoppers (High Frequency VIPs)
+82,Simran Ghosh,simran.ghosh82@example.com,31,0.8065,0.7565,0.2258,1,Power Shoppers (High Frequency VIPs)
+83,Aakash Sharma,aakash.sharma83@example.com,44,0.8409,0.7773,0.2955,1,Power Shoppers (High Frequency VIPs)
+84,Neha Sengupta,neha.sengupta84@example.com,40,0.875,0.8113,0.15,1,Power Shoppers (High Frequency VIPs)
+85,Amit Pandey,amit.pandey85@example.com,56,0.8214,0.7536,0.2321,1,Power Shoppers (High Frequency VIPs)
+86,Payal Kulkarni,payal.kulkarni86@example.com,18,0.9444,0.8511,0.5,1,Power Shoppers (High Frequency VIPs)
+87,Nikhil Gupta,nikhil.gupta87@example.com,48,0.8333,0.7815,0.3333,1,Power Shoppers (High Frequency VIPs)
+88,Sanjana Choudhury,sanjana.choudhury88@example.com,33,0.8485,0.7839,0.3636,1,Power Shoppers (High Frequency VIPs)
+89,Dev Patel,dev.patel89@example.com,34,0.9118,0.8297,0.2059,1,Power Shoppers (High Frequency VIPs)
+90,Gaurav Deshmukh,gaurav.deshmukh90@example.com,35,0.9143,0.8294,0.2857,1,Power Shoppers (High Frequency VIPs)
+91,Ananya Deshmukh,ananya.deshmukh91@example.com,26,0.9615,0.8662,0.3077,1,Power Shoppers (High Frequency VIPs)
+92,Kabir Menon,kabir.menon92@example.com,32,0.9062,0.8266,0.2188,1,Power Shoppers (High Frequency VIPs)
+93,Kavya Chopra,kavya.chopra93@example.com,41,0.9268,0.8427,0.1463,1,Power Shoppers (High Frequency VIPs)
+94,Kavya Bhat,kavya.bhat94@example.com,26,0.8846,0.8162,0.2308,1,Power Shoppers (High Frequency VIPs)
+95,Swati Mehta,swati.mehta95@example.com,48,0.8333,0.7775,0.2083,1,Power Shoppers (High Frequency VIPs)
+96,Bhavna Bhat,bhavna.bhat96@example.com,28,0.8929,0.8221,0.3214,1,Power Shoppers (High Frequency VIPs)
+97,Siddharth Gupta,siddharth.gupta97@example.com,28,0.8929,0.8332,0.3214,1,Power Shoppers (High Frequency VIPs)
+98,Dev Nair,dev.nair98@example.com,23,0.8696,0.8113,0.3043,1,Power Shoppers (High Frequency VIPs)
+99,Aditya Bansal,aditya.bansal99@example.com,28,0.8929,0.8475,0.2143,1,Power Shoppers (High Frequency VIPs)
+100,Neha Kapoor,neha.kapoor100@example.com,27,0.9259,0.84,0.4815,1,Power Shoppers (High Frequency VIPs)
+101,Neha Menon,neha.menon101@example.com,10,0.8,0.781,0.1,0,Occasional / Trial Users
+102,Kabir Choudhury,kabir.choudhury102@example.com,14,0.9286,0.8471,0.2143,0,Occasional / Trial Users
+103,Siddharth Verma,siddharth.verma103@example.com,22,0.9545,0.8705,0.3182,1,Power Shoppers (High Frequency VIPs)
+104,Kavya Reddy,kavya.reddy104@example.com,23,0.9565,0.8878,0.3478,1,Power Shoppers (High Frequency VIPs)
+105,Sameer Mishra,sameer.mishra105@example.com,14,0.8571,0.7914,0.3571,1,Power Shoppers (High Frequency VIPs)
+106,Priya Menon,priya.menon106@example.com,14,0.8571,0.79,0.0714,0,Occasional / Trial Users
+107,Aarav Bansal,aarav.bansal107@example.com,4,1.0,0.895,0.25,0,Occasional / Trial Users
+108,Yash Iyer,yash.iyer108@example.com,14,0.9286,0.8579,0.2143,0,Occasional / Trial Users
+109,Meera Ghosh,meera.ghosh109@example.com,19,0.9474,0.8705,0.3158,1,Power Shoppers (High Frequency VIPs)
+110,Sakshi Verma,sakshi.verma110@example.com,17,0.8235,0.7618,0.2941,1,Power Shoppers (High Frequency VIPs)
+111,Kunal Gupta,kunal.gupta111@example.com,14,0.9286,0.8521,0.2857,1,Power Shoppers (High Frequency VIPs)
+112,Nandini Agarwal,nandini.agarwal112@example.com,12,1.0,0.9017,0.3333,0,Occasional / Trial Users
+113,Anushka Joshi,anushka.joshi113@example.com,12,0.8333,0.7858,0.3333,1,Power Shoppers (High Frequency VIPs)
+114,Akshay Bose,akshay.bose114@example.com,15,0.7333,0.7073,0.3333,1,Power Shoppers (High Frequency VIPs)
+115,Aarav Kapoor,aarav.kapoor115@example.com,14,0.8571,0.7943,0.2143,1,Power Shoppers (High Frequency VIPs)
+116,Siddharth Rao,siddharth.rao116@example.com,8,0.625,0.6375,0.25,2,At-Risk / Sensitive Users
+117,Payal Bose,payal.bose117@example.com,11,1.0,0.9018,0.5455,3,Engaged Fashion Explorers
+118,Meera Mehta,meera.mehta118@example.com,22,0.8636,0.7905,0.2727,1,Power Shoppers (High Frequency VIPs)
+119,Harsh Patel,harsh.patel119@example.com,16,1.0,0.8762,0.25,1,Power Shoppers (High Frequency VIPs)
+120,Sakshi Verma,sakshi.verma120@example.com,13,0.9231,0.8446,0.3846,1,Power Shoppers (High Frequency VIPs)
+121,Rohan Sengupta,rohan.sengupta121@example.com,12,1.0,0.9008,0.25,0,Occasional / Trial Users
+122,Karan Gupta,karan.gupta122@example.com,5,1.0,0.854,0.2,0,Occasional / Trial Users
+123,Yash Iyer,yash.iyer123@example.com,17,0.8235,0.7571,0.3529,1,Power Shoppers (High Frequency VIPs)
+124,Varun Menon,varun.menon124@example.com,19,0.9474,0.8811,0.4211,1,Power Shoppers (High Frequency VIPs)
+125,Arjun Pandey,arjun.pandey125@example.com,19,0.9474,0.8647,0.2632,1,Power Shoppers (High Frequency VIPs)
+126,Diya Rao,diya.rao126@example.com,11,1.0,0.8845,0.3636,0,Occasional / Trial Users
+127,Yash Das,yash.das127@example.com,26,0.9231,0.8469,0.3077,1,Power Shoppers (High Frequency VIPs)
+128,Arjun Pandey,arjun.pandey128@example.com,6,1.0,0.8933,0.0,0,Occasional / Trial Users
+129,Aakash Das,aakash.das129@example.com,23,0.8261,0.7635,0.3043,1,Power Shoppers (High Frequency VIPs)
+130,Rahul Gupta,rahul.gupta130@example.com,16,0.8125,0.7638,0.125,1,Power Shoppers (High Frequency VIPs)
+131,Priya Mishra,priya.mishra131@example.com,4,0.25,0.2875,0.25,2,At-Risk / Sensitive Users
+132,Diya Bansal,diya.bansal132@example.com,8,0.875,0.7688,0.125,0,Occasional / Trial Users
+133,Ritu Joshi,ritu.joshi133@example.com,25,0.68,0.6676,0.28,1,Power Shoppers (High Frequency VIPs)
+134,Karan Agarwal,karan.agarwal134@example.com,8,0.875,0.8087,0.125,0,Occasional / Trial Users
+135,Nandini Mishra,nandini.mishra135@example.com,19,0.6316,0.6289,0.2105,1,Power Shoppers (High Frequency VIPs)
+136,Diya Iyer,diya.iyer136@example.com,8,0.625,0.615,0.5,2,At-Risk / Sensitive Users
+137,Bhavna Joshi,bhavna.joshi137@example.com,15,0.9333,0.86,0.3333,1,Power Shoppers (High Frequency VIPs)
+138,Kunal Bose,kunal.bose138@example.com,21,0.8095,0.771,0.381,1,Power Shoppers (High Frequency VIPs)
+139,Dev Bose,dev.bose139@example.com,23,0.9565,0.8561,0.3913,1,Power Shoppers (High Frequency VIPs)
+140,Meera Chopra,meera.chopra140@example.com,15,0.8,0.7273,0.2667,1,Power Shoppers (High Frequency VIPs)
+141,Siddharth Patel,siddharth.patel141@example.com,7,0.8571,0.8157,0.4286,3,Engaged Fashion Explorers
+142,Divya Mukherjee,divya.mukherjee142@example.com,15,0.9333,0.8233,0.4,1,Power Shoppers (High Frequency VIPs)
+143,Amit Trivedi,amit.trivedi143@example.com,8,1.0,0.9038,0.5,3,Engaged Fashion Explorers
+144,Shreya Bose,shreya.bose144@example.com,15,1.0,0.8887,0.4667,3,Engaged Fashion Explorers
+145,Ritu Menon,ritu.menon145@example.com,20,0.9,0.812,0.4,1,Power Shoppers (High Frequency VIPs)
+146,Meera Trivedi,meera.trivedi146@example.com,12,0.8333,0.7867,0.3333,1,Power Shoppers (High Frequency VIPs)
+147,Priya Bansal,priya.bansal147@example.com,12,0.9167,0.8233,0.25,0,Occasional / Trial Users
+148,Simran Singhania,simran.singhania148@example.com,18,0.9444,0.8539,0.3889,1,Power Shoppers (High Frequency VIPs)
+149,Aditya Gupta,aditya.gupta149@example.com,8,0.75,0.7387,0.125,0,Occasional / Trial Users
+150,Aakash Bansal,aakash.bansal150@example.com,10,0.9,0.82,0.3,0,Occasional / Trial Users
+151,Pranav Sengupta,pranav.sengupta151@example.com,16,0.8125,0.7831,0.3125,1,Power Shoppers (High Frequency VIPs)
+152,Aarav Sengupta,aarav.sengupta152@example.com,6,0.5,0.4967,0.1667,2,At-Risk / Sensitive Users
+153,Isha Pandey,isha.pandey153@example.com,9,1.0,0.8989,0.3333,0,Occasional / Trial Users
+154,Tara Kapoor,tara.kapoor154@example.com,6,1.0,0.9133,0.3333,0,Occasional / Trial Users
+155,Sameer Bansal,sameer.bansal155@example.com,11,0.9091,0.7982,0.3636,1,Power Shoppers (High Frequency VIPs)
+156,Gaurav Pandey,gaurav.pandey156@example.com,14,0.7143,0.6907,0.2857,1,Power Shoppers (High Frequency VIPs)
+157,Ishita Sengupta,ishita.sengupta157@example.com,10,0.9,0.831,0.6,3,Engaged Fashion Explorers
+158,Akshay Menon,akshay.menon158@example.com,16,1.0,0.8919,0.125,0,Occasional / Trial Users
+159,Deepak Nair,deepak.nair159@example.com,14,0.9286,0.85,0.2857,1,Power Shoppers (High Frequency VIPs)
+160,Rahul Pandey,rahul.pandey160@example.com,11,0.9091,0.8345,0.2727,0,Occasional / Trial Users
+161,Diya Patel,diya.patel161@example.com,14,0.8571,0.7893,0.2857,1,Power Shoppers (High Frequency VIPs)
+162,Swati Das,swati.das162@example.com,14,0.7143,0.6814,0.2143,1,Power Shoppers (High Frequency VIPs)
+163,Varun Ghosh,varun.ghosh163@example.com,16,0.875,0.8131,0.4375,1,Power Shoppers (High Frequency VIPs)
+164,Vikram Singhania,vikram.singhania164@example.com,16,0.9375,0.87,0.3125,1,Power Shoppers (High Frequency VIPs)
+165,Anushka Chopra,anushka.chopra165@example.com,8,0.875,0.7913,0.125,0,Occasional / Trial Users
+166,Tara Singhania,tara.singhania166@example.com,14,0.9286,0.8286,0.5,3,Engaged Fashion Explorers
+167,Trisha Bose,trisha.bose167@example.com,12,1.0,0.91,0.0833,0,Occasional / Trial Users
+168,Rishi Deshmukh,rishi.deshmukh168@example.com,23,0.8696,0.8017,0.2609,1,Power Shoppers (High Frequency VIPs)
+169,Sakshi Nair,sakshi.nair169@example.com,6,1.0,0.925,0.3333,0,Occasional / Trial Users
+170,Aditya Pandey,aditya.pandey170@example.com,16,0.875,0.7956,0.1875,1,Power Shoppers (High Frequency VIPs)
+171,Divya Choudhury,divya.choudhury171@example.com,8,0.875,0.8237,0.125,0,Occasional / Trial Users
+172,Deepak Ghosh,deepak.ghosh172@example.com,22,0.8182,0.7691,0.0909,1,Power Shoppers (High Frequency VIPs)
+173,Amit Ghosh,amit.ghosh173@example.com,11,1.0,0.8955,0.2727,0,Occasional / Trial Users
+174,Sakshi Malhotra,sakshi.malhotra174@example.com,14,0.7143,0.6793,0.0714,2,At-Risk / Sensitive Users
+175,Gaurav Malhotra,gaurav.malhotra175@example.com,11,0.6364,0.6082,0.0,2,At-Risk / Sensitive Users
+176,Akshay Joshi,akshay.joshi176@example.com,13,0.9231,0.84,0.1538,0,Occasional / Trial Users
+177,Akshay Nair,akshay.nair177@example.com,13,0.7692,0.7315,0.2308,1,Power Shoppers (High Frequency VIPs)
+178,Kabir Singhania,kabir.singhania178@example.com,16,0.9375,0.8444,0.1875,1,Power Shoppers (High Frequency VIPs)
+179,Tanvi Kapoor,tanvi.kapoor179@example.com,19,0.9474,0.8447,0.3684,1,Power Shoppers (High Frequency VIPs)
+180,Ishita Verma,ishita.verma180@example.com,8,0.875,0.8212,0.25,0,Occasional / Trial Users
+181,Aakash Singhania,aakash.singhania181@example.com,23,0.8696,0.8096,0.4783,1,Power Shoppers (High Frequency VIPs)
+182,Sneha Mehta,sneha.mehta182@example.com,8,1.0,0.8962,0.625,3,Engaged Fashion Explorers
+183,Ritu Choudhury,ritu.choudhury183@example.com,14,1.0,0.9,0.0714,0,Occasional / Trial Users
+184,Ananya Gupta,ananya.gupta184@example.com,9,1.0,0.9189,0.2222,0,Occasional / Trial Users
+185,Trisha Bhat,trisha.bhat185@example.com,16,0.75,0.7062,0.25,1,Power Shoppers (High Frequency VIPs)
+186,Deepak Bhat,deepak.bhat186@example.com,15,0.8667,0.804,0.2667,1,Power Shoppers (High Frequency VIPs)
+187,Aarav Reddy,aarav.reddy187@example.com,12,0.9167,0.8442,0.0,0,Occasional / Trial Users
+188,Varun Choudhury,varun.choudhury188@example.com,11,1.0,0.9073,0.1818,0,Occasional / Trial Users
+189,Rahul Kulkarni,rahul.kulkarni189@example.com,15,0.7333,0.704,0.2667,1,Power Shoppers (High Frequency VIPs)
+190,Isha Kulkarni,isha.kulkarni190@example.com,8,0.875,0.8337,0.375,0,Occasional / Trial Users
+191,Ritu Bansal,ritu.bansal191@example.com,18,0.7778,0.7494,0.1667,1,Power Shoppers (High Frequency VIPs)
+192,Amit Rao,amit.rao192@example.com,6,1.0,0.8933,0.3333,0,Occasional / Trial Users
+193,Swati Choudhury,swati.choudhury193@example.com,3,1.0,0.8767,0.6667,3,Engaged Fashion Explorers
+194,Bhavna Bhat,bhavna.bhat194@example.com,25,0.96,0.8608,0.36,1,Power Shoppers (High Frequency VIPs)
+195,Ishita Agarwal,ishita.agarwal195@example.com,28,0.8214,0.7654,0.25,1,Power Shoppers (High Frequency VIPs)
+196,Neha Rao,neha.rao196@example.com,10,1.0,0.912,0.4,3,Engaged Fashion Explorers
+197,Aakash Kapoor,aakash.kapoor197@example.com,11,0.9091,0.8373,0.2727,0,Occasional / Trial Users
+198,Dev Kapoor,dev.kapoor198@example.com,16,0.75,0.7338,0.1875,1,Power Shoppers (High Frequency VIPs)
+199,Deepak Mishra,deepak.mishra199@example.com,9,1.0,0.9078,0.3333,0,Occasional / Trial Users
+200,Ishita Kulkarni,ishita.kulkarni200@example.com,15,0.8,0.736,0.1333,1,Power Shoppers (High Frequency VIPs)
+201,Harsh Patel,harsh.patel201@example.com,28,0.9286,0.8375,0.3571,1,Power Shoppers (High Frequency VIPs)
+202,Tara Mehta,tara.mehta202@example.com,14,1.0,0.9171,0.3571,1,Power Shoppers (High Frequency VIPs)
+203,Deepak Sharma,deepak.sharma203@example.com,14,0.8571,0.7879,0.2857,1,Power Shoppers (High Frequency VIPs)
+204,Diya Menon,diya.menon204@example.com,7,1.0,0.9086,0.1429,0,Occasional / Trial Users
+205,Aditya Kulkarni,aditya.kulkarni205@example.com,25,0.92,0.8368,0.44,1,Power Shoppers (High Frequency VIPs)
+206,Pranav Gupta,pranav.gupta206@example.com,11,0.8182,0.7918,0.2727,0,Occasional / Trial Users
+207,Siddharth Saxena,siddharth.saxena207@example.com,11,0.6364,0.6245,0.0,2,At-Risk / Sensitive Users
+208,Kunal Menon,kunal.menon208@example.com,16,0.875,0.7944,0.3125,1,Power Shoppers (High Frequency VIPs)
+209,Priya Iyer,priya.iyer209@example.com,7,1.0,0.8943,0.2857,0,Occasional / Trial Users
+210,Priya Bhat,priya.bhat210@example.com,10,0.9,0.836,0.0,0,Occasional / Trial Users
+211,Simran Singhania,simran.singhania211@example.com,9,0.7778,0.7111,0.2222,0,Occasional / Trial Users
+212,Bhavna Singhania,bhavna.singhania212@example.com,10,0.8,0.742,0.3,0,Occasional / Trial Users
+213,Vivaan Singhania,vivaan.singhania213@example.com,18,0.9444,0.8289,0.4444,1,Power Shoppers (High Frequency VIPs)
+214,Kunal Pandey,kunal.pandey214@example.com,13,0.8462,0.7992,0.2308,0,Occasional / Trial Users
+215,Rohan Reddy,rohan.reddy215@example.com,12,1.0,0.915,0.25,0,Occasional / Trial Users
+216,Yash Reddy,yash.reddy216@example.com,10,1.0,0.904,0.2,0,Occasional / Trial Users
+217,Tara Kapoor,tara.kapoor217@example.com,25,1.0,0.8824,0.32,1,Power Shoppers (High Frequency VIPs)
+218,Anushka Iyer,anushka.iyer218@example.com,14,0.9286,0.8586,0.3571,1,Power Shoppers (High Frequency VIPs)
+219,Akshay Ghosh,akshay.ghosh219@example.com,11,1.0,0.9,0.0909,0,Occasional / Trial Users
+220,Rhea Bose,rhea.bose220@example.com,12,1.0,0.91,0.25,0,Occasional / Trial Users
+221,Divya Agarwal,divya.agarwal221@example.com,13,0.6923,0.6677,0.3077,1,Power Shoppers (High Frequency VIPs)
+222,Harsh Saxena,harsh.saxena222@example.com,13,1.0,0.9154,0.3077,0,Occasional / Trial Users
+223,Isha Mishra,isha.mishra223@example.com,6,1.0,0.9333,0.0,0,Occasional / Trial Users
+224,Dev Das,dev.das224@example.com,1,0.0,0.17,0.0,2,At-Risk / Sensitive Users
+225,Tanvi Ghosh,tanvi.ghosh225@example.com,13,0.9231,0.8554,0.3846,1,Power Shoppers (High Frequency VIPs)
+226,Deepak Malhotra,deepak.malhotra226@example.com,19,0.8421,0.7884,0.2105,1,Power Shoppers (High Frequency VIPs)
+227,Yash Chopra,yash.chopra227@example.com,14,0.7143,0.665,0.2857,1,Power Shoppers (High Frequency VIPs)
+228,Anushka Das,anushka.das228@example.com,16,0.9375,0.8388,0.5,3,Engaged Fashion Explorers
+229,Anushka Gupta,anushka.gupta229@example.com,13,1.0,0.9115,0.2308,0,Occasional / Trial Users
+230,Ritu Joshi,ritu.joshi230@example.com,13,0.8462,0.8,0.2308,0,Occasional / Trial Users
+231,Tanvi Choudhury,tanvi.choudhury231@example.com,10,0.9,0.808,0.0,0,Occasional / Trial Users
+232,Vikram Mehta,vikram.mehta232@example.com,14,0.7143,0.6786,0.2857,1,Power Shoppers (High Frequency VIPs)
+233,Varun Kulkarni,varun.kulkarni233@example.com,16,0.875,0.7975,0.3125,1,Power Shoppers (High Frequency VIPs)
+234,Rishi Kulkarni,rishi.kulkarni234@example.com,15,0.7333,0.7113,0.2,1,Power Shoppers (High Frequency VIPs)
+235,Anushka Malhotra,anushka.malhotra235@example.com,10,0.7,0.713,0.3,1,Power Shoppers (High Frequency VIPs)
+236,Nikhil Nair,nikhil.nair236@example.com,15,1.0,0.9007,0.4667,3,Engaged Fashion Explorers
+237,Kavya Sengupta,kavya.sengupta237@example.com,10,1.0,0.919,0.1,0,Occasional / Trial Users
+238,Shreya Kulkarni,shreya.kulkarni238@example.com,12,0.9167,0.8558,0.4167,3,Engaged Fashion Explorers
+239,Karan Bose,karan.bose239@example.com,15,0.7333,0.6913,0.2,1,Power Shoppers (High Frequency VIPs)
+240,Karan Singhania,karan.singhania240@example.com,11,0.9091,0.8182,0.4545,3,Engaged Fashion Explorers
+241,Priya Joshi,priya.joshi241@example.com,11,0.9091,0.8073,0.2727,0,Occasional / Trial Users
+242,Amit Gupta,amit.gupta242@example.com,14,0.8571,0.8129,0.2143,1,Power Shoppers (High Frequency VIPs)
+243,Sanjana Choudhury,sanjana.choudhury243@example.com,13,0.7692,0.7369,0.0,0,Occasional / Trial Users
+244,Vikram Gupta,vikram.gupta244@example.com,15,0.9333,0.858,0.1333,0,Occasional / Trial Users
+245,Amit Bhat,amit.bhat245@example.com,11,0.6364,0.6127,0.2727,2,At-Risk / Sensitive Users
+246,Nikhil Iyer,nikhil.iyer246@example.com,17,0.9412,0.88,0.5294,3,Engaged Fashion Explorers
+247,Rahul Reddy,rahul.reddy247@example.com,12,0.9167,0.8192,0.1667,0,Occasional / Trial Users
+248,Aarav Singhania,aarav.singhania248@example.com,11,0.8182,0.7473,0.1818,0,Occasional / Trial Users
+249,Tanvi Patel,tanvi.patel249@example.com,24,0.875,0.7829,0.25,1,Power Shoppers (High Frequency VIPs)
+250,Nikhil Singhania,nikhil.singhania250@example.com,19,0.8947,0.8263,0.4211,1,Power Shoppers (High Frequency VIPs)
+251,Deepak Kulkarni,deepak.kulkarni251@example.com,10,1.0,0.901,0.2,0,Occasional / Trial Users
+252,Pranav Sengupta,pranav.sengupta252@example.com,10,1.0,0.88,0.3,0,Occasional / Trial Users
+253,Sameer Kapoor,sameer.kapoor253@example.com,6,0.8333,0.7717,0.5,3,Engaged Fashion Explorers
+254,Siddharth Das,siddharth.das254@example.com,11,1.0,0.9091,0.4545,3,Engaged Fashion Explorers
+255,Kabir Chopra,kabir.chopra255@example.com,21,0.9048,0.821,0.2381,1,Power Shoppers (High Frequency VIPs)
+256,Pranav Agarwal,pranav.agarwal256@example.com,12,0.8333,0.7742,0.25,0,Occasional / Trial Users
+257,Rhea Verma,rhea.verma257@example.com,16,0.8125,0.7669,0.1875,1,Power Shoppers (High Frequency VIPs)
+258,Ishita Nair,ishita.nair258@example.com,17,0.8235,0.7759,0.4118,1,Power Shoppers (High Frequency VIPs)
+259,Deepak Bose,deepak.bose259@example.com,20,0.9,0.8325,0.3,1,Power Shoppers (High Frequency VIPs)
+260,Swati Nair,swati.nair260@example.com,4,0.5,0.5625,0.25,2,At-Risk / Sensitive Users
+261,Sameer Mukherjee,sameer.mukherjee261@example.com,6,0.8333,0.7483,0.1667,0,Occasional / Trial Users
+262,Bhavna Bose,bhavna.bose262@example.com,15,0.8,0.7287,0.4,1,Power Shoppers (High Frequency VIPs)
+263,Swati Patel,swati.patel263@example.com,21,0.8095,0.7557,0.1905,1,Power Shoppers (High Frequency VIPs)
+264,Vivaan Saxena,vivaan.saxena264@example.com,18,1.0,0.8994,0.3889,1,Power Shoppers (High Frequency VIPs)
+265,Sneha Joshi,sneha.joshi265@example.com,8,1.0,0.895,0.625,3,Engaged Fashion Explorers
+266,Arjun Nair,arjun.nair266@example.com,9,1.0,0.8989,0.4444,3,Engaged Fashion Explorers
+267,Kabir Rao,kabir.rao267@example.com,20,0.9,0.836,0.3,1,Power Shoppers (High Frequency VIPs)
+268,Sameer Singhania,sameer.singhania268@example.com,10,0.7,0.728,0.0,0,Occasional / Trial Users
+269,Nikhil Patel,nikhil.patel269@example.com,14,0.8571,0.8114,0.4286,1,Power Shoppers (High Frequency VIPs)
+270,Payal Sengupta,payal.sengupta270@example.com,14,0.7857,0.7793,0.4286,1,Power Shoppers (High Frequency VIPs)
+271,Kabir Bansal,kabir.bansal271@example.com,34,0.9412,0.8697,0.2647,1,Power Shoppers (High Frequency VIPs)
+272,Akshay Bhat,akshay.bhat272@example.com,17,0.8824,0.8059,0.1765,1,Power Shoppers (High Frequency VIPs)
+273,Isha Iyer,isha.iyer273@example.com,15,1.0,0.91,0.2667,1,Power Shoppers (High Frequency VIPs)
+274,Tara Verma,tara.verma274@example.com,16,0.8125,0.735,0.25,1,Power Shoppers (High Frequency VIPs)
+275,Kabir Patel,kabir.patel275@example.com,13,0.9231,0.8231,0.1538,0,Occasional / Trial Users
+276,Kunal Trivedi,kunal.trivedi276@example.com,13,0.8462,0.7769,0.3077,1,Power Shoppers (High Frequency VIPs)
+277,Sameer Iyer,sameer.iyer277@example.com,16,0.75,0.7356,0.125,1,Power Shoppers (High Frequency VIPs)
+278,Priya Singhania,priya.singhania278@example.com,14,0.9286,0.8179,0.3571,1,Power Shoppers (High Frequency VIPs)
+279,Manish Choudhury,manish.choudhury279@example.com,8,0.75,0.7488,0.25,0,Occasional / Trial Users
+280,Ishita Menon,ishita.menon280@example.com,19,0.8421,0.7921,0.2105,1,Power Shoppers (High Frequency VIPs)
+281,Sanjana Kapoor,sanjana.kapoor281@example.com,20,0.75,0.694,0.45,1,Power Shoppers (High Frequency VIPs)
+282,Diya Mehta,diya.mehta282@example.com,9,0.7778,0.7756,0.1111,0,Occasional / Trial Users
+283,Pranav Bhat,pranav.bhat283@example.com,16,0.9375,0.8506,0.3125,1,Power Shoppers (High Frequency VIPs)
+284,Tanvi Bhat,tanvi.bhat284@example.com,9,0.7778,0.6744,0.1111,0,Occasional / Trial Users
+285,Gaurav Deshmukh,gaurav.deshmukh285@example.com,8,0.875,0.7988,0.375,0,Occasional / Trial Users
+286,Tanvi Rao,tanvi.rao286@example.com,9,0.8889,0.8156,0.3333,0,Occasional / Trial Users
+287,Akshay Mishra,akshay.mishra287@example.com,9,0.8889,0.8211,0.5556,3,Engaged Fashion Explorers
+288,Gaurav Reddy,gaurav.reddy288@example.com,10,1.0,0.908,0.3,0,Occasional / Trial Users
+289,Dev Bansal,dev.bansal289@example.com,11,0.7273,0.6891,0.1818,0,Occasional / Trial Users
+290,Ritu Bose,ritu.bose290@example.com,15,0.9333,0.85,0.4667,3,Engaged Fashion Explorers
+291,Nikhil Bansal,nikhil.bansal291@example.com,22,0.9091,0.8364,0.3182,1,Power Shoppers (High Frequency VIPs)
+292,Rohan Malhotra,rohan.malhotra292@example.com,19,0.9474,0.8495,0.3158,1,Power Shoppers (High Frequency VIPs)
+293,Siddharth Kapoor,siddharth.kapoor293@example.com,14,0.9286,0.8686,0.2143,0,Occasional / Trial Users
+294,Manish Mishra,manish.mishra294@example.com,11,1.0,0.9145,0.3636,0,Occasional / Trial Users
+295,Harsh Malhotra,harsh.malhotra295@example.com,19,0.8421,0.78,0.3684,1,Power Shoppers (High Frequency VIPs)
+296,Vikram Deshmukh,vikram.deshmukh296@example.com,11,1.0,0.9018,0.5455,3,Engaged Fashion Explorers
+297,Deepak Kulkarni,deepak.kulkarni297@example.com,23,0.913,0.8126,0.2174,1,Power Shoppers (High Frequency VIPs)
+298,Deepak Patel,deepak.patel298@example.com,22,0.8182,0.7714,0.2273,1,Power Shoppers (High Frequency VIPs)
+299,Sakshi Verma,sakshi.verma299@example.com,4,1.0,0.8725,0.25,0,Occasional / Trial Users
+300,Rishi Kulkarni,rishi.kulkarni300@example.com,23,0.913,0.8257,0.3478,1,Power Shoppers (High Frequency VIPs)
+301,Akshay Menon,akshay.menon301@example.com,11,0.8182,0.79,0.3636,1,Power Shoppers (High Frequency VIPs)
+302,Arjun Sengupta,arjun.sengupta302@example.com,13,0.9231,0.8469,0.3077,1,Power Shoppers (High Frequency VIPs)
+303,Sakshi Bose,sakshi.bose303@example.com,15,0.8,0.7553,0.4,1,Power Shoppers (High Frequency VIPs)
+304,Meera Malhotra,meera.malhotra304@example.com,7,0.8571,0.7571,0.1429,0,Occasional / Trial Users
+305,Rhea Kulkarni,rhea.kulkarni305@example.com,15,0.8667,0.7993,0.3333,1,Power Shoppers (High Frequency VIPs)
+306,Payal Joshi,payal.joshi306@example.com,13,0.9231,0.8438,0.3077,1,Power Shoppers (High Frequency VIPs)
+307,Gaurav Nair,gaurav.nair307@example.com,9,1.0,0.9011,0.2222,0,Occasional / Trial Users
+308,Rhea Chopra,rhea.chopra308@example.com,21,0.9048,0.8286,0.4762,1,Power Shoppers (High Frequency VIPs)
+309,Manish Trivedi,manish.trivedi309@example.com,8,1.0,0.8925,0.25,0,Occasional / Trial Users
+310,Tanvi Saxena,tanvi.saxena310@example.com,13,0.8462,0.8169,0.1538,0,Occasional / Trial Users
+311,Manish Joshi,manish.joshi311@example.com,13,0.8462,0.7762,0.1538,0,Occasional / Trial Users
+312,Amit Sengupta,amit.sengupta312@example.com,13,0.8462,0.8,0.2308,0,Occasional / Trial Users
+313,Yash Kulkarni,yash.kulkarni313@example.com,19,1.0,0.9132,0.4737,1,Power Shoppers (High Frequency VIPs)
+314,Harsh Kulkarni,harsh.kulkarni314@example.com,19,0.7895,0.7784,0.4211,1,Power Shoppers (High Frequency VIPs)
+315,Sakshi Saxena,sakshi.saxena315@example.com,14,0.8571,0.8107,0.2143,1,Power Shoppers (High Frequency VIPs)
+316,Neha Mukherjee,neha.mukherjee316@example.com,5,1.0,0.882,0.2,0,Occasional / Trial Users
+317,Rishi Nair,rishi.nair317@example.com,16,0.875,0.8125,0.375,1,Power Shoppers (High Frequency VIPs)
+318,Rahul Das,rahul.das318@example.com,3,1.0,0.87,0.3333,0,Occasional / Trial Users
+319,Dev Trivedi,dev.trivedi319@example.com,13,0.7692,0.7577,0.1538,0,Occasional / Trial Users
+320,Aakash Chopra,aakash.chopra320@example.com,6,1.0,0.92,0.1667,0,Occasional / Trial Users
+321,Rhea Kulkarni,rhea.kulkarni321@example.com,10,0.9,0.842,0.2,0,Occasional / Trial Users
+322,Manish Bhat,manish.bhat322@example.com,7,0.7143,0.6814,0.1429,2,At-Risk / Sensitive Users
+323,Sameer Iyer,sameer.iyer323@example.com,22,1.0,0.8923,0.2727,1,Power Shoppers (High Frequency VIPs)
+324,Aarav Trivedi,aarav.trivedi324@example.com,15,0.8,0.7533,0.2667,1,Power Shoppers (High Frequency VIPs)
+325,Tara Verma,tara.verma325@example.com,10,0.9,0.825,0.2,0,Occasional / Trial Users
+326,Siddharth Kapoor,siddharth.kapoor326@example.com,8,1.0,0.9062,0.25,0,Occasional / Trial Users
+327,Simran Agarwal,simran.agarwal327@example.com,16,0.6875,0.6894,0.0625,2,At-Risk / Sensitive Users
+328,Nandini Das,nandini.das328@example.com,20,0.95,0.869,0.3,1,Power Shoppers (High Frequency VIPs)
+329,Dev Agarwal,dev.agarwal329@example.com,22,1.0,0.8955,0.3182,1,Power Shoppers (High Frequency VIPs)
+330,Rohan Menon,rohan.menon330@example.com,23,0.8696,0.8091,0.2609,1,Power Shoppers (High Frequency VIPs)
+331,Akshay Bansal,akshay.bansal331@example.com,12,0.8333,0.7575,0.1667,0,Occasional / Trial Users
+332,Sanjana Mehta,sanjana.mehta332@example.com,7,1.0,0.8914,0.1429,0,Occasional / Trial Users
+333,Deepak Agarwal,deepak.agarwal333@example.com,6,0.8333,0.815,0.1667,0,Occasional / Trial Users
+334,Sameer Rao,sameer.rao334@example.com,12,0.9167,0.8333,0.1667,0,Occasional / Trial Users
+335,Diya Patel,diya.patel335@example.com,16,0.75,0.7244,0.1875,1,Power Shoppers (High Frequency VIPs)
+336,Nikhil Reddy,nikhil.reddy336@example.com,8,0.75,0.7062,0.25,0,Occasional / Trial Users
+337,Rhea Nair,rhea.nair337@example.com,10,1.0,0.897,0.3,0,Occasional / Trial Users
+338,Pranav Bansal,pranav.bansal338@example.com,16,0.875,0.7962,0.125,1,Power Shoppers (High Frequency VIPs)
+339,Pooja Mehta,pooja.mehta339@example.com,21,0.7619,0.7067,0.1905,1,Power Shoppers (High Frequency VIPs)
+340,Swati Bansal,swati.bansal340@example.com,14,0.7857,0.7421,0.3571,1,Power Shoppers (High Frequency VIPs)
+341,Bhavna Verma,bhavna.verma341@example.com,14,0.7857,0.7471,0.2857,1,Power Shoppers (High Frequency VIPs)
+342,Akshay Joshi,akshay.joshi342@example.com,16,0.9375,0.835,0.4375,1,Power Shoppers (High Frequency VIPs)
+343,Yash Sharma,yash.sharma343@example.com,14,0.9286,0.8393,0.2857,1,Power Shoppers (High Frequency VIPs)
+344,Nandini Choudhury,nandini.choudhury344@example.com,13,0.9231,0.8492,0.3846,1,Power Shoppers (High Frequency VIPs)
+345,Sameer Reddy,sameer.reddy345@example.com,23,0.8696,0.8304,0.2609,1,Power Shoppers (High Frequency VIPs)
+346,Akshay Bose,akshay.bose346@example.com,20,0.9,0.831,0.15,1,Power Shoppers (High Frequency VIPs)
+347,Neha Das,neha.das347@example.com,21,0.7619,0.7105,0.1429,1,Power Shoppers (High Frequency VIPs)
+348,Aakash Das,aakash.das348@example.com,17,0.8824,0.8071,0.1765,1,Power Shoppers (High Frequency VIPs)
+349,Kavya Chopra,kavya.chopra349@example.com,19,0.8947,0.8247,0.2105,1,Power Shoppers (High Frequency VIPs)
+350,Pranav Sengupta,pranav.sengupta350@example.com,10,1.0,0.903,0.4,3,Engaged Fashion Explorers
+351,Diya Mishra,diya.mishra351@example.com,5,0.8,0.73,0.4,3,Engaged Fashion Explorers
+352,Tanvi Sharma,tanvi.sharma352@example.com,18,0.8889,0.8422,0.2778,1,Power Shoppers (High Frequency VIPs)
+353,Trisha Trivedi,trisha.trivedi353@example.com,9,0.8889,0.8489,0.2222,0,Occasional / Trial Users
+354,Sanjana Kulkarni,sanjana.kulkarni354@example.com,13,0.8462,0.8031,0.3077,1,Power Shoppers (High Frequency VIPs)
+355,Kunal Pandey,kunal.pandey355@example.com,13,0.7692,0.7308,0.4615,1,Power Shoppers (High Frequency VIPs)
+356,Akshay Gupta,akshay.gupta356@example.com,16,0.875,0.835,0.25,1,Power Shoppers (High Frequency VIPs)
+357,Nandini Saxena,nandini.saxena357@example.com,15,0.8667,0.812,0.4,1,Power Shoppers (High Frequency VIPs)
+358,Aditya Agarwal,aditya.agarwal358@example.com,14,0.7143,0.6686,0.2857,1,Power Shoppers (High Frequency VIPs)
+359,Tara Patel,tara.patel359@example.com,7,0.8571,0.8171,0.1429,0,Occasional / Trial Users
+360,Rohan Bhat,rohan.bhat360@example.com,11,0.7273,0.7082,0.1818,0,Occasional / Trial Users
+361,Aditya Mehta,aditya.mehta361@example.com,13,0.7692,0.7238,0.2308,1,Power Shoppers (High Frequency VIPs)
+362,Sanjana Bose,sanjana.bose362@example.com,12,0.9167,0.855,0.5,3,Engaged Fashion Explorers
+363,Aditya Pandey,aditya.pandey363@example.com,14,0.7143,0.6464,0.2857,1,Power Shoppers (High Frequency VIPs)
+364,Divya Deshmukh,divya.deshmukh364@example.com,30,0.8667,0.7853,0.2333,1,Power Shoppers (High Frequency VIPs)
+365,Siddharth Mukherjee,siddharth.mukherjee365@example.com,20,1.0,0.8915,0.3,1,Power Shoppers (High Frequency VIPs)
+366,Sanjana Das,sanjana.das366@example.com,15,0.8,0.736,0.2667,1,Power Shoppers (High Frequency VIPs)
+367,Neha Mehta,neha.mehta367@example.com,16,0.9375,0.8475,0.375,1,Power Shoppers (High Frequency VIPs)
+368,Nandini Trivedi,nandini.trivedi368@example.com,17,0.8235,0.7435,0.3529,1,Power Shoppers (High Frequency VIPs)
+369,Sakshi Reddy,sakshi.reddy369@example.com,10,0.8,0.744,0.2,0,Occasional / Trial Users
+370,Aarav Joshi,aarav.joshi370@example.com,11,0.8182,0.7709,0.0,0,Occasional / Trial Users
+371,Neha Reddy,neha.reddy371@example.com,6,1.0,0.8867,0.5,3,Engaged Fashion Explorers
+372,Nandini Joshi,nandini.joshi372@example.com,17,0.8235,0.7618,0.3529,1,Power Shoppers (High Frequency VIPs)
+373,Akshay Reddy,akshay.reddy373@example.com,8,0.75,0.7137,0.125,0,Occasional / Trial Users
+374,Rahul Kulkarni,rahul.kulkarni374@example.com,9,0.8889,0.8556,0.1111,0,Occasional / Trial Users
+375,Sakshi Kapoor,sakshi.kapoor375@example.com,22,0.8636,0.7755,0.2273,1,Power Shoppers (High Frequency VIPs)
+376,Tara Mehta,tara.mehta376@example.com,12,0.9167,0.8167,0.3333,1,Power Shoppers (High Frequency VIPs)
+377,Rishi Sengupta,rishi.sengupta377@example.com,13,0.9231,0.85,0.4615,3,Engaged Fashion Explorers
+378,Meera Verma,meera.verma378@example.com,11,0.8182,0.7464,0.3636,1,Power Shoppers (High Frequency VIPs)
+379,Priya Kulkarni,priya.kulkarni379@example.com,5,1.0,0.92,0.4,3,Engaged Fashion Explorers
+380,Kavya Ghosh,kavya.ghosh380@example.com,17,1.0,0.8918,0.2353,1,Power Shoppers (High Frequency VIPs)
+381,Aakash Malhotra,aakash.malhotra381@example.com,5,0.8,0.798,0.4,3,Engaged Fashion Explorers
+382,Sanjana Singhania,sanjana.singhania382@example.com,6,1.0,0.8883,0.5,3,Engaged Fashion Explorers
+383,Bhavna Trivedi,bhavna.trivedi383@example.com,28,0.8929,0.8154,0.3929,1,Power Shoppers (High Frequency VIPs)
+384,Tara Iyer,tara.iyer384@example.com,18,0.8333,0.7622,0.1667,1,Power Shoppers (High Frequency VIPs)
+385,Varun Joshi,varun.joshi385@example.com,14,0.9286,0.8136,0.4286,1,Power Shoppers (High Frequency VIPs)
+386,Shreya Gupta,shreya.gupta386@example.com,9,1.0,0.9133,0.2222,0,Occasional / Trial Users
+387,Kavya Das,kavya.das387@example.com,2,0.0,0.21,0.0,2,At-Risk / Sensitive Users
+388,Nandini Reddy,nandini.reddy388@example.com,15,0.7333,0.7107,0.2,1,Power Shoppers (High Frequency VIPs)
+389,Karan Patel,karan.patel389@example.com,10,0.8,0.758,0.3,0,Occasional / Trial Users
+390,Vikram Iyer,vikram.iyer390@example.com,13,0.9231,0.8523,0.3077,1,Power Shoppers (High Frequency VIPs)
+391,Yash Gupta,yash.gupta391@example.com,11,0.9091,0.8564,0.3636,0,Occasional / Trial Users
+392,Kunal Sharma,kunal.sharma392@example.com,21,0.7619,0.7295,0.1905,1,Power Shoppers (High Frequency VIPs)
+393,Kavya Verma,kavya.verma393@example.com,3,1.0,0.9067,0.3333,0,Occasional / Trial Users
+394,Kabir Mishra,kabir.mishra394@example.com,18,0.8889,0.8222,0.2222,1,Power Shoppers (High Frequency VIPs)
+395,Bhavna Gupta,bhavna.gupta395@example.com,9,0.7778,0.7289,0.1111,0,Occasional / Trial Users
+396,Trisha Verma,trisha.verma396@example.com,13,0.9231,0.8646,0.3077,1,Power Shoppers (High Frequency VIPs)
+397,Tanvi Das,tanvi.das397@example.com,15,0.9333,0.8553,0.3333,1,Power Shoppers (High Frequency VIPs)
+398,Harsh Joshi,harsh.joshi398@example.com,8,0.75,0.72,0.125,0,Occasional / Trial Users
+399,Yash Das,yash.das399@example.com,11,0.9091,0.8527,0.3636,0,Occasional / Trial Users
+400,Aarav Reddy,aarav.reddy400@example.com,19,0.9474,0.8516,0.3684,1,Power Shoppers (High Frequency VIPs)
+401,Dev Sharma,dev.sharma401@example.com,2,1.0,0.945,0.0,0,Occasional / Trial Users
+402,Ananya Verma,ananya.verma402@example.com,3,1.0,0.9167,0.0,0,Occasional / Trial Users
+403,Meera Trivedi,meera.trivedi403@example.com,2,1.0,0.845,0.5,3,Engaged Fashion Explorers
+404,Sameer Saxena,sameer.saxena404@example.com,5,1.0,0.88,0.4,3,Engaged Fashion Explorers
+405,Bhavna Iyer,bhavna.iyer405@example.com,1,1.0,0.93,0.0,0,Occasional / Trial Users
+406,Rahul Menon,rahul.menon406@example.com,1,1.0,0.85,0.0,0,Occasional / Trial Users
+407,Yash Deshmukh,yash.deshmukh407@example.com,9,0.7778,0.7756,0.2222,0,Occasional / Trial Users
+408,Tara Sharma,tara.sharma408@example.com,3,1.0,0.87,0.3333,0,Occasional / Trial Users
+409,Simran Bose,simran.bose409@example.com,1,1.0,0.83,0.0,0,Occasional / Trial Users
+410,Anushka Singhania,anushka.singhania410@example.com,4,0.75,0.715,0.25,0,Occasional / Trial Users
+411,Ishita Kapoor,ishita.kapoor411@example.com,4,1.0,0.91,0.25,0,Occasional / Trial Users
+412,Kabir Verma,kabir.verma412@example.com,2,1.0,0.9,0.5,3,Engaged Fashion Explorers
+413,Akshay Bhat,akshay.bhat413@example.com,8,1.0,0.875,0.375,3,Engaged Fashion Explorers
+414,Dev Chopra,dev.chopra414@example.com,5,0.8,0.754,0.6,3,Engaged Fashion Explorers
+415,Nikhil Malhotra,nikhil.malhotra415@example.com,2,1.0,0.93,1.0,3,Engaged Fashion Explorers
+416,Isha Iyer,isha.iyer416@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+417,Tara Agarwal,tara.agarwal417@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+418,Sneha Bose,sneha.bose418@example.com,7,1.0,0.8886,0.2857,0,Occasional / Trial Users
+419,Varun Kapoor,varun.kapoor419@example.com,1,0.0,0.04,0.0,2,At-Risk / Sensitive Users
+420,Varun Trivedi,varun.trivedi420@example.com,3,0.6667,0.6133,0.0,2,At-Risk / Sensitive Users
+421,Isha Kapoor,isha.kapoor421@example.com,5,1.0,0.886,0.0,0,Occasional / Trial Users
+422,Shreya Verma,shreya.verma422@example.com,8,0.875,0.7712,0.5,3,Engaged Fashion Explorers
+423,Kabir Mehta,kabir.mehta423@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+424,Isha Iyer,isha.iyer424@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+425,Sakshi Patel,sakshi.patel425@example.com,3,1.0,0.89,0.0,0,Occasional / Trial Users
+426,Sakshi Kapoor,sakshi.kapoor426@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+427,Varun Reddy,varun.reddy427@example.com,1,1.0,0.98,1.0,3,Engaged Fashion Explorers
+428,Amit Patel,amit.patel428@example.com,3,1.0,0.9033,0.3333,0,Occasional / Trial Users
+429,Priya Reddy,priya.reddy429@example.com,4,1.0,0.9225,0.5,3,Engaged Fashion Explorers
+430,Manish Gupta,manish.gupta430@example.com,2,1.0,0.855,0.0,0,Occasional / Trial Users
+431,Gaurav Nair,gaurav.nair431@example.com,4,1.0,0.885,0.5,3,Engaged Fashion Explorers
+432,Sakshi Reddy,sakshi.reddy432@example.com,3,0.6667,0.6167,0.0,2,At-Risk / Sensitive Users
+433,Pranav Nair,pranav.nair433@example.com,1,0.0,0.3,0.0,2,At-Risk / Sensitive Users
+434,Trisha Mishra,trisha.mishra434@example.com,2,0.5,0.515,0.0,2,At-Risk / Sensitive Users
+435,Nandini Agarwal,nandini.agarwal435@example.com,8,1.0,0.8962,0.375,3,Engaged Fashion Explorers
+436,Kunal Mukherjee,kunal.mukherjee436@example.com,5,1.0,0.878,0.4,3,Engaged Fashion Explorers
+437,Tanvi Sharma,tanvi.sharma437@example.com,3,1.0,0.8567,0.0,0,Occasional / Trial Users
+438,Rishi Saxena,rishi.saxena438@example.com,5,1.0,0.928,0.4,3,Engaged Fashion Explorers
+439,Karan Sharma,karan.sharma439@example.com,4,0.75,0.7375,0.25,0,Occasional / Trial Users
+440,Pranav Bansal,pranav.bansal440@example.com,3,0.6667,0.7433,0.0,2,At-Risk / Sensitive Users
+441,Rhea Trivedi,rhea.trivedi441@example.com,6,1.0,0.895,0.3333,0,Occasional / Trial Users
+442,Ishita Trivedi,ishita.trivedi442@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+443,Aakash Bose,aakash.bose443@example.com,5,1.0,0.904,0.4,3,Engaged Fashion Explorers
+444,Arjun Reddy,arjun.reddy444@example.com,2,1.0,0.965,0.0,0,Occasional / Trial Users
+445,Dev Saxena,dev.saxena445@example.com,8,0.625,0.6663,0.375,2,At-Risk / Sensitive Users
+446,Ishita Ghosh,ishita.ghosh446@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+447,Arjun Saxena,arjun.saxena447@example.com,5,1.0,0.87,0.2,0,Occasional / Trial Users
+448,Nandini Mehta,nandini.mehta448@example.com,3,1.0,0.91,1.0,3,Engaged Fashion Explorers
+449,Yash Bose,yash.bose449@example.com,1,0.0,0.0,0.0,2,At-Risk / Sensitive Users
+450,Sameer Bose,sameer.bose450@example.com,5,1.0,0.91,0.0,0,Occasional / Trial Users
+451,Deepak Deshmukh,deepak.deshmukh451@example.com,4,1.0,0.8725,0.5,3,Engaged Fashion Explorers
+452,Isha Iyer,isha.iyer452@example.com,3,1.0,0.8933,0.3333,0,Occasional / Trial Users
+453,Nandini Bhat,nandini.bhat453@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+454,Yash Sengupta,yash.sengupta454@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+455,Simran Menon,simran.menon455@example.com,4,1.0,0.905,0.75,3,Engaged Fashion Explorers
+456,Sneha Sengupta,sneha.sengupta456@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+457,Deepak Joshi,deepak.joshi457@example.com,6,1.0,0.9267,0.1667,0,Occasional / Trial Users
+458,Meera Sharma,meera.sharma458@example.com,1,1.0,0.93,1.0,3,Engaged Fashion Explorers
+459,Isha Rao,isha.rao459@example.com,1,1.0,0.94,0.0,0,Occasional / Trial Users
+460,Harsh Singhania,harsh.singhania460@example.com,5,0.8,0.792,0.6,3,Engaged Fashion Explorers
+461,Sakshi Mishra,sakshi.mishra461@example.com,1,1.0,0.96,0.0,0,Occasional / Trial Users
+462,Kabir Chopra,kabir.chopra462@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+463,Diya Malhotra,diya.malhotra463@example.com,3,0.6667,0.6667,0.3333,2,At-Risk / Sensitive Users
+464,Pranav Bose,pranav.bose464@example.com,5,0.8,0.744,0.0,0,Occasional / Trial Users
+465,Payal Agarwal,payal.agarwal465@example.com,5,0.8,0.796,0.4,3,Engaged Fashion Explorers
+466,Meera Chopra,meera.chopra466@example.com,2,0.5,0.565,0.5,2,At-Risk / Sensitive Users
+467,Arjun Pandey,arjun.pandey467@example.com,5,1.0,0.9,0.6,3,Engaged Fashion Explorers
+468,Rishi Mukherjee,rishi.mukherjee468@example.com,7,0.8571,0.8114,0.2857,0,Occasional / Trial Users
+469,Isha Das,isha.das469@example.com,7,0.8571,0.8186,0.4286,3,Engaged Fashion Explorers
+470,Isha Bhat,isha.bhat470@example.com,1,1.0,0.85,1.0,3,Engaged Fashion Explorers
+471,Ishita Chopra,ishita.chopra471@example.com,4,0.75,0.7,0.0,0,Occasional / Trial Users
+472,Ritu Nair,ritu.nair472@example.com,3,0.6667,0.7267,0.3333,2,At-Risk / Sensitive Users
+473,Kabir Deshmukh,kabir.deshmukh473@example.com,7,1.0,0.9,0.1429,0,Occasional / Trial Users
+474,Divya Deshmukh,divya.deshmukh474@example.com,4,1.0,0.94,0.5,3,Engaged Fashion Explorers
+475,Karan Trivedi,karan.trivedi475@example.com,3,1.0,0.9033,0.0,0,Occasional / Trial Users
+476,Kavya Iyer,kavya.iyer476@example.com,2,0.5,0.46,0.0,2,At-Risk / Sensitive Users
+477,Vikram Rao,vikram.rao477@example.com,3,1.0,0.9,0.6667,3,Engaged Fashion Explorers
+478,Deepak Saxena,deepak.saxena478@example.com,1,1.0,0.96,1.0,3,Engaged Fashion Explorers
+479,Pooja Saxena,pooja.saxena479@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+480,Neha Saxena,neha.saxena480@example.com,3,0.6667,0.71,0.6667,3,Engaged Fashion Explorers
+481,Sameer Bansal,sameer.bansal481@example.com,2,1.0,0.915,0.0,0,Occasional / Trial Users
+482,Akshay Menon,akshay.menon482@example.com,6,0.8333,0.78,0.3333,0,Occasional / Trial Users
+483,Dev Verma,dev.verma483@example.com,1,1.0,0.94,0.0,0,Occasional / Trial Users
+484,Gaurav Malhotra,gaurav.malhotra484@example.com,5,1.0,0.872,0.6,3,Engaged Fashion Explorers
+485,Tanvi Bhat,tanvi.bhat485@example.com,2,0.5,0.455,0.5,2,At-Risk / Sensitive Users
+486,Manish Mehta,manish.mehta486@example.com,5,0.8,0.808,0.0,0,Occasional / Trial Users
+487,Sameer Patel,sameer.patel487@example.com,1,1.0,0.88,0.0,0,Occasional / Trial Users
+488,Nikhil Mehta,nikhil.mehta488@example.com,3,1.0,0.87,0.6667,3,Engaged Fashion Explorers
+489,Swati Menon,swati.menon489@example.com,3,0.6667,0.6933,0.0,2,At-Risk / Sensitive Users
+490,Neha Bhat,neha.bhat490@example.com,5,0.6,0.562,0.4,2,At-Risk / Sensitive Users
+491,Rohan Malhotra,rohan.malhotra491@example.com,2,0.5,0.535,0.0,2,At-Risk / Sensitive Users
+492,Vikram Kapoor,vikram.kapoor492@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+493,Manish Verma,manish.verma493@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+494,Vivaan Pandey,vivaan.pandey494@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+495,Ishita Deshmukh,ishita.deshmukh495@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+496,Rohan Nair,rohan.nair496@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+497,Divya Deshmukh,divya.deshmukh497@example.com,5,1.0,0.866,0.2,0,Occasional / Trial Users
+498,Shreya Reddy,shreya.reddy498@example.com,8,1.0,0.8912,0.25,0,Occasional / Trial Users
+499,Varun Saxena,varun.saxena499@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+500,Kunal Patel,kunal.patel500@example.com,2,1.0,0.915,0.5,3,Engaged Fashion Explorers
+501,Ritu Mehta,ritu.mehta501@example.com,4,0.75,0.705,0.25,0,Occasional / Trial Users
+502,Sakshi Bansal,sakshi.bansal502@example.com,6,1.0,0.8783,0.3333,0,Occasional / Trial Users
+503,Siddharth Trivedi,siddharth.trivedi503@example.com,3,1.0,0.9167,0.0,0,Occasional / Trial Users
+504,Rhea Kapoor,rhea.kapoor504@example.com,2,1.0,0.89,0.0,0,Occasional / Trial Users
+505,Yash Verma,yash.verma505@example.com,4,0.75,0.685,0.25,0,Occasional / Trial Users
+506,Tara Singhania,tara.singhania506@example.com,7,0.8571,0.7757,0.2857,0,Occasional / Trial Users
+507,Aditya Menon,aditya.menon507@example.com,2,0.5,0.54,0.0,2,At-Risk / Sensitive Users
+508,Sakshi Chopra,sakshi.chopra508@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+509,Aditya Bansal,aditya.bansal509@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+510,Nandini Mukherjee,nandini.mukherjee510@example.com,2,1.0,0.92,0.5,3,Engaged Fashion Explorers
+511,Tara Bansal,tara.bansal511@example.com,2,1.0,0.865,0.0,0,Occasional / Trial Users
+512,Shreya Sharma,shreya.sharma512@example.com,4,0.75,0.665,0.25,0,Occasional / Trial Users
+513,Pooja Gupta,pooja.gupta513@example.com,4,1.0,0.9025,0.0,0,Occasional / Trial Users
+514,Vikram Nair,vikram.nair514@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+515,Kabir Sengupta,kabir.sengupta515@example.com,5,0.8,0.806,0.0,0,Occasional / Trial Users
+516,Trisha Choudhury,trisha.choudhury516@example.com,3,0.6667,0.7067,0.6667,3,Engaged Fashion Explorers
+517,Yash Kapoor,yash.kapoor517@example.com,2,0.0,0.265,0.0,2,At-Risk / Sensitive Users
+518,Kunal Chopra,kunal.chopra518@example.com,3,1.0,0.8733,0.0,0,Occasional / Trial Users
+519,Pooja Mishra,pooja.mishra519@example.com,4,1.0,0.9275,0.25,0,Occasional / Trial Users
+520,Arjun Trivedi,arjun.trivedi520@example.com,4,1.0,0.915,0.5,3,Engaged Fashion Explorers
+521,Varun Reddy,varun.reddy521@example.com,3,1.0,0.9233,0.6667,3,Engaged Fashion Explorers
+522,Kavya Malhotra,kavya.malhotra522@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+523,Deepak Trivedi,deepak.trivedi523@example.com,3,0.6667,0.7233,0.3333,2,At-Risk / Sensitive Users
+524,Harsh Nair,harsh.nair524@example.com,2,0.5,0.66,0.0,2,At-Risk / Sensitive Users
+525,Vikram Reddy,vikram.reddy525@example.com,6,1.0,0.9033,0.3333,0,Occasional / Trial Users
+526,Sameer Malhotra,sameer.malhotra526@example.com,1,1.0,0.89,0.0,0,Occasional / Trial Users
+527,Manish Deshmukh,manish.deshmukh527@example.com,3,1.0,0.9567,1.0,3,Engaged Fashion Explorers
+528,Vikram Pandey,vikram.pandey528@example.com,3,0.3333,0.3067,0.3333,2,At-Risk / Sensitive Users
+529,Siddharth Patel,siddharth.patel529@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+530,Shreya Choudhury,shreya.choudhury530@example.com,8,0.875,0.805,0.375,0,Occasional / Trial Users
+531,Divya Das,divya.das531@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+532,Ishita Saxena,ishita.saxena532@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+533,Sameer Ghosh,sameer.ghosh533@example.com,7,1.0,0.8957,0.7143,3,Engaged Fashion Explorers
+534,Isha Mehta,isha.mehta534@example.com,5,0.8,0.752,0.4,3,Engaged Fashion Explorers
+535,Karan Mukherjee,karan.mukherjee535@example.com,12,1.0,0.9267,0.5,3,Engaged Fashion Explorers
+536,Ananya Chopra,ananya.chopra536@example.com,1,0.0,0.15,0.0,2,At-Risk / Sensitive Users
+537,Kavya Chopra,kavya.chopra537@example.com,7,1.0,0.9029,0.0,0,Occasional / Trial Users
+538,Rahul Sharma,rahul.sharma538@example.com,5,1.0,0.898,0.4,3,Engaged Fashion Explorers
+539,Payal Agarwal,payal.agarwal539@example.com,6,0.6667,0.7083,0.3333,2,At-Risk / Sensitive Users
+540,Aditya Patel,aditya.patel540@example.com,2,0.5,0.565,0.5,2,At-Risk / Sensitive Users
+541,Rishi Mishra,rishi.mishra541@example.com,3,1.0,0.9067,0.0,0,Occasional / Trial Users
+542,Gaurav Malhotra,gaurav.malhotra542@example.com,7,0.8571,0.7643,0.2857,0,Occasional / Trial Users
+543,Ishita Sharma,ishita.sharma543@example.com,5,1.0,0.87,0.6,3,Engaged Fashion Explorers
+544,Rhea Choudhury,rhea.choudhury544@example.com,5,1.0,0.872,0.2,0,Occasional / Trial Users
+545,Isha Iyer,isha.iyer545@example.com,3,1.0,0.9,0.0,0,Occasional / Trial Users
+546,Priya Iyer,priya.iyer546@example.com,4,1.0,0.8875,0.0,0,Occasional / Trial Users
+547,Varun Agarwal,varun.agarwal547@example.com,8,1.0,0.905,0.375,3,Engaged Fashion Explorers
+548,Kabir Iyer,kabir.iyer548@example.com,1,1.0,0.89,0.0,0,Occasional / Trial Users
+549,Harsh Sharma,harsh.sharma549@example.com,6,1.0,0.9133,0.3333,0,Occasional / Trial Users
+550,Pranav Nair,pranav.nair550@example.com,4,0.75,0.77,0.25,0,Occasional / Trial Users
+551,Isha Sharma,isha.sharma551@example.com,14,0.8571,0.7886,0.2143,1,Power Shoppers (High Frequency VIPs)
+552,Kavya Bhat,kavya.bhat552@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+553,Yash Bansal,yash.bansal553@example.com,4,0.75,0.7,0.0,0,Occasional / Trial Users
+554,Shreya Mehta,shreya.mehta554@example.com,4,1.0,0.93,0.0,0,Occasional / Trial Users
+555,Manish Pandey,manish.pandey555@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+556,Diya Chopra,diya.chopra556@example.com,6,0.8333,0.715,0.1667,0,Occasional / Trial Users
+557,Akshay Chopra,akshay.chopra557@example.com,6,0.6667,0.6033,0.3333,2,At-Risk / Sensitive Users
+558,Sanjana Sharma,sanjana.sharma558@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+559,Karan Nair,karan.nair559@example.com,7,0.8571,0.7686,0.4286,3,Engaged Fashion Explorers
+560,Vivaan Saxena,vivaan.saxena560@example.com,2,0.5,0.6,0.0,2,At-Risk / Sensitive Users
+561,Deepak Kapoor,deepak.kapoor561@example.com,7,0.8571,0.83,0.1429,0,Occasional / Trial Users
+562,Karan Choudhury,karan.choudhury562@example.com,2,1.0,0.875,0.0,0,Occasional / Trial Users
+563,Pooja Mishra,pooja.mishra563@example.com,6,1.0,0.9017,0.6667,3,Engaged Fashion Explorers
+564,Rishi Kulkarni,rishi.kulkarni564@example.com,7,0.8571,0.8029,0.0,0,Occasional / Trial Users
+565,Aditya Mehta,aditya.mehta565@example.com,2,1.0,0.905,0.0,0,Occasional / Trial Users
+566,Nikhil Gupta,nikhil.gupta566@example.com,2,1.0,0.905,0.5,3,Engaged Fashion Explorers
+567,Rohan Kapoor,rohan.kapoor567@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+568,Simran Mishra,simran.mishra568@example.com,2,1.0,0.855,1.0,3,Engaged Fashion Explorers
+569,Siddharth Patel,siddharth.patel569@example.com,5,1.0,0.856,0.8,3,Engaged Fashion Explorers
+570,Nikhil Reddy,nikhil.reddy570@example.com,2,1.0,0.885,0.0,0,Occasional / Trial Users
+571,Ritu Joshi,ritu.joshi571@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+572,Isha Ghosh,isha.ghosh572@example.com,5,1.0,0.894,0.0,0,Occasional / Trial Users
+573,Sameer Ghosh,sameer.ghosh573@example.com,2,0.5,0.52,0.0,2,At-Risk / Sensitive Users
+574,Pooja Kulkarni,pooja.kulkarni574@example.com,3,1.0,0.88,0.0,0,Occasional / Trial Users
+575,Shreya Mukherjee,shreya.mukherjee575@example.com,7,0.8571,0.8057,0.2857,0,Occasional / Trial Users
+576,Ishita Trivedi,ishita.trivedi576@example.com,2,0.5,0.55,0.0,2,At-Risk / Sensitive Users
+577,Isha Menon,isha.menon577@example.com,4,0.75,0.76,0.75,3,Engaged Fashion Explorers
+578,Nikhil Kapoor,nikhil.kapoor578@example.com,3,1.0,0.87,0.3333,0,Occasional / Trial Users
+579,Dev Bansal,dev.bansal579@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+580,Sameer Menon,sameer.menon580@example.com,6,1.0,0.9083,0.6667,3,Engaged Fashion Explorers
+581,Rishi Malhotra,rishi.malhotra581@example.com,1,1.0,0.85,0.0,0,Occasional / Trial Users
+582,Rohan Trivedi,rohan.trivedi582@example.com,1,1.0,0.91,1.0,3,Engaged Fashion Explorers
+583,Isha Joshi,isha.joshi583@example.com,4,1.0,0.8875,0.5,3,Engaged Fashion Explorers
+584,Kabir Bansal,kabir.bansal584@example.com,4,1.0,0.9375,0.25,0,Occasional / Trial Users
+585,Shreya Deshmukh,shreya.deshmukh585@example.com,4,0.75,0.695,0.25,0,Occasional / Trial Users
+586,Diya Verma,diya.verma586@example.com,2,1.0,0.885,0.0,0,Occasional / Trial Users
+587,Sameer Patel,sameer.patel587@example.com,8,1.0,0.9213,0.375,3,Engaged Fashion Explorers
+588,Kavya Saxena,kavya.saxena588@example.com,4,0.75,0.74,0.75,3,Engaged Fashion Explorers
+589,Shreya Chopra,shreya.chopra589@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+590,Kunal Verma,kunal.verma590@example.com,2,0.5,0.415,0.5,2,At-Risk / Sensitive Users
+591,Shreya Reddy,shreya.reddy591@example.com,2,1.0,0.92,0.0,0,Occasional / Trial Users
+592,Pranav Verma,pranav.verma592@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+593,Simran Kapoor,simran.kapoor593@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+594,Kavya Iyer,kavya.iyer594@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+595,Pooja Kulkarni,pooja.kulkarni595@example.com,2,1.0,0.96,0.0,0,Occasional / Trial Users
+596,Sakshi Iyer,sakshi.iyer596@example.com,1,0.0,0.27,0.0,2,At-Risk / Sensitive Users
+597,Payal Malhotra,payal.malhotra597@example.com,3,0.6667,0.6433,0.3333,2,At-Risk / Sensitive Users
+598,Nikhil Singhania,nikhil.singhania598@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+599,Meera Verma,meera.verma599@example.com,7,1.0,0.9214,0.2857,0,Occasional / Trial Users
+600,Pooja Ghosh,pooja.ghosh600@example.com,5,1.0,0.86,0.6,3,Engaged Fashion Explorers
+601,Nandini Das,nandini.das601@example.com,3,1.0,0.88,0.3333,0,Occasional / Trial Users
+602,Karan Singhania,karan.singhania602@example.com,6,0.6667,0.69,0.3333,2,At-Risk / Sensitive Users
+603,Harsh Sengupta,harsh.sengupta603@example.com,8,0.875,0.7762,0.0,0,Occasional / Trial Users
+604,Payal Singhania,payal.singhania604@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+605,Pooja Pandey,pooja.pandey605@example.com,5,0.4,0.446,0.0,2,At-Risk / Sensitive Users
+606,Rahul Iyer,rahul.iyer606@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+607,Kavya Pandey,kavya.pandey607@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+608,Shreya Choudhury,shreya.choudhury608@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+609,Neha Pandey,neha.pandey609@example.com,4,0.75,0.735,0.75,3,Engaged Fashion Explorers
+610,Swati Ghosh,swati.ghosh610@example.com,5,1.0,0.936,0.0,0,Occasional / Trial Users
+611,Priya Chopra,priya.chopra611@example.com,3,1.0,0.8967,0.6667,3,Engaged Fashion Explorers
+612,Varun Saxena,varun.saxena612@example.com,4,1.0,0.8825,0.5,3,Engaged Fashion Explorers
+613,Kabir Verma,kabir.verma613@example.com,3,0.6667,0.64,0.6667,3,Engaged Fashion Explorers
+614,Kabir Malhotra,kabir.malhotra614@example.com,10,0.8,0.762,0.2,0,Occasional / Trial Users
+615,Divya Reddy,divya.reddy615@example.com,3,1.0,0.8633,0.6667,3,Engaged Fashion Explorers
+616,Akshay Bhat,akshay.bhat616@example.com,3,1.0,0.9367,0.3333,0,Occasional / Trial Users
+617,Isha Deshmukh,isha.deshmukh617@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+618,Divya Verma,divya.verma618@example.com,1,1.0,0.88,0.0,0,Occasional / Trial Users
+619,Arjun Kapoor,arjun.kapoor619@example.com,6,0.6667,0.6317,0.1667,2,At-Risk / Sensitive Users
+620,Divya Ghosh,divya.ghosh620@example.com,2,1.0,0.915,0.0,0,Occasional / Trial Users
+621,Siddharth Gupta,siddharth.gupta621@example.com,5,0.8,0.776,0.6,3,Engaged Fashion Explorers
+622,Tanvi Verma,tanvi.verma622@example.com,1,1.0,0.91,0.0,0,Occasional / Trial Users
+623,Swati Choudhury,swati.choudhury623@example.com,5,1.0,0.888,0.2,0,Occasional / Trial Users
+624,Tara Rao,tara.rao624@example.com,1,1.0,0.97,0.0,0,Occasional / Trial Users
+625,Rhea Rao,rhea.rao625@example.com,6,1.0,0.9183,0.3333,0,Occasional / Trial Users
+626,Amit Ghosh,amit.ghosh626@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+627,Pranav Patel,pranav.patel627@example.com,3,1.0,0.9,0.0,0,Occasional / Trial Users
+628,Rohan Agarwal,rohan.agarwal628@example.com,4,1.0,0.9275,0.5,3,Engaged Fashion Explorers
+629,Tara Gupta,tara.gupta629@example.com,9,1.0,0.8767,0.3333,0,Occasional / Trial Users
+630,Swati Agarwal,swati.agarwal630@example.com,3,1.0,0.88,0.6667,3,Engaged Fashion Explorers
+631,Akshay Choudhury,akshay.choudhury631@example.com,1,1.0,0.97,0.0,0,Occasional / Trial Users
+632,Priya Kulkarni,priya.kulkarni632@example.com,4,0.75,0.6775,0.5,3,Engaged Fashion Explorers
+633,Simran Sengupta,simran.sengupta633@example.com,3,1.0,0.92,0.0,0,Occasional / Trial Users
+634,Rishi Patel,rishi.patel634@example.com,5,0.6,0.67,0.2,2,At-Risk / Sensitive Users
+635,Varun Kulkarni,varun.kulkarni635@example.com,3,1.0,0.92,0.6667,3,Engaged Fashion Explorers
+636,Ritu Menon,ritu.menon636@example.com,3,1.0,0.8667,0.0,0,Occasional / Trial Users
+637,Payal Kapoor,payal.kapoor637@example.com,3,1.0,0.9,0.3333,0,Occasional / Trial Users
+638,Aditya Saxena,aditya.saxena638@example.com,1,1.0,0.86,0.0,0,Occasional / Trial Users
+639,Sakshi Iyer,sakshi.iyer639@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+640,Neha Iyer,neha.iyer640@example.com,5,0.8,0.724,0.4,3,Engaged Fashion Explorers
+641,Kavya Verma,kavya.verma641@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+642,Nikhil Chopra,nikhil.chopra642@example.com,4,0.75,0.675,0.5,3,Engaged Fashion Explorers
+643,Kavya Das,kavya.das643@example.com,3,1.0,0.8967,0.3333,0,Occasional / Trial Users
+644,Pranav Trivedi,pranav.trivedi644@example.com,6,1.0,0.8883,0.1667,0,Occasional / Trial Users
+645,Deepak Rao,deepak.rao645@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+646,Neha Kulkarni,neha.kulkarni646@example.com,2,1.0,0.915,0.5,3,Engaged Fashion Explorers
+647,Diya Mehta,diya.mehta647@example.com,1,1.0,0.86,0.0,0,Occasional / Trial Users
+648,Neha Nair,neha.nair648@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+649,Karan Patel,karan.patel649@example.com,5,0.8,0.81,0.2,0,Occasional / Trial Users
+650,Anushka Menon,anushka.menon650@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+651,Gaurav Sengupta,gaurav.sengupta651@example.com,5,1.0,0.852,0.4,3,Engaged Fashion Explorers
+652,Vivaan Bose,vivaan.bose652@example.com,2,1.0,0.925,0.0,0,Occasional / Trial Users
+653,Amit Reddy,amit.reddy653@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+654,Rohan Chopra,rohan.chopra654@example.com,1,1.0,0.88,0.0,0,Occasional / Trial Users
+655,Sakshi Gupta,sakshi.gupta655@example.com,3,0.3333,0.3433,0.0,2,At-Risk / Sensitive Users
+656,Nikhil Mehta,nikhil.mehta656@example.com,1,1.0,0.88,0.0,0,Occasional / Trial Users
+657,Sameer Saxena,sameer.saxena657@example.com,5,0.8,0.74,0.4,3,Engaged Fashion Explorers
+658,Swati Bansal,swati.bansal658@example.com,7,0.8571,0.7586,0.2857,0,Occasional / Trial Users
+659,Aditya Iyer,aditya.iyer659@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+660,Ritu Choudhury,ritu.choudhury660@example.com,1,1.0,0.83,0.0,0,Occasional / Trial Users
+661,Vikram Menon,vikram.menon661@example.com,1,1.0,0.96,1.0,3,Engaged Fashion Explorers
+662,Manish Patel,manish.patel662@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+663,Aditya Singhania,aditya.singhania663@example.com,6,0.8333,0.7517,0.1667,0,Occasional / Trial Users
+664,Divya Malhotra,divya.malhotra664@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+665,Manish Verma,manish.verma665@example.com,9,0.7778,0.7356,0.3333,0,Occasional / Trial Users
+666,Dev Rao,dev.rao666@example.com,5,0.8,0.73,0.4,3,Engaged Fashion Explorers
+667,Sanjana Mishra,sanjana.mishra667@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+668,Ritu Deshmukh,ritu.deshmukh668@example.com,3,0.6667,0.5933,0.0,2,At-Risk / Sensitive Users
+669,Anushka Singhania,anushka.singhania669@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+670,Gaurav Mishra,gaurav.mishra670@example.com,5,0.4,0.428,0.0,2,At-Risk / Sensitive Users
+671,Ritu Bansal,ritu.bansal671@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+672,Bhavna Sengupta,bhavna.sengupta672@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+673,Diya Menon,diya.menon673@example.com,6,1.0,0.8767,0.1667,0,Occasional / Trial Users
+674,Tara Pandey,tara.pandey674@example.com,1,0.0,0.33,0.0,2,At-Risk / Sensitive Users
+675,Rahul Trivedi,rahul.trivedi675@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+676,Gaurav Rao,gaurav.rao676@example.com,2,1.0,0.9,0.5,3,Engaged Fashion Explorers
+677,Amit Menon,amit.menon677@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+678,Nandini Nair,nandini.nair678@example.com,3,0.6667,0.6667,0.3333,2,At-Risk / Sensitive Users
+679,Rishi Iyer,rishi.iyer679@example.com,1,1.0,0.91,1.0,3,Engaged Fashion Explorers
+680,Sameer Kapoor,sameer.kapoor680@example.com,3,1.0,0.91,0.0,0,Occasional / Trial Users
+681,Varun Singhania,varun.singhania681@example.com,7,1.0,0.9014,0.7143,3,Engaged Fashion Explorers
+682,Manish Saxena,manish.saxena682@example.com,2,0.5,0.505,0.0,2,At-Risk / Sensitive Users
+683,Sanjana Trivedi,sanjana.trivedi683@example.com,4,0.5,0.485,0.25,2,At-Risk / Sensitive Users
+684,Aditya Deshmukh,aditya.deshmukh684@example.com,2,0.5,0.54,0.0,2,At-Risk / Sensitive Users
+685,Dev Bansal,dev.bansal685@example.com,5,0.6,0.548,0.2,2,At-Risk / Sensitive Users
+686,Aakash Kapoor,aakash.kapoor686@example.com,3,0.6667,0.6133,0.3333,2,At-Risk / Sensitive Users
+687,Harsh Kapoor,harsh.kapoor687@example.com,5,0.8,0.78,0.0,0,Occasional / Trial Users
+688,Nandini Saxena,nandini.saxena688@example.com,3,1.0,0.9033,0.6667,3,Engaged Fashion Explorers
+689,Rishi Joshi,rishi.joshi689@example.com,2,0.5,0.445,0.0,2,At-Risk / Sensitive Users
+690,Vikram Nair,vikram.nair690@example.com,7,0.8571,0.78,0.1429,0,Occasional / Trial Users
+691,Priya Nair,priya.nair691@example.com,2,1.0,0.925,0.0,0,Occasional / Trial Users
+692,Payal Gupta,payal.gupta692@example.com,6,0.8333,0.795,0.1667,0,Occasional / Trial Users
+693,Anushka Kapoor,anushka.kapoor693@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+694,Sakshi Mukherjee,sakshi.mukherjee694@example.com,2,1.0,0.88,1.0,3,Engaged Fashion Explorers
+695,Meera Bhat,meera.bhat695@example.com,3,1.0,0.96,0.6667,3,Engaged Fashion Explorers
+696,Aakash Ghosh,aakash.ghosh696@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+697,Trisha Pandey,trisha.pandey697@example.com,7,1.0,0.9,0.2857,0,Occasional / Trial Users
+698,Rohan Sengupta,rohan.sengupta698@example.com,2,1.0,0.925,0.0,0,Occasional / Trial Users
+699,Sameer Agarwal,sameer.agarwal699@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+700,Gaurav Gupta,gaurav.gupta700@example.com,4,1.0,0.8425,0.0,0,Occasional / Trial Users
+701,Tanvi Mukherjee,tanvi.mukherjee701@example.com,1,1.0,0.97,0.0,0,Occasional / Trial Users
+702,Tanvi Verma,tanvi.verma702@example.com,4,1.0,0.8975,0.5,3,Engaged Fashion Explorers
+703,Sanjana Bhat,sanjana.bhat703@example.com,6,1.0,0.8667,0.1667,0,Occasional / Trial Users
+704,Ananya Bansal,ananya.bansal704@example.com,2,1.0,0.88,0.0,0,Occasional / Trial Users
+705,Akshay Nair,akshay.nair705@example.com,2,1.0,0.935,0.5,3,Engaged Fashion Explorers
+706,Varun Kapoor,varun.kapoor706@example.com,3,0.6667,0.66,0.3333,2,At-Risk / Sensitive Users
+707,Nandini Saxena,nandini.saxena707@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+708,Sakshi Mukherjee,sakshi.mukherjee708@example.com,3,1.0,0.8967,0.3333,0,Occasional / Trial Users
+709,Tara Mukherjee,tara.mukherjee709@example.com,9,0.8889,0.8056,0.2222,0,Occasional / Trial Users
+710,Tara Gupta,tara.gupta710@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+711,Nikhil Agarwal,nikhil.agarwal711@example.com,3,1.0,0.9133,0.0,0,Occasional / Trial Users
+712,Tara Bhat,tara.bhat712@example.com,1,1.0,0.95,0.0,0,Occasional / Trial Users
+713,Sanjana Trivedi,sanjana.trivedi713@example.com,1,1.0,0.95,0.0,0,Occasional / Trial Users
+714,Varun Ghosh,varun.ghosh714@example.com,5,0.8,0.77,0.2,0,Occasional / Trial Users
+715,Simran Pandey,simran.pandey715@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+716,Sanjana Das,sanjana.das716@example.com,1,1.0,0.9,0.0,0,Occasional / Trial Users
+717,Aarav Sengupta,aarav.sengupta717@example.com,4,1.0,0.9025,0.5,3,Engaged Fashion Explorers
+718,Vivaan Mukherjee,vivaan.mukherjee718@example.com,1,1.0,0.84,0.0,0,Occasional / Trial Users
+719,Neha Agarwal,neha.agarwal719@example.com,5,1.0,0.91,0.4,3,Engaged Fashion Explorers
+720,Anushka Ghosh,anushka.ghosh720@example.com,1,1.0,0.89,0.0,0,Occasional / Trial Users
+721,Neha Joshi,neha.joshi721@example.com,2,1.0,0.88,1.0,3,Engaged Fashion Explorers
+722,Ritu Rao,ritu.rao722@example.com,4,0.5,0.5275,0.0,2,At-Risk / Sensitive Users
+723,Siddharth Singhania,siddharth.singhania723@example.com,8,0.875,0.8363,0.375,0,Occasional / Trial Users
+724,Sanjana Kapoor,sanjana.kapoor724@example.com,8,0.875,0.7963,0.125,0,Occasional / Trial Users
+725,Nandini Saxena,nandini.saxena725@example.com,1,1.0,0.96,1.0,3,Engaged Fashion Explorers
+726,Swati Das,swati.das726@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+727,Isha Deshmukh,isha.deshmukh727@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+728,Simran Bansal,simran.bansal728@example.com,1,1.0,0.83,1.0,3,Engaged Fashion Explorers
+729,Aditya Kulkarni,aditya.kulkarni729@example.com,5,1.0,0.86,0.4,3,Engaged Fashion Explorers
+730,Aarav Joshi,aarav.joshi730@example.com,6,1.0,0.915,0.3333,0,Occasional / Trial Users
+731,Sameer Saxena,sameer.saxena731@example.com,2,0.5,0.62,0.0,2,At-Risk / Sensitive Users
+732,Priya Bhat,priya.bhat732@example.com,5,1.0,0.94,0.4,3,Engaged Fashion Explorers
+733,Siddharth Agarwal,siddharth.agarwal733@example.com,4,1.0,0.8925,0.0,0,Occasional / Trial Users
+734,Kavya Patel,kavya.patel734@example.com,5,1.0,0.936,0.4,3,Engaged Fashion Explorers
+735,Neha Sengupta,neha.sengupta735@example.com,3,0.6667,0.5833,0.3333,2,At-Risk / Sensitive Users
+736,Nandini Deshmukh,nandini.deshmukh736@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+737,Rishi Iyer,rishi.iyer737@example.com,4,0.75,0.7575,0.25,0,Occasional / Trial Users
+738,Shreya Menon,shreya.menon738@example.com,3,0.6667,0.73,0.0,2,At-Risk / Sensitive Users
+739,Aditya Kulkarni,aditya.kulkarni739@example.com,4,1.0,0.8625,0.25,0,Occasional / Trial Users
+740,Sanjana Menon,sanjana.menon740@example.com,3,0.6667,0.69,0.3333,2,At-Risk / Sensitive Users
+741,Rishi Choudhury,rishi.choudhury741@example.com,1,1.0,0.93,0.0,0,Occasional / Trial Users
+742,Yash Mishra,yash.mishra742@example.com,2,0.5,0.57,0.0,2,At-Risk / Sensitive Users
+743,Nandini Saxena,nandini.saxena743@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+744,Divya Malhotra,divya.malhotra744@example.com,6,1.0,0.8833,0.8333,3,Engaged Fashion Explorers
+745,Shreya Mehta,shreya.mehta745@example.com,4,1.0,0.9125,0.25,0,Occasional / Trial Users
+746,Ananya Mishra,ananya.mishra746@example.com,2,1.0,0.955,0.0,0,Occasional / Trial Users
+747,Vikram Bhat,vikram.bhat747@example.com,1,1.0,0.88,0.0,0,Occasional / Trial Users
+748,Arjun Kapoor,arjun.kapoor748@example.com,1,1.0,0.82,0.0,0,Occasional / Trial Users
+749,Meera Bansal,meera.bansal749@example.com,5,1.0,0.916,0.4,3,Engaged Fashion Explorers
+750,Bhavna Kulkarni,bhavna.kulkarni750@example.com,3,1.0,0.9333,0.3333,0,Occasional / Trial Users
+751,Sameer Pandey,sameer.pandey751@example.com,5,1.0,0.916,0.4,3,Engaged Fashion Explorers
+752,Aditya Deshmukh,aditya.deshmukh752@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+753,Pranav Patel,pranav.patel753@example.com,6,0.8333,0.79,0.3333,0,Occasional / Trial Users
+754,Nandini Pandey,nandini.pandey754@example.com,4,1.0,0.9025,0.75,3,Engaged Fashion Explorers
+755,Diya Chopra,diya.chopra755@example.com,3,1.0,0.9367,0.6667,3,Engaged Fashion Explorers
+756,Sanjana Gupta,sanjana.gupta756@example.com,6,0.8333,0.7733,0.3333,0,Occasional / Trial Users
+757,Rohan Bose,rohan.bose757@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+758,Kabir Choudhury,kabir.choudhury758@example.com,2,1.0,0.915,0.5,3,Engaged Fashion Explorers
+759,Gaurav Patel,gaurav.patel759@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+760,Pooja Saxena,pooja.saxena760@example.com,5,1.0,0.912,0.2,0,Occasional / Trial Users
+761,Amit Agarwal,amit.agarwal761@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+762,Aakash Malhotra,aakash.malhotra762@example.com,4,0.75,0.6425,0.5,3,Engaged Fashion Explorers
+763,Ishita Bansal,ishita.bansal763@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+764,Aditya Agarwal,aditya.agarwal764@example.com,2,1.0,0.88,0.5,3,Engaged Fashion Explorers
+765,Pooja Choudhury,pooja.choudhury765@example.com,5,0.8,0.736,0.2,0,Occasional / Trial Users
+766,Aditya Trivedi,aditya.trivedi766@example.com,8,1.0,0.8937,0.0,0,Occasional / Trial Users
+767,Deepak Sharma,deepak.sharma767@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+768,Nandini Trivedi,nandini.trivedi768@example.com,5,0.8,0.756,0.4,3,Engaged Fashion Explorers
+769,Harsh Chopra,harsh.chopra769@example.com,2,1.0,0.86,0.5,3,Engaged Fashion Explorers
+770,Neha Reddy,neha.reddy770@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+771,Vikram Mukherjee,vikram.mukherjee771@example.com,4,1.0,0.95,0.5,3,Engaged Fashion Explorers
+772,Yash Bose,yash.bose772@example.com,2,1.0,0.885,0.5,3,Engaged Fashion Explorers
+773,Kavya Gupta,kavya.gupta773@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+774,Kunal Patel,kunal.patel774@example.com,16,0.875,0.7944,0.25,1,Power Shoppers (High Frequency VIPs)
+775,Nandini Singhania,nandini.singhania775@example.com,6,0.6667,0.595,0.3333,2,At-Risk / Sensitive Users
+776,Sanjana Patel,sanjana.patel776@example.com,6,0.8333,0.7583,0.5,3,Engaged Fashion Explorers
+777,Rahul Choudhury,rahul.choudhury777@example.com,14,0.9286,0.8636,0.3571,1,Power Shoppers (High Frequency VIPs)
+778,Aditya Deshmukh,aditya.deshmukh778@example.com,4,0.75,0.66,0.5,3,Engaged Fashion Explorers
+779,Amit Bhat,amit.bhat779@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+780,Kunal Saxena,kunal.saxena780@example.com,2,0.5,0.47,0.5,2,At-Risk / Sensitive Users
+781,Kavya Sengupta,kavya.sengupta781@example.com,3,0.6667,0.5633,0.0,2,At-Risk / Sensitive Users
+782,Divya Nair,divya.nair782@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+783,Tanvi Patel,tanvi.patel783@example.com,3,0.6667,0.5933,0.3333,2,At-Risk / Sensitive Users
+784,Sanjana Mukherjee,sanjana.mukherjee784@example.com,4,1.0,0.8675,0.0,0,Occasional / Trial Users
+785,Nandini Bose,nandini.bose785@example.com,1,1.0,0.89,1.0,3,Engaged Fashion Explorers
+786,Ananya Reddy,ananya.reddy786@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+787,Aakash Pandey,aakash.pandey787@example.com,3,1.0,0.89,0.0,0,Occasional / Trial Users
+788,Rishi Bose,rishi.bose788@example.com,2,1.0,0.92,1.0,3,Engaged Fashion Explorers
+789,Priya Chopra,priya.chopra789@example.com,4,0.5,0.5225,0.25,2,At-Risk / Sensitive Users
+790,Gaurav Nair,gaurav.nair790@example.com,3,1.0,0.9333,0.0,0,Occasional / Trial Users
+791,Payal Verma,payal.verma791@example.com,4,0.75,0.775,0.25,0,Occasional / Trial Users
+792,Sakshi Bose,sakshi.bose792@example.com,6,0.8333,0.7917,0.5,3,Engaged Fashion Explorers
+793,Divya Verma,divya.verma793@example.com,6,1.0,0.9167,0.1667,0,Occasional / Trial Users
+794,Siddharth Gupta,siddharth.gupta794@example.com,2,1.0,0.905,0.0,0,Occasional / Trial Users
+795,Ishita Mukherjee,ishita.mukherjee795@example.com,3,0.6667,0.6567,0.0,2,At-Risk / Sensitive Users
+796,Ishita Choudhury,ishita.choudhury796@example.com,10,0.9,0.81,0.2,0,Occasional / Trial Users
+797,Tanvi Chopra,tanvi.chopra797@example.com,6,0.8333,0.755,0.0,0,Occasional / Trial Users
+798,Kunal Patel,kunal.patel798@example.com,3,1.0,0.9133,0.3333,0,Occasional / Trial Users
+799,Deepak Bhat,deepak.bhat799@example.com,3,1.0,0.89,0.0,0,Occasional / Trial Users
+800,Sneha Kulkarni,sneha.kulkarni800@example.com,7,1.0,0.9243,0.4286,3,Engaged Fashion Explorers
+801,Priya Mukherjee,priya.mukherjee801@example.com,5,1.0,0.892,1.0,3,Engaged Fashion Explorers
+802,Vikram Trivedi,vikram.trivedi802@example.com,10,1.0,0.884,0.4,3,Engaged Fashion Explorers
+803,Deepak Kulkarni,deepak.kulkarni803@example.com,7,0.8571,0.7371,0.1429,0,Occasional / Trial Users
+804,Kunal Singhania,kunal.singhania804@example.com,3,1.0,0.87,0.3333,0,Occasional / Trial Users
+805,Kavya Choudhury,kavya.choudhury805@example.com,1,1.0,0.83,0.0,0,Occasional / Trial Users
+806,Aakash Malhotra,aakash.malhotra806@example.com,1,1.0,0.92,0.0,0,Occasional / Trial Users
+807,Karan Sengupta,karan.sengupta807@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+808,Manish Ghosh,manish.ghosh808@example.com,3,1.0,0.8567,0.3333,0,Occasional / Trial Users
+809,Vivaan Pandey,vivaan.pandey809@example.com,4,0.75,0.7675,0.5,3,Engaged Fashion Explorers
+810,Sneha Reddy,sneha.reddy810@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+811,Rohan Bhat,rohan.bhat811@example.com,2,0.5,0.58,0.5,2,At-Risk / Sensitive Users
+812,Rhea Sharma,rhea.sharma812@example.com,5,0.6,0.588,0.2,2,At-Risk / Sensitive Users
+813,Bhavna Bhat,bhavna.bhat813@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+814,Rhea Gupta,rhea.gupta814@example.com,2,0.5,0.6,0.0,2,At-Risk / Sensitive Users
+815,Aakash Bhat,aakash.bhat815@example.com,1,0.0,0.0,0.0,2,At-Risk / Sensitive Users
+816,Sakshi Agarwal,sakshi.agarwal816@example.com,6,1.0,0.9017,0.8333,3,Engaged Fashion Explorers
+817,Siddharth Saxena,siddharth.saxena817@example.com,2,1.0,0.955,0.0,0,Occasional / Trial Users
+818,Tara Trivedi,tara.trivedi818@example.com,9,0.7778,0.7744,0.4444,3,Engaged Fashion Explorers
+819,Arjun Trivedi,arjun.trivedi819@example.com,2,1.0,0.885,0.0,0,Occasional / Trial Users
+820,Aditya Trivedi,aditya.trivedi820@example.com,5,0.6,0.552,0.2,2,At-Risk / Sensitive Users
+821,Pooja Mukherjee,pooja.mukherjee821@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+822,Ananya Deshmukh,ananya.deshmukh822@example.com,2,1.0,0.88,0.0,0,Occasional / Trial Users
+823,Yash Patel,yash.patel823@example.com,5,1.0,0.884,0.4,3,Engaged Fashion Explorers
+824,Aditya Mishra,aditya.mishra824@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+825,Kabir Singhania,kabir.singhania825@example.com,6,0.6667,0.5883,0.0,2,At-Risk / Sensitive Users
+826,Sneha Deshmukh,sneha.deshmukh826@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+827,Ananya Menon,ananya.menon827@example.com,1,1.0,0.84,0.0,0,Occasional / Trial Users
+828,Swati Mukherjee,swati.mukherjee828@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+829,Anushka Sharma,anushka.sharma829@example.com,4,1.0,0.925,0.5,3,Engaged Fashion Explorers
+830,Sakshi Bose,sakshi.bose830@example.com,5,0.8,0.77,0.4,3,Engaged Fashion Explorers
+831,Divya Trivedi,divya.trivedi831@example.com,7,0.8571,0.8114,0.4286,3,Engaged Fashion Explorers
+832,Nikhil Sharma,nikhil.sharma832@example.com,2,0.5,0.595,0.5,2,At-Risk / Sensitive Users
+833,Nandini Bose,nandini.bose833@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+834,Vivaan Deshmukh,vivaan.deshmukh834@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+835,Vikram Menon,vikram.menon835@example.com,5,1.0,0.876,0.8,3,Engaged Fashion Explorers
+836,Karan Joshi,karan.joshi836@example.com,7,0.7143,0.6671,0.2857,2,At-Risk / Sensitive Users
+837,Shreya Chopra,shreya.chopra837@example.com,1,1.0,0.87,1.0,3,Engaged Fashion Explorers
+838,Kavya Singhania,kavya.singhania838@example.com,5,0.6,0.552,0.0,2,At-Risk / Sensitive Users
+839,Nandini Mishra,nandini.mishra839@example.com,3,1.0,0.9033,0.0,0,Occasional / Trial Users
+840,Tara Saxena,tara.saxena840@example.com,4,1.0,0.925,0.0,0,Occasional / Trial Users
+841,Simran Chopra,simran.chopra841@example.com,3,1.0,0.8833,0.3333,0,Occasional / Trial Users
+842,Gaurav Patel,gaurav.patel842@example.com,7,0.8571,0.7557,0.1429,0,Occasional / Trial Users
+843,Rishi Rao,rishi.rao843@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+844,Isha Agarwal,isha.agarwal844@example.com,4,1.0,0.915,0.25,0,Occasional / Trial Users
+845,Vivaan Ghosh,vivaan.ghosh845@example.com,1,1.0,0.98,0.0,0,Occasional / Trial Users
+846,Rahul Gupta,rahul.gupta846@example.com,3,0.6667,0.69,0.0,2,At-Risk / Sensitive Users
+847,Gaurav Joshi,gaurav.joshi847@example.com,3,1.0,0.8833,0.0,0,Occasional / Trial Users
+848,Nandini Mukherjee,nandini.mukherjee848@example.com,1,1.0,0.86,0.0,0,Occasional / Trial Users
+849,Pranav Bansal,pranav.bansal849@example.com,6,1.0,0.9117,0.1667,0,Occasional / Trial Users
+850,Dev Sharma,dev.sharma850@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+851,Rhea Saxena,rhea.saxena851@example.com,5,1.0,0.904,0.2,0,Occasional / Trial Users
+852,Priya Rao,priya.rao852@example.com,2,1.0,0.935,1.0,3,Engaged Fashion Explorers
+853,Pranav Mishra,pranav.mishra853@example.com,1,1.0,0.92,1.0,3,Engaged Fashion Explorers
+854,Harsh Kapoor,harsh.kapoor854@example.com,5,1.0,0.904,0.2,0,Occasional / Trial Users
+855,Aditya Pandey,aditya.pandey855@example.com,9,1.0,0.8933,0.5556,3,Engaged Fashion Explorers
+856,Ishita Deshmukh,ishita.deshmukh856@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+857,Vivaan Bose,vivaan.bose857@example.com,4,0.75,0.7175,0.0,0,Occasional / Trial Users
+858,Ritu Menon,ritu.menon858@example.com,5,1.0,0.932,0.4,3,Engaged Fashion Explorers
+859,Simran Saxena,simran.saxena859@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+860,Akshay Joshi,akshay.joshi860@example.com,2,1.0,0.93,0.0,0,Occasional / Trial Users
+861,Rahul Reddy,rahul.reddy861@example.com,4,0.75,0.74,0.0,0,Occasional / Trial Users
+862,Isha Rao,isha.rao862@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+863,Yash Chopra,yash.chopra863@example.com,7,0.8571,0.7771,0.1429,0,Occasional / Trial Users
+864,Nikhil Pandey,nikhil.pandey864@example.com,6,1.0,0.9017,0.5,3,Engaged Fashion Explorers
+865,Kabir Mehta,kabir.mehta865@example.com,8,1.0,0.9125,0.5,3,Engaged Fashion Explorers
+866,Aakash Singhania,aakash.singhania866@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+867,Sanjana Chopra,sanjana.chopra867@example.com,4,1.0,0.84,0.25,0,Occasional / Trial Users
+868,Vivaan Mehta,vivaan.mehta868@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+869,Sameer Reddy,sameer.reddy869@example.com,5,0.8,0.734,0.6,3,Engaged Fashion Explorers
+870,Aditya Mehta,aditya.mehta870@example.com,3,0.6667,0.6233,0.3333,2,At-Risk / Sensitive Users
+871,Sameer Choudhury,sameer.choudhury871@example.com,6,0.8333,0.7583,0.3333,0,Occasional / Trial Users
+872,Varun Iyer,varun.iyer872@example.com,2,1.0,0.895,0.5,3,Engaged Fashion Explorers
+873,Karan Choudhury,karan.choudhury873@example.com,3,1.0,0.9467,0.3333,0,Occasional / Trial Users
+874,Kunal Pandey,kunal.pandey874@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+875,Aarav Sengupta,aarav.sengupta875@example.com,2,1.0,0.925,0.0,0,Occasional / Trial Users
+876,Trisha Mehta,trisha.mehta876@example.com,3,1.0,0.8733,0.6667,3,Engaged Fashion Explorers
+877,Pranav Deshmukh,pranav.deshmukh877@example.com,2,0.5,0.5,0.0,2,At-Risk / Sensitive Users
+878,Aakash Rao,aakash.rao878@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+879,Priya Joshi,priya.joshi879@example.com,4,0.5,0.57,0.25,2,At-Risk / Sensitive Users
+880,Kabir Rao,kabir.rao880@example.com,3,0.6667,0.5867,0.3333,2,At-Risk / Sensitive Users
+881,Varun Sengupta,varun.sengupta881@example.com,3,1.0,0.8867,0.6667,3,Engaged Fashion Explorers
+882,Shreya Joshi,shreya.joshi882@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+883,Akshay Kulkarni,akshay.kulkarni883@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+884,Vikram Malhotra,vikram.malhotra884@example.com,2,0.5,0.525,0.0,2,At-Risk / Sensitive Users
+885,Priya Sharma,priya.sharma885@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+886,Swati Chopra,swati.chopra886@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+887,Ritu Bose,ritu.bose887@example.com,5,0.8,0.742,0.6,3,Engaged Fashion Explorers
+888,Aditya Sengupta,aditya.sengupta888@example.com,1,1.0,0.86,0.0,0,Occasional / Trial Users
+889,Rishi Gupta,rishi.gupta889@example.com,2,1.0,0.91,1.0,3,Engaged Fashion Explorers
+890,Pooja Chopra,pooja.chopra890@example.com,10,0.8,0.738,0.3,0,Occasional / Trial Users
+891,Sanjana Singhania,sanjana.singhania891@example.com,1,1.0,0.9,1.0,3,Engaged Fashion Explorers
+892,Pranav Pandey,pranav.pandey892@example.com,6,0.8333,0.8383,0.3333,0,Occasional / Trial Users
+893,Aakash Joshi,aakash.joshi893@example.com,8,0.875,0.7788,0.25,0,Occasional / Trial Users
+894,Meera Mukherjee,meera.mukherjee894@example.com,6,1.0,0.9033,0.5,3,Engaged Fashion Explorers
+895,Bhavna Choudhury,bhavna.choudhury895@example.com,2,1.0,0.915,0.0,0,Occasional / Trial Users
+896,Trisha Choudhury,trisha.choudhury896@example.com,4,1.0,0.885,0.5,3,Engaged Fashion Explorers
+897,Neha Singhania,neha.singhania897@example.com,8,1.0,0.865,0.375,3,Engaged Fashion Explorers
+898,Nikhil Mishra,nikhil.mishra898@example.com,4,1.0,0.9225,0.5,3,Engaged Fashion Explorers
+899,Varun Bansal,varun.bansal899@example.com,2,1.0,0.88,0.0,0,Occasional / Trial Users
+900,Akshay Sengupta,akshay.sengupta900@example.com,1,1.0,0.98,0.0,0,Occasional / Trial Users
+901,Yash Verma,yash.verma901@example.com,4,0.5,0.54,0.25,2,At-Risk / Sensitive Users
+902,Kabir Malhotra,kabir.malhotra902@example.com,4,0.75,0.73,0.5,3,Engaged Fashion Explorers
+903,Bhavna Chopra,bhavna.chopra903@example.com,3,0.6667,0.7033,0.3333,2,At-Risk / Sensitive Users
+904,Rishi Bose,rishi.bose904@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+905,Shreya Singhania,shreya.singhania905@example.com,4,0.75,0.6725,0.25,0,Occasional / Trial Users
+906,Akshay Mukherjee,akshay.mukherjee906@example.com,3,1.0,0.86,0.3333,0,Occasional / Trial Users
+907,Trisha Nair,trisha.nair907@example.com,3,1.0,0.95,0.3333,0,Occasional / Trial Users
+908,Karan Rao,karan.rao908@example.com,3,1.0,0.9233,0.0,0,Occasional / Trial Users
+909,Rohan Bhat,rohan.bhat909@example.com,1,0.0,0.28,0.0,2,At-Risk / Sensitive Users
+910,Tara Chopra,tara.chopra910@example.com,2,1.0,0.855,0.5,3,Engaged Fashion Explorers
+911,Vivaan Sharma,vivaan.sharma911@example.com,1,0.0,0.03,0.0,2,At-Risk / Sensitive Users
+912,Rahul Deshmukh,rahul.deshmukh912@example.com,2,1.0,0.885,0.5,3,Engaged Fashion Explorers
+913,Bhavna Singhania,bhavna.singhania913@example.com,3,0.3333,0.3933,0.0,2,At-Risk / Sensitive Users
+914,Sameer Reddy,sameer.reddy914@example.com,1,1.0,0.86,0.0,0,Occasional / Trial Users
+915,Trisha Bansal,trisha.bansal915@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+916,Manish Verma,manish.verma916@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+917,Gaurav Iyer,gaurav.iyer917@example.com,12,0.9167,0.8358,0.5833,3,Engaged Fashion Explorers
+918,Ishita Iyer,ishita.iyer918@example.com,5,0.4,0.406,0.2,2,At-Risk / Sensitive Users
+919,Priya Kapoor,priya.kapoor919@example.com,5,0.6,0.604,0.2,2,At-Risk / Sensitive Users
+920,Divya Kulkarni,divya.kulkarni920@example.com,2,0.5,0.48,0.5,2,At-Risk / Sensitive Users
+921,Vivaan Malhotra,vivaan.malhotra921@example.com,7,0.7143,0.6471,0.0,2,At-Risk / Sensitive Users
+922,Dev Mehta,dev.mehta922@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+923,Payal Iyer,payal.iyer923@example.com,6,1.0,0.9267,0.3333,0,Occasional / Trial Users
+924,Tara Iyer,tara.iyer924@example.com,2,1.0,0.87,1.0,3,Engaged Fashion Explorers
+925,Sanjana Nair,sanjana.nair925@example.com,8,1.0,0.9125,0.625,3,Engaged Fashion Explorers
+926,Sakshi Rao,sakshi.rao926@example.com,6,1.0,0.905,0.5,3,Engaged Fashion Explorers
+927,Isha Malhotra,isha.malhotra927@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+928,Akshay Rao,akshay.rao928@example.com,8,0.875,0.7888,0.25,0,Occasional / Trial Users
+929,Yash Bose,yash.bose929@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+930,Sanjana Menon,sanjana.menon930@example.com,4,1.0,0.8875,0.25,0,Occasional / Trial Users
+931,Bhavna Bose,bhavna.bose931@example.com,3,1.0,0.8867,0.6667,3,Engaged Fashion Explorers
+932,Payal Gupta,payal.gupta932@example.com,1,1.0,0.83,0.0,0,Occasional / Trial Users
+933,Deepak Singhania,deepak.singhania933@example.com,9,1.0,0.8967,0.2222,0,Occasional / Trial Users
+934,Vivaan Pandey,vivaan.pandey934@example.com,2,1.0,0.905,0.5,3,Engaged Fashion Explorers
+935,Shreya Kapoor,shreya.kapoor935@example.com,1,1.0,0.95,1.0,3,Engaged Fashion Explorers
+936,Meera Joshi,meera.joshi936@example.com,1,1.0,0.93,1.0,3,Engaged Fashion Explorers
+937,Divya Agarwal,divya.agarwal937@example.com,8,1.0,0.9087,0.125,0,Occasional / Trial Users
+938,Aakash Menon,aakash.menon938@example.com,2,1.0,0.93,0.5,3,Engaged Fashion Explorers
+939,Meera Reddy,meera.reddy939@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+940,Swati Rao,swati.rao940@example.com,7,1.0,0.8729,0.1429,0,Occasional / Trial Users
+941,Priya Mukherjee,priya.mukherjee941@example.com,4,0.75,0.7425,0.25,0,Occasional / Trial Users
+942,Ishita Bansal,ishita.bansal942@example.com,5,0.8,0.766,0.2,0,Occasional / Trial Users
+943,Meera Nair,meera.nair943@example.com,3,0.6667,0.6167,0.3333,2,At-Risk / Sensitive Users
+944,Pooja Reddy,pooja.reddy944@example.com,6,1.0,0.91,0.1667,0,Occasional / Trial Users
+945,Manish Chopra,manish.chopra945@example.com,3,1.0,0.8633,0.0,0,Occasional / Trial Users
+946,Aditya Bhat,aditya.bhat946@example.com,5,1.0,0.916,0.6,3,Engaged Fashion Explorers
+947,Pooja Kulkarni,pooja.kulkarni947@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+948,Rishi Mukherjee,rishi.mukherjee948@example.com,3,0.3333,0.42,0.0,2,At-Risk / Sensitive Users
+949,Sakshi Rao,sakshi.rao949@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+950,Aditya Rao,aditya.rao950@example.com,5,1.0,0.888,0.4,3,Engaged Fashion Explorers
+951,Swati Patel,swati.patel951@example.com,2,1.0,0.85,0.5,3,Engaged Fashion Explorers
+952,Anushka Verma,anushka.verma952@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+953,Sakshi Deshmukh,sakshi.deshmukh953@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+954,Varun Bansal,varun.bansal954@example.com,6,0.5,0.4983,0.1667,2,At-Risk / Sensitive Users
+955,Payal Mishra,payal.mishra955@example.com,5,0.8,0.732,0.2,0,Occasional / Trial Users
+956,Arjun Mehta,arjun.mehta956@example.com,9,0.8889,0.7744,0.3333,0,Occasional / Trial Users
+957,Deepak Nair,deepak.nair957@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+958,Tanvi Nair,tanvi.nair958@example.com,2,1.0,0.875,0.0,0,Occasional / Trial Users
+959,Arjun Saxena,arjun.saxena959@example.com,3,0.3333,0.43,0.0,2,At-Risk / Sensitive Users
+960,Sanjana Saxena,sanjana.saxena960@example.com,2,1.0,0.88,0.0,0,Occasional / Trial Users
+961,Manish Iyer,manish.iyer961@example.com,1,1.0,0.9,1.0,3,Engaged Fashion Explorers
+962,Tanvi Saxena,tanvi.saxena962@example.com,1,1.0,0.98,0.0,0,Occasional / Trial Users
+963,Harsh Mishra,harsh.mishra963@example.com,2,1.0,0.915,1.0,3,Engaged Fashion Explorers
+964,Sameer Choudhury,sameer.choudhury964@example.com,9,0.8889,0.8178,0.2222,0,Occasional / Trial Users
+965,Vivaan Trivedi,vivaan.trivedi965@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+966,Priya Das,priya.das966@example.com,8,0.75,0.71,0.375,0,Occasional / Trial Users
+967,Siddharth Reddy,siddharth.reddy967@example.com,5,0.6,0.588,0.0,2,At-Risk / Sensitive Users
+968,Meera Saxena,meera.saxena968@example.com,7,0.8571,0.8029,0.2857,0,Occasional / Trial Users
+969,Sanjana Bhat,sanjana.bhat969@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+970,Payal Menon,payal.menon970@example.com,4,0.75,0.72,0.25,0,Occasional / Trial Users
+971,Arjun Menon,arjun.menon971@example.com,9,0.7778,0.7678,0.2222,0,Occasional / Trial Users
+972,Sneha Pandey,sneha.pandey972@example.com,3,1.0,0.9067,0.3333,0,Occasional / Trial Users
+973,Karan Choudhury,karan.choudhury973@example.com,7,1.0,0.9157,0.4286,3,Engaged Fashion Explorers
+974,Harsh Rao,harsh.rao974@example.com,2,1.0,0.9,0.5,3,Engaged Fashion Explorers
+975,Nikhil Sengupta,nikhil.sengupta975@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+976,Manish Ghosh,manish.ghosh976@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+977,Aditya Saxena,aditya.saxena977@example.com,4,0.75,0.71,0.25,0,Occasional / Trial Users
+978,Tanvi Das,tanvi.das978@example.com,6,0.8333,0.7833,0.3333,0,Occasional / Trial Users
+979,Rishi Das,rishi.das979@example.com,4,0.75,0.675,0.0,0,Occasional / Trial Users
+980,Rhea Singhania,rhea.singhania980@example.com,3,1.0,0.92,0.0,0,Occasional / Trial Users
+981,Deepak Mishra,deepak.mishra981@example.com,8,0.75,0.7287,0.375,0,Occasional / Trial Users
+982,Anushka Verma,anushka.verma982@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+983,Tanvi Agarwal,tanvi.agarwal983@example.com,3,1.0,0.8833,0.6667,3,Engaged Fashion Explorers
+984,Sameer Mehta,sameer.mehta984@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+985,Simran Deshmukh,simran.deshmukh985@example.com,3,0.6667,0.6767,0.3333,2,At-Risk / Sensitive Users
+986,Shreya Malhotra,shreya.malhotra986@example.com,1,1.0,0.84,0.0,0,Occasional / Trial Users
+987,Bhavna Sharma,bhavna.sharma987@example.com,2,0.5,0.595,0.0,2,At-Risk / Sensitive Users
+988,Neha Agarwal,neha.agarwal988@example.com,9,1.0,0.92,0.3333,0,Occasional / Trial Users
+989,Karan Das,karan.das989@example.com,3,1.0,0.91,0.3333,0,Occasional / Trial Users
+990,Simran Gupta,simran.gupta990@example.com,1,1.0,0.88,1.0,3,Engaged Fashion Explorers
+991,Anushka Joshi,anushka.joshi991@example.com,4,1.0,0.91,0.0,0,Occasional / Trial Users
+992,Ritu Choudhury,ritu.choudhury992@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+993,Pranav Das,pranav.das993@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+994,Nandini Saxena,nandini.saxena994@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+995,Vivaan Agarwal,vivaan.agarwal995@example.com,4,1.0,0.905,0.25,0,Occasional / Trial Users
+996,Meera Mukherjee,meera.mukherjee996@example.com,1,1.0,0.9,0.0,0,Occasional / Trial Users
+997,Neha Sharma,neha.sharma997@example.com,1,1.0,0.95,0.0,0,Occasional / Trial Users
+998,Rishi Mukherjee,rishi.mukherjee998@example.com,5,1.0,0.914,0.2,0,Occasional / Trial Users
+999,Priya Rao,priya.rao999@example.com,2,1.0,0.9,0.0,0,Occasional / Trial Users
+1000,Tara Reddy,tara.reddy1000@example.com,4,1.0,0.8675,0.5,3,Engaged Fashion Explorers
+1001,Shreya Bansal,shreya.bansal1001@example.com,8,0.75,0.68,0.25,0,Occasional / Trial Users
+1002,Ananya Chopra,ananya.chopra1002@example.com,5,1.0,0.9,0.4,3,Engaged Fashion Explorers
+1003,Amit Singhania,amit.singhania1003@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1004,Tara Mehta,tara.mehta1004@example.com,4,1.0,0.885,0.75,3,Engaged Fashion Explorers
+1005,Aarav Gupta,aarav.gupta1005@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1006,Aditya Bhat,aditya.bhat1006@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1007,Nandini Malhotra,nandini.malhotra1007@example.com,4,1.0,0.8975,0.25,0,Occasional / Trial Users
+1008,Rishi Kapoor,rishi.kapoor1008@example.com,1,0.0,0.27,0.0,2,At-Risk / Sensitive Users
+1009,Rishi Verma,rishi.verma1009@example.com,4,0.75,0.7375,0.0,0,Occasional / Trial Users
+1010,Rahul Chopra,rahul.chopra1010@example.com,3,1.0,0.9433,0.0,0,Occasional / Trial Users
+1011,Vivaan Iyer,vivaan.iyer1011@example.com,4,0.75,0.6925,0.5,3,Engaged Fashion Explorers
+1012,Priya Verma,priya.verma1012@example.com,1,1.0,0.93,0.0,0,Occasional / Trial Users
+1013,Tara Bansal,tara.bansal1013@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1014,Divya Bhat,divya.bhat1014@example.com,3,1.0,0.9167,0.3333,0,Occasional / Trial Users
+1015,Tara Rao,tara.rao1015@example.com,2,0.5,0.625,0.0,2,At-Risk / Sensitive Users
+1016,Amit Gupta,amit.gupta1016@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1017,Rhea Mukherjee,rhea.mukherjee1017@example.com,9,0.8889,0.7978,0.5556,3,Engaged Fashion Explorers
+1018,Nandini Malhotra,nandini.malhotra1018@example.com,1,1.0,0.95,0.0,0,Occasional / Trial Users
+1019,Vivaan Verma,vivaan.verma1019@example.com,1,0.0,0.34,0.0,2,At-Risk / Sensitive Users
+1020,Amit Chopra,amit.chopra1020@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1021,Dev Pandey,dev.pandey1021@example.com,5,1.0,0.906,0.4,3,Engaged Fashion Explorers
+1022,Tanvi Agarwal,tanvi.agarwal1022@example.com,7,0.4286,0.4529,0.1429,2,At-Risk / Sensitive Users
+1023,Sakshi Menon,sakshi.menon1023@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1024,Kunal Sengupta,kunal.sengupta1024@example.com,2,0.5,0.61,0.0,2,At-Risk / Sensitive Users
+1025,Yash Ghosh,yash.ghosh1025@example.com,1,1.0,0.92,0.0,0,Occasional / Trial Users
+1026,Divya Menon,divya.menon1026@example.com,12,0.8333,0.795,0.1667,0,Occasional / Trial Users
+1027,Sanjana Chopra,sanjana.chopra1027@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1028,Ananya Pandey,ananya.pandey1028@example.com,3,1.0,0.8733,0.3333,0,Occasional / Trial Users
+1029,Aakash Iyer,aakash.iyer1029@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1030,Akshay Menon,akshay.menon1030@example.com,8,0.875,0.7887,0.25,0,Occasional / Trial Users
+1031,Aarav Reddy,aarav.reddy1031@example.com,1,1.0,0.91,1.0,3,Engaged Fashion Explorers
+1032,Aakash Das,aakash.das1032@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1033,Shreya Choudhury,shreya.choudhury1033@example.com,6,0.8333,0.7933,0.5,3,Engaged Fashion Explorers
+1034,Deepak Kulkarni,deepak.kulkarni1034@example.com,1,1.0,0.85,0.0,0,Occasional / Trial Users
+1035,Bhavna Mehta,bhavna.mehta1035@example.com,5,1.0,0.916,0.4,3,Engaged Fashion Explorers
+1036,Sneha Patel,sneha.patel1036@example.com,4,1.0,0.935,0.25,0,Occasional / Trial Users
+1037,Manish Sengupta,manish.sengupta1037@example.com,2,1.0,0.945,0.0,0,Occasional / Trial Users
+1038,Manish Saxena,manish.saxena1038@example.com,5,0.8,0.73,0.2,0,Occasional / Trial Users
+1039,Rishi Chopra,rishi.chopra1039@example.com,2,1.0,0.97,0.5,3,Engaged Fashion Explorers
+1040,Harsh Choudhury,harsh.choudhury1040@example.com,1,0.0,0.32,0.0,2,At-Risk / Sensitive Users
+1041,Tanvi Mehta,tanvi.mehta1041@example.com,2,0.5,0.575,0.5,2,At-Risk / Sensitive Users
+1042,Manish Mukherjee,manish.mukherjee1042@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1043,Harsh Kapoor,harsh.kapoor1043@example.com,6,0.8333,0.8017,0.1667,0,Occasional / Trial Users
+1044,Akshay Saxena,akshay.saxena1044@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1045,Tara Mehta,tara.mehta1045@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1046,Isha Trivedi,isha.trivedi1046@example.com,3,1.0,0.92,0.0,0,Occasional / Trial Users
+1047,Kavya Mehta,kavya.mehta1047@example.com,3,1.0,0.91,0.6667,3,Engaged Fashion Explorers
+1048,Neha Menon,neha.menon1048@example.com,12,0.9167,0.8542,0.4167,3,Engaged Fashion Explorers
+1049,Priya Bansal,priya.bansal1049@example.com,11,0.7273,0.7355,0.1818,0,Occasional / Trial Users
+1050,Pooja Iyer,pooja.iyer1050@example.com,2,1.0,0.86,0.5,3,Engaged Fashion Explorers
+1051,Aditya Singhania,aditya.singhania1051@example.com,4,1.0,0.915,0.25,0,Occasional / Trial Users
+1052,Anushka Reddy,anushka.reddy1052@example.com,4,1.0,0.86,0.5,3,Engaged Fashion Explorers
+1053,Amit Joshi,amit.joshi1053@example.com,1,0.0,0.32,0.0,2,At-Risk / Sensitive Users
+1054,Aditya Trivedi,aditya.trivedi1054@example.com,7,1.0,0.9071,0.5714,3,Engaged Fashion Explorers
+1055,Meera Saxena,meera.saxena1055@example.com,2,1.0,0.93,0.5,3,Engaged Fashion Explorers
+1056,Isha Joshi,isha.joshi1056@example.com,1,1.0,0.97,0.0,0,Occasional / Trial Users
+1057,Siddharth Singhania,siddharth.singhania1057@example.com,2,1.0,0.95,0.5,3,Engaged Fashion Explorers
+1058,Kabir Kulkarni,kabir.kulkarni1058@example.com,1,1.0,0.86,1.0,3,Engaged Fashion Explorers
+1059,Shreya Patel,shreya.patel1059@example.com,5,1.0,0.862,0.0,0,Occasional / Trial Users
+1060,Arjun Reddy,arjun.reddy1060@example.com,3,1.0,0.8667,0.0,0,Occasional / Trial Users
+1061,Trisha Iyer,trisha.iyer1061@example.com,2,1.0,0.92,0.0,0,Occasional / Trial Users
+1062,Amit Iyer,amit.iyer1062@example.com,8,0.625,0.6337,0.125,2,At-Risk / Sensitive Users
+1063,Manish Sharma,manish.sharma1063@example.com,3,1.0,0.9433,0.0,0,Occasional / Trial Users
+1064,Kavya Patel,kavya.patel1064@example.com,5,1.0,0.914,0.2,0,Occasional / Trial Users
+1065,Aakash Mukherjee,aakash.mukherjee1065@example.com,4,0.5,0.515,0.0,2,At-Risk / Sensitive Users
+1066,Rohan Choudhury,rohan.choudhury1066@example.com,1,1.0,0.89,1.0,3,Engaged Fashion Explorers
+1067,Rahul Kapoor,rahul.kapoor1067@example.com,4,0.75,0.725,0.75,3,Engaged Fashion Explorers
+1068,Amit Kapoor,amit.kapoor1068@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1069,Pranav Reddy,pranav.reddy1069@example.com,4,0.75,0.73,0.25,0,Occasional / Trial Users
+1070,Nandini Ghosh,nandini.ghosh1070@example.com,2,0.5,0.42,0.0,2,At-Risk / Sensitive Users
+1071,Rahul Pandey,rahul.pandey1071@example.com,3,1.0,0.9033,0.0,0,Occasional / Trial Users
+1072,Simran Mehta,simran.mehta1072@example.com,8,1.0,0.9063,0.25,0,Occasional / Trial Users
+1073,Trisha Das,trisha.das1073@example.com,2,0.5,0.6,0.0,2,At-Risk / Sensitive Users
+1074,Ishita Choudhury,ishita.choudhury1074@example.com,3,0.6667,0.6767,0.0,2,At-Risk / Sensitive Users
+1075,Shreya Gupta,shreya.gupta1075@example.com,2,1.0,0.95,0.0,0,Occasional / Trial Users
+1076,Priya Trivedi,priya.trivedi1076@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1077,Neha Reddy,neha.reddy1077@example.com,4,1.0,0.8925,0.0,0,Occasional / Trial Users
+1078,Trisha Saxena,trisha.saxena1078@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1079,Harsh Saxena,harsh.saxena1079@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1080,Aarav Mukherjee,aarav.mukherjee1080@example.com,4,1.0,0.915,0.25,0,Occasional / Trial Users
+1081,Rahul Choudhury,rahul.choudhury1081@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1082,Rishi Ghosh,rishi.ghosh1082@example.com,1,1.0,0.95,0.0,0,Occasional / Trial Users
+1083,Aarav Saxena,aarav.saxena1083@example.com,7,0.8571,0.8314,0.4286,3,Engaged Fashion Explorers
+1084,Sanjana Trivedi,sanjana.trivedi1084@example.com,11,0.8182,0.7382,0.1818,0,Occasional / Trial Users
+1085,Sneha Deshmukh,sneha.deshmukh1085@example.com,3,1.0,0.8533,0.3333,0,Occasional / Trial Users
+1086,Anushka Patel,anushka.patel1086@example.com,10,0.9,0.833,0.1,0,Occasional / Trial Users
+1087,Tanvi Mehta,tanvi.mehta1087@example.com,1,1.0,0.92,0.0,0,Occasional / Trial Users
+1088,Divya Bose,divya.bose1088@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1089,Neha Trivedi,neha.trivedi1089@example.com,7,0.7143,0.68,0.1429,2,At-Risk / Sensitive Users
+1090,Vivaan Deshmukh,vivaan.deshmukh1090@example.com,2,1.0,0.865,0.0,0,Occasional / Trial Users
+1091,Simran Mehta,simran.mehta1091@example.com,7,0.8571,0.7857,0.4286,3,Engaged Fashion Explorers
+1092,Ananya Bose,ananya.bose1092@example.com,3,1.0,0.94,0.0,0,Occasional / Trial Users
+1093,Kavya Sengupta,kavya.sengupta1093@example.com,7,0.8571,0.8357,0.0,0,Occasional / Trial Users
+1094,Simran Singhania,simran.singhania1094@example.com,3,0.6667,0.69,0.3333,2,At-Risk / Sensitive Users
+1095,Sameer Joshi,sameer.joshi1095@example.com,2,1.0,0.855,0.0,0,Occasional / Trial Users
+1096,Vikram Verma,vikram.verma1096@example.com,2,1.0,0.905,0.0,0,Occasional / Trial Users
+1097,Rhea Iyer,rhea.iyer1097@example.com,2,1.0,0.865,0.0,0,Occasional / Trial Users
+1098,Neha Kapoor,neha.kapoor1098@example.com,4,0.75,0.655,0.25,0,Occasional / Trial Users
+1099,Harsh Reddy,harsh.reddy1099@example.com,4,1.0,0.9075,0.5,3,Engaged Fashion Explorers
+1100,Priya Malhotra,priya.malhotra1100@example.com,2,1.0,0.88,0.5,3,Engaged Fashion Explorers
+1101,Ishita Rao,ishita.rao1101@example.com,4,0.75,0.695,0.5,3,Engaged Fashion Explorers
+1102,Payal Singhania,payal.singhania1102@example.com,2,1.0,0.865,0.0,0,Occasional / Trial Users
+1103,Sneha Mishra,sneha.mishra1103@example.com,5,1.0,0.922,0.2,0,Occasional / Trial Users
+1104,Ishita Singhania,ishita.singhania1104@example.com,4,1.0,0.93,0.25,0,Occasional / Trial Users
+1105,Simran Deshmukh,simran.deshmukh1105@example.com,3,1.0,0.9267,0.3333,0,Occasional / Trial Users
+1106,Priya Joshi,priya.joshi1106@example.com,3,1.0,0.89,0.3333,0,Occasional / Trial Users
+1107,Simran Das,simran.das1107@example.com,1,1.0,0.86,1.0,3,Engaged Fashion Explorers
+1108,Sanjana Choudhury,sanjana.choudhury1108@example.com,3,1.0,0.8433,0.6667,3,Engaged Fashion Explorers
+1109,Neha Iyer,neha.iyer1109@example.com,4,0.75,0.7525,0.0,0,Occasional / Trial Users
+1110,Aarav Patel,aarav.patel1110@example.com,2,1.0,0.925,0.5,3,Engaged Fashion Explorers
+1111,Vikram Mishra,vikram.mishra1111@example.com,1,1.0,0.89,1.0,3,Engaged Fashion Explorers
+1112,Nandini Agarwal,nandini.agarwal1112@example.com,2,1.0,0.92,0.5,3,Engaged Fashion Explorers
+1113,Bhavna Bhat,bhavna.bhat1113@example.com,7,0.8571,0.84,0.2857,0,Occasional / Trial Users
+1114,Diya Mehta,diya.mehta1114@example.com,5,0.8,0.738,0.0,0,Occasional / Trial Users
+1115,Sameer Pandey,sameer.pandey1115@example.com,5,0.8,0.732,0.0,0,Occasional / Trial Users
+1116,Ritu Iyer,ritu.iyer1116@example.com,3,0.6667,0.5767,0.0,2,At-Risk / Sensitive Users
+1117,Ananya Rao,ananya.rao1117@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1118,Amit Chopra,amit.chopra1118@example.com,6,0.8333,0.77,0.1667,0,Occasional / Trial Users
+1119,Aakash Bansal,aakash.bansal1119@example.com,4,1.0,0.9475,0.5,3,Engaged Fashion Explorers
+1120,Karan Gupta,karan.gupta1120@example.com,1,1.0,0.84,0.0,0,Occasional / Trial Users
+1121,Tanvi Malhotra,tanvi.malhotra1121@example.com,10,0.9,0.839,0.1,0,Occasional / Trial Users
+1122,Swati Menon,swati.menon1122@example.com,4,1.0,0.8725,0.5,3,Engaged Fashion Explorers
+1123,Tara Sengupta,tara.sengupta1123@example.com,3,1.0,0.9,0.6667,3,Engaged Fashion Explorers
+1124,Sakshi Kulkarni,sakshi.kulkarni1124@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1125,Tanvi Chopra,tanvi.chopra1125@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1126,Vikram Agarwal,vikram.agarwal1126@example.com,6,1.0,0.9083,0.5,3,Engaged Fashion Explorers
+1127,Akshay Pandey,akshay.pandey1127@example.com,1,1.0,0.9,0.0,0,Occasional / Trial Users
+1128,Aakash Pandey,aakash.pandey1128@example.com,2,0.5,0.535,0.0,2,At-Risk / Sensitive Users
+1129,Harsh Pandey,harsh.pandey1129@example.com,6,0.6667,0.6417,0.1667,2,At-Risk / Sensitive Users
+1130,Pranav Deshmukh,pranav.deshmukh1130@example.com,2,1.0,0.895,0.0,0,Occasional / Trial Users
+1131,Tanvi Rao,tanvi.rao1131@example.com,2,0.5,0.575,0.0,2,At-Risk / Sensitive Users
+1132,Kunal Nair,kunal.nair1132@example.com,3,0.6667,0.6767,0.0,2,At-Risk / Sensitive Users
+1133,Ananya Pandey,ananya.pandey1133@example.com,4,1.0,0.8775,0.5,3,Engaged Fashion Explorers
+1134,Karan Saxena,karan.saxena1134@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1135,Arjun Iyer,arjun.iyer1135@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1136,Kavya Joshi,kavya.joshi1136@example.com,6,0.8333,0.835,0.0,0,Occasional / Trial Users
+1137,Ananya Saxena,ananya.saxena1137@example.com,3,1.0,0.93,0.3333,0,Occasional / Trial Users
+1138,Aakash Reddy,aakash.reddy1138@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1139,Kavya Bhat,kavya.bhat1139@example.com,7,1.0,0.9314,0.2857,0,Occasional / Trial Users
+1140,Rishi Reddy,rishi.reddy1140@example.com,3,1.0,0.8633,0.0,0,Occasional / Trial Users
+1141,Payal Singhania,payal.singhania1141@example.com,4,1.0,0.8625,0.5,3,Engaged Fashion Explorers
+1142,Pranav Verma,pranav.verma1142@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1143,Anushka Choudhury,anushka.choudhury1143@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+1144,Anushka Patel,anushka.patel1144@example.com,3,0.3333,0.3467,0.0,2,At-Risk / Sensitive Users
+1145,Rahul Menon,rahul.menon1145@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1146,Divya Kulkarni,divya.kulkarni1146@example.com,2,0.5,0.55,0.0,2,At-Risk / Sensitive Users
+1147,Swati Gupta,swati.gupta1147@example.com,1,1.0,0.92,1.0,3,Engaged Fashion Explorers
+1148,Payal Rao,payal.rao1148@example.com,3,1.0,0.9167,0.3333,0,Occasional / Trial Users
+1149,Diya Verma,diya.verma1149@example.com,3,0.6667,0.6167,0.0,2,At-Risk / Sensitive Users
+1150,Rhea Saxena,rhea.saxena1150@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1151,Shreya Mehta,shreya.mehta1151@example.com,5,1.0,0.894,0.4,3,Engaged Fashion Explorers
+1152,Yash Chopra,yash.chopra1152@example.com,3,0.6667,0.68,0.3333,2,At-Risk / Sensitive Users
+1153,Ritu Sengupta,ritu.sengupta1153@example.com,6,1.0,0.8833,0.1667,0,Occasional / Trial Users
+1154,Arjun Trivedi,arjun.trivedi1154@example.com,3,0.6667,0.6967,0.3333,2,At-Risk / Sensitive Users
+1155,Anushka Agarwal,anushka.agarwal1155@example.com,3,1.0,0.9233,0.6667,3,Engaged Fashion Explorers
+1156,Payal Choudhury,payal.choudhury1156@example.com,1,1.0,0.91,1.0,3,Engaged Fashion Explorers
+1157,Karan Nair,karan.nair1157@example.com,1,1.0,0.88,1.0,3,Engaged Fashion Explorers
+1158,Pooja Chopra,pooja.chopra1158@example.com,2,1.0,0.825,0.5,3,Engaged Fashion Explorers
+1159,Rishi Sengupta,rishi.sengupta1159@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1160,Amit Sharma,amit.sharma1160@example.com,5,0.8,0.736,0.0,0,Occasional / Trial Users
+1161,Simran Das,simran.das1161@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1162,Pooja Menon,pooja.menon1162@example.com,4,0.75,0.7825,0.5,3,Engaged Fashion Explorers
+1163,Rahul Agarwal,rahul.agarwal1163@example.com,4,1.0,0.92,0.5,3,Engaged Fashion Explorers
+1164,Anushka Verma,anushka.verma1164@example.com,2,1.0,0.93,0.0,0,Occasional / Trial Users
+1165,Kabir Nair,kabir.nair1165@example.com,3,0.6667,0.6733,0.0,2,At-Risk / Sensitive Users
+1166,Arjun Agarwal,arjun.agarwal1166@example.com,8,0.875,0.8263,0.625,3,Engaged Fashion Explorers
+1167,Yash Agarwal,yash.agarwal1167@example.com,2,0.5,0.49,0.0,2,At-Risk / Sensitive Users
+1168,Aarav Joshi,aarav.joshi1168@example.com,1,1.0,0.9,0.0,0,Occasional / Trial Users
+1169,Rishi Mehta,rishi.mehta1169@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1170,Vivaan Trivedi,vivaan.trivedi1170@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1171,Aakash Malhotra,aakash.malhotra1171@example.com,3,1.0,0.91,0.3333,0,Occasional / Trial Users
+1172,Varun Kulkarni,varun.kulkarni1172@example.com,6,1.0,0.9233,0.5,3,Engaged Fashion Explorers
+1173,Harsh Chopra,harsh.chopra1173@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1174,Pranav Agarwal,pranav.agarwal1174@example.com,1,1.0,0.92,1.0,3,Engaged Fashion Explorers
+1175,Arjun Malhotra,arjun.malhotra1175@example.com,4,1.0,0.8775,0.0,0,Occasional / Trial Users
+1176,Nikhil Sharma,nikhil.sharma1176@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1177,Vivaan Mehta,vivaan.mehta1177@example.com,5,1.0,0.902,0.0,0,Occasional / Trial Users
+1178,Aakash Rao,aakash.rao1178@example.com,6,0.8333,0.7683,0.1667,0,Occasional / Trial Users
+1179,Ishita Kapoor,ishita.kapoor1179@example.com,3,0.6667,0.5967,0.0,2,At-Risk / Sensitive Users
+1180,Gaurav Singhania,gaurav.singhania1180@example.com,8,1.0,0.885,0.375,3,Engaged Fashion Explorers
+1181,Tara Rao,tara.rao1181@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1182,Arjun Patel,arjun.patel1182@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1183,Sneha Gupta,sneha.gupta1183@example.com,2,1.0,0.845,0.5,3,Engaged Fashion Explorers
+1184,Sakshi Trivedi,sakshi.trivedi1184@example.com,6,0.8333,0.82,0.1667,0,Occasional / Trial Users
+1185,Yash Sengupta,yash.sengupta1185@example.com,3,0.6667,0.67,0.0,2,At-Risk / Sensitive Users
+1186,Vivaan Patel,vivaan.patel1186@example.com,1,1.0,0.93,0.0,0,Occasional / Trial Users
+1187,Sakshi Mishra,sakshi.mishra1187@example.com,2,1.0,0.85,0.0,0,Occasional / Trial Users
+1188,Ananya Reddy,ananya.reddy1188@example.com,7,0.7143,0.7043,0.1429,0,Occasional / Trial Users
+1189,Ishita Sengupta,ishita.sengupta1189@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+1190,Kunal Kulkarni,kunal.kulkarni1190@example.com,3,1.0,0.8967,0.0,0,Occasional / Trial Users
+1191,Diya Gupta,diya.gupta1191@example.com,1,1.0,0.95,1.0,3,Engaged Fashion Explorers
+1192,Nikhil Mehta,nikhil.mehta1192@example.com,5,1.0,0.914,0.2,0,Occasional / Trial Users
+1193,Priya Pandey,priya.pandey1193@example.com,8,1.0,0.8888,0.125,0,Occasional / Trial Users
+1194,Anushka Ghosh,anushka.ghosh1194@example.com,8,1.0,0.8975,0.25,0,Occasional / Trial Users
+1195,Ishita Agarwal,ishita.agarwal1195@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1196,Pooja Reddy,pooja.reddy1196@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
+1197,Pooja Malhotra,pooja.malhotra1197@example.com,1,1.0,0.87,0.0,0,Occasional / Trial Users
+1198,Sameer Malhotra,sameer.malhotra1198@example.com,2,0.5,0.525,0.0,2,At-Risk / Sensitive Users
+1199,Tanvi Bhat,tanvi.bhat1199@example.com,4,1.0,0.915,0.5,3,Engaged Fashion Explorers
+1200,Deepak Singhania,deepak.singhania1200@example.com,0,0.85,0.88,0.2,0,Occasional / Trial Users
