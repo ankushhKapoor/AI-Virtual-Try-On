@@ -476,6 +476,11 @@ class CatVTONService:
         return {
             "result": result,
 
+            # Retained in-memory by the API only.  It lets the evaluation
+            # layer score preservation outside the region CatVTON edited.
+            "garment_mask": mask,
+            "person_image": person_resized,
+
             "processing_time_seconds": round(
                 elapsed,
                 3,

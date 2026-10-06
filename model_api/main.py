@@ -38,6 +38,7 @@ else:
     MODEL_CACHE_DIR = Path(os.getenv('HF_HUB_CACHE', '~/.cache/huggingface/hub')).expanduser()
 
 from app.networking import frontend_origins, service_port
+from ai.evaluation import evaluate_tryon
 from ai.garment_type import resolve_garment_type
 
 logger = logging.getLogger(__name__)
@@ -201,6 +202,16 @@ async def tryon(
 
     result_image = output['result']
     result_b64 = _pil_to_base64(result_image, fmt='PNG')
+    try:
+        evaluation_metrics = evaluate_tryon(
+            person_image=output['person_image'],
+            result_image=result_image,
+            garment_mask=output['garment_mask'],
+        )
+    except Exception:
+        # Quality reporting must never make an otherwise valid try-on fail.
+        logger.exception('Could not calculate try-on evaluation metrics')
+        evaluation_metrics = None
 
     return JSONResponse({
         'status': 'success',
@@ -208,6 +219,7 @@ async def tryon(
         'processing_time_seconds': output['processing_time_seconds'],
         'cloth_type': output['cloth_type'],
         'image_info': output['image_info'],
+        'evaluation_metrics': evaluation_metrics,
     })
 
 

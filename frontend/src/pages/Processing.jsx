@@ -22,7 +22,7 @@ function detectDeviceType() {
 }
 
 // ── Fire-and-forget DWH recording (never throws) ─────────────
-async function recordTryOnEvent({ success, failureReason, product, processingTimeMs }) {
+async function recordTryOnEvent({ success, failureReason, product, processingTimeMs, evaluationMetrics }) {
   try {
     let token = ''
     try {
@@ -55,7 +55,7 @@ async function recordTryOnEvent({ success, failureReason, product, processingTim
       device_type: detectDeviceType(),
       upload_method: uploadMethod,
       processing_time_ms: processingTimeMs ?? null,
-      quality_score: success ? 0.82 : null,   // placeholder until model returns a score
+      quality_score: success ? (evaluationMetrics?.person_background_ssim ?? null) : null,
     }
     await fetch(`${API_BASE_URL}/tryon/record`, {
       method: 'POST',
@@ -148,11 +148,19 @@ function Processing() {
 
         const data = await response.json()
         const processingTimeMs = Date.now() - startMs
-        updateLook(resultId.current, { resultImage: data.result_image })
+        updateLook(resultId.current, {
+          resultImage: data.result_image,
+          evaluationMetrics: data.evaluation_metrics || null,
+        })
         setProgress(100)
 
         // ── Record success in live DWH (fire-and-forget) ─────
-        recordTryOnEvent({ success: true, product: selectedProduct, processingTimeMs })
+        recordTryOnEvent({
+          success: true,
+          product: selectedProduct,
+          processingTimeMs,
+          evaluationMetrics: data.evaluation_metrics,
+        })
 
         setTimeout(() => navigate('/result/' + resultId.current), 400)
       } catch (err) {

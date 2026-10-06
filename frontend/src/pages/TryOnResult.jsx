@@ -10,6 +10,7 @@ import RecentLooks from '../components/tryon/RecentLooks'
 import ResultActions from '../components/tryon/ResultActions'
 import ResultImagePlaceholder from '../components/tryon/ResultImagePlaceholder'
 import TryOnProgress from '../components/tryon/TryOnProgress'
+import EvaluationMetrics from '../components/tryon/EvaluationMetrics'
 import useSavedLooks from '../hooks/useSavedLooks'
 import useTryOn from '../hooks/useTryOn'
 
@@ -56,6 +57,7 @@ function TryOnResult() {
       product,
       userPhoto: result.userPhoto,
       resultImage: result.resultImage,
+      evaluationMetrics: result.evaluationMetrics,
       createdAt: result.createdAt || new Date().toISOString(),
     })
     if (savedSuccessfully) updateLook(result.id, { saved: true })
@@ -176,6 +178,7 @@ function TryOnResult() {
             beforeImage={result.userPhoto?.previewUrl}
             afterImage={result.resultImage}
           />
+          <EvaluationMetrics metrics={result.evaluationMetrics} resultImage={result.resultImage} className="mt-10" />
           <RecentLooks
             looks={otherLooks}
             onView={(lookId) => navigate(`/result/${lookId}`)}
