@@ -148,7 +148,10 @@ function CompleteTheLook({ product, onWishlist, onTryOn }) {
 
     fetchRecommendations()
     return () => { cancelled = true }
-  }, [product?.asin])
+  // Product detail data can be enriched after the initial ASIN is loaded.
+  // Re-run when those outfit attributes arrive so recommendations never stay
+  // attached to a stale generic category.
+  }, [product?.asin, product?.title, product?.name, product?.category, product?.gender, product?.color])
 
   // ── Loading ──
   if (recommendations === null) {
