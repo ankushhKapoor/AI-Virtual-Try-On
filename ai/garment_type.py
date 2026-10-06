@@ -7,7 +7,7 @@ from typing import Optional
 
 _OVERALL_PATTERN = re.compile(
     r"\b(?:dress(?:es)?|gown(?:s)?|jumpsuit(?:s)?|romper(?:s)?|playsuit(?:s)?|"
-    r"one[ -]?piece|saree(?:s)?|sari(?:s)?|kaftan(?:s)?|kurta[ -]?set(?:s)?|"
+    r"one[ -]?piece|saree(?:s)?|sari(?:s)?|kaftan(?:s)?|kurti(?:s)?|kurta[ -]?set(?:s)?|"
     r"salwar[ -]?suit(?:s)?|anarkali(?:s)?|lehenga(?:s)?|ethnic[ -]?suit(?:s)?|"
     r"co[ -]?ord(?:inate)?(?:[ -]?set)?s?|tracksuit(?:s)?)\b",
     re.IGNORECASE,
@@ -29,7 +29,7 @@ _LOWER_PATTERN = re.compile(
 )
 _UPPER_PATTERN = re.compile(
     r"\b(?:t[ -]?shirts?|shirts?|tops?|blouses?|tunics?|jackets?|blazers?|coats?|"
-    r"hoodies?|sweatshirts?|sweaters?|cardigans?|polos?|kurtas?|kurtis?|tees?)\b",
+    r"hoodies?|sweatshirts?|sweaters?|cardigans?|polos?|kurtas?|tees?)\b",
     re.IGNORECASE,
 )
 SUPPORTED_CLOTH_TYPES = frozenset({"upper", "lower", "overall", "inner", "outer"})
