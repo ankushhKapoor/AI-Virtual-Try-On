@@ -101,6 +101,9 @@ _CATEGORY_TERMS: dict[str, tuple[str, ...]] = {
     "crossbody bag": ("crossbody", "sling bag", "shoulder bag"),
     "clutch purse": ("clutch", "purse"), "bangles": ("bangle",),
     "bracelet": ("bracelet",), "earrings": ("earring",), "ethnic sandals": ("sandal", "jutti", "kolhapuri"),
+    "night slippers": ("slipper", "house slipper", "flip flop"),
+    "college backpack": ("backpack", "college bag", "rucksack"),
+    "office laptop bag": ("laptop bag", "office bag", "briefcase", "messenger bag"),
 }
 
 

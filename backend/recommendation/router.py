@@ -74,7 +74,7 @@ def get_recommendations(
     product = body.product
     asin    = product.asin.strip().upper()
     cache_identity = json.dumps({
-        "v": 3, "asin": asin, "title": product.title, "category": product.category,
+        "v": 4, "asin": asin, "title": product.title, "category": product.category,
         "gender": product.gender, "color": product.color, "domain": product.domain,
     }, sort_keys=True)
     cache_key = f"rec-v2:{hashlib.sha256(cache_identity.encode()).hexdigest()}"

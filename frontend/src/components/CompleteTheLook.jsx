@@ -36,6 +36,10 @@ Object.assign(SLOT_META, {
   watch: { label: 'Watches', emoji: 'Watch' },
   belt: { label: 'Belts', emoji: 'Belt' },
   jewellery: { label: 'Jewellery', emoji: 'Jewellery' },
+  bangles: { label: 'Bangles', emoji: 'Jewellery' },
+  earrings: { label: 'Earrings', emoji: 'Jewellery' },
+  college_bag: { label: 'College Bags', emoji: 'Bag' },
+  office_bag: { label: 'Office Bags', emoji: 'Bag' },
 })
 
 function SlotRow({ slot, category, products, onWishlist, onTryOn }) {

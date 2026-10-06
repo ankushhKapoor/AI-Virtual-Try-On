@@ -38,7 +38,7 @@ CATEGORY_CANDIDATES: list[str] = [
     "t-shirt", "shirt", "blouse", "top", "polo",
     "jacket", "blazer", "coat", "hoodie", "sweatshirt", "cardigan", "sweater",
     "jeans", "trousers", "pants", "shorts", "skirt", "leggings", "chinos", "joggers",
-    "dress", "jumpsuit", "kurta", "ethnic wear", "saree",
+    "dress", "jumpsuit", "kurta", "kurta set", "ethnic wear", "saree", "pajamas",
     "sneakers", "shoes", "boots", "sandals", "heels", "loafers", "formal shoes",
     "bag", "handbag", "watch", "belt", "hat", "sunglasses", "accessories",
 ]
@@ -158,6 +158,8 @@ def _classify_all_attributes(image) -> dict:
 # ---------------------------------------------------------------------------
 
 _TITLE_CATEGORY_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r'\bpajamas?\b|\bpyjamas?\b|\bnightwear\b|\bnight suit\b', re.I), "pajamas"),
+    (re.compile(r'\bkurta\s*(?:pant|palazzo|set|with)\b|\bkurti\s*(?:set|with)\b', re.I), "kurta set"),
     (re.compile(r'\bt.?shirt\b', re.I), "t-shirt"),
     (re.compile(r'\bjeans?\b', re.I), "jeans"),
     (re.compile(r'\btrousers?\b', re.I), "trousers"),
@@ -171,7 +173,7 @@ _TITLE_CATEGORY_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r'\bsweatshirt\b', re.I), "sweatshirt"),
     (re.compile(r'\bsweater\b', re.I), "sweater"),
     (re.compile(r'\bcardigan\b', re.I), "cardigan"),
-    (re.compile(r'\bkurta\b', re.I), "kurta"),
+    (re.compile(r'\bkurta\b|\bkurti\b', re.I), "kurta"),
     (re.compile(r'\bsaree|sari\b', re.I), "saree"),
     (re.compile(r'\bsneakers?\b', re.I), "sneakers"),
     (re.compile(r'\bboots?\b', re.I), "boots"),
