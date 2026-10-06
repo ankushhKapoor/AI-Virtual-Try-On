@@ -60,10 +60,16 @@ def evaluate_tryon(
     garment_mask: Image.Image,
 ) -> dict[str, Any]:
     """Calculate honest per-try-on metrics without loading another ML model."""
+    # CatVTON can return a final image whose dimensions differ from its
+    # preprocessed input (depending on the pipeline's VAE scale/crop). Align
+    # both reference inputs to the final result before pixel comparisons.
+    if person_image.size != result_image.size:
+        person_image = person_image.resize(result_image.size, Image.Resampling.BICUBIC)
+    if garment_mask.size != result_image.size:
+        garment_mask = garment_mask.resize(result_image.size, Image.Resampling.BILINEAR)
+
     person = _as_rgb_array(person_image)
     result = _as_rgb_array(result_image)
-    if person.shape != result.shape:
-        raise ValueError("Person and result images must have identical dimensions.")
 
     return {
         "person_background_ssim": round(_masked_ssim(person, result, garment_mask), 4),
