@@ -185,12 +185,19 @@ class CatVTONService:
         ):
             return
 
+        # snapshot_download reuses Hugging Face's existing local snapshot on
+        # later process restarts. `cache_dir` is optional so the standard
+        # persistent Hugging Face cache remains the default.
+        snapshot_options = {"repo_id": self.config.resume_path}
+        if os.getenv("HF_HUB_CACHE"):
+            snapshot_options["cache_dir"] = os.environ["HF_HUB_CACHE"]
         self.repo_path = snapshot_download(
-            repo_id=self.config.resume_path
+            **snapshot_options,
         )
 
         logger.info(
-            "Loading CatVTON pipeline on %s with precision=%s",
+            "Loading CatVTON pipeline from %s on %s with precision=%s",
+            self.repo_path,
             self.device,
             self.mixed_precision,
         )

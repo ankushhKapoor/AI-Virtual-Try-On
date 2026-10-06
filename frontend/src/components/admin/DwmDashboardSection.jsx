@@ -41,7 +41,7 @@ function formatFailureReasons(val) {
 export default function DwmDashboardSection({ accessToken }) {
   const [activeTab, setActiveTab] = useState('apriori') // 'apriori', 'kmeans', 'correlations', 'rollups'
   const [source, setSource] = useState('benchmark_10k') // 'benchmark_10k' or 'live'
-  
+
   // High-level Stats
   const [stats, setStats] = useState(null)
   const [statsLoading, setStatsLoading] = useState(false)
@@ -719,7 +719,6 @@ export default function DwmDashboardSection({ accessToken }) {
                   {num}
                 </button>
               ))}
-              
               {/* Grouping Quality Metric Badge */}
               <div className="ml-2 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface px-2.5 py-1 text-xs">
                 <span className="text-muted font-medium">Grouping Quality:</span>

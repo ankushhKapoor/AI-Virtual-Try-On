@@ -157,19 +157,19 @@ dwm/
 ### Run Standalone Mining & Pipeline Scripts
 ```powershell
 # Run ETL Pipeline
-.\venv\Scripts\python.exe dwm/etl/run_pipeline.py
+uv run python dwm/etl/run_pipeline.py
 
 # Run Apriori
-.\venv\Scripts\python.exe dwm/mining/association_rules.py
+uv run python dwm/mining/association_rules.py
 
 # Run K-Means Clustering
-.\venv\Scripts\python.exe dwm/mining/kmeans_clustering.py
+uv run python dwm/mining/kmeans_clustering.py
 
 # Run Correlation Analysis
-.\venv\Scripts\python.exe dwm/mining/correlation_analysis.py
+uv run python dwm/mining/correlation_analysis.py
 
 # Refresh Rollups
-.\venv\Scripts\python.exe dwm/mining/rollups.py
+uv run python dwm/mining/rollups.py
 ```
 
 ### Run the Interactive Admin Web Dashboard

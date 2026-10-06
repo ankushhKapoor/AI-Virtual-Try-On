@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { fileURLToPath } from 'node:url'
 import { loadEnv } from 'vite'
 
-const projectRoot = fileURLToPath(new URL('../../', import.meta.url))
+const projectRoot = fileURLToPath(new URL('../', import.meta.url))
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, projectRoot, '')

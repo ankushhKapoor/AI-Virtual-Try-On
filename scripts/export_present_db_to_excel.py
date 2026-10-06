@@ -44,12 +44,12 @@ def sanitize_value_for_excel(val: Any) -> Any:
 def style_worksheet(ws, title: str, row_count: int, col_count: int):
     """Applies professional enterprise styling to Excel worksheets."""
     ws.views.sheetView[0].showGridLines = True
-    
+
     # Header styling: Dark Navy with white text
     header_fill = PatternFill(start_color="1F497D", end_color="1F497D", fill_type="solid")
     header_font = Font(name="Segoe UI", size=11, bold=True, color="FFFFFF")
     header_alignment = Alignment(horizontal="center", vertical="center", wrap_text=True)
-    
+
     # Border
     thin_border = Border(
         left=Side(style="thin", color="D3D3D3"),

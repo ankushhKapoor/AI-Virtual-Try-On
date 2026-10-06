@@ -1,7 +1,10 @@
 # Python & Virtual Environments
 .venv/
 venv/
-backend/.venv/
+.uv-cache/
+.npm-cache/
+.model-cache/
+.cache/
 __pycache__/
 *.py[cod]
 *$py.class
@@ -39,7 +42,7 @@ test_result.png
 .DS_Store
 
 # Frontend & Dependencies
-frontend/frontend/node_modules/
 frontend/node_modules/
+node_modules/
 model_api/__pycache__/
 backend/__pycache__/

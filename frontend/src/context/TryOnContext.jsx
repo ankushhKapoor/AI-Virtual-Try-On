@@ -1,6 +1,36 @@
 import { useCallback, useEffect, useState } from 'react'
 import TryOnContext from './tryOnStore'
 
+const HISTORY_STORAGE_KEY = 'vesta_tryon_history'
+
+function readHistory() {
+  try {
+    const history = JSON.parse(localStorage.getItem(HISTORY_STORAGE_KEY) || '[]')
+    return Array.isArray(history) ? history : []
+  } catch {
+    return []
+  }
+}
+
+function historyMetadata(looks) {
+  // Generated images can be several MB once encoded as data URLs. Keeping them
+  // in localStorage exceeds browser quota and can crash the result route after
+  // a successful generation. The current session retains the full image for
+  // viewing/downloading; history intentionally retains only lightweight data.
+  return looks.map(({ userPhoto, resultImage, ...look }) => ({
+    ...look,
+    userPhoto: userPhoto
+      ? {
+          fileName: userPhoto.fileName,
+          fileType: userPhoto.fileType,
+          fileSize: userPhoto.fileSize,
+        }
+      : null,
+    resultImage: null,
+    imageAvailableInSession: Boolean(resultImage),
+  }))
+}
+
 function TryOnProvider({ children }) {
   const [userPhoto, setUserPhoto] = useState(null)
   const [selectedProduct, setSelectedProduct] = useState(null)
@@ -10,20 +40,19 @@ function TryOnProvider({ children }) {
   const [looks, setLooks] = useState([])
 
   const [favoriteLookId, setFavoriteLookId] = useState(null)
-  const [history, setHistory] = useState(() => {
-    try {
-      return JSON.parse(localStorage.getItem('vesta_tryon_history') || '[]')
-    } catch {
-      return []
-    }
-  })
+  const [history, setHistory] = useState(readHistory)
 
   useEffect(() => () => {
     if (userPhoto?.previewUrl?.startsWith('blob:')) URL.revokeObjectURL(userPhoto.previewUrl)
   }, [userPhoto])
 
   useEffect(() => {
-    localStorage.setItem('vesta_tryon_history', JSON.stringify(history))
+    try {
+      localStorage.setItem(HISTORY_STORAGE_KEY, JSON.stringify(historyMetadata(history)))
+    } catch (error) {
+      // History must never prevent the current result page from rendering.
+      console.warn('Unable to save try-on history locally:', error)
+    }
   }, [history])
 
   const selectProduct = useCallback((product, selectedSize = null) => {

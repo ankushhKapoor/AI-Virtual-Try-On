@@ -481,11 +481,11 @@ Double-click [`run_web.bat`](run_web.bat) or run in PowerShell:
 #### Manual Terminal Commands
 - **Terminal 1 — Backend API (Port 8000)**:
   ```powershell
-  .\venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
+  uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload
   ```
 - **Terminal 2 — Frontend UI (Port 5173)**:
   ```powershell
-  cd frontend\frontend
+  cd frontend
   npm run dev
   ```
 
@@ -503,39 +503,39 @@ Once logged in, click the **"DWM Data Mining Hub"** tab to interact with all 4 t
 #### 1. Run the ETL Pipeline (Transactional $\rightarrow$ Star Schema)
 ```powershell
 # Incremental ETL
-.\venv\Scripts\python.exe dwm/etl/run_pipeline.py
+uv run python dwm/etl/run_pipeline.py
 
 # Full Historical Re-Sync
-.\venv\Scripts\python.exe dwm/etl/run_pipeline.py --full-refresh
+uv run python dwm/etl/run_pipeline.py --full-refresh
 ```
 
 #### 2. Execute Apriori Association Mining
 ```powershell
-.\venv\Scripts\python.exe dwm/mining/association_rules.py
+uv run python dwm/mining/association_rules.py
 ```
 
 #### 3. Execute K-Means User Segmentation
 ```powershell
-.\venv\Scripts\python.exe dwm/mining/kmeans_clustering.py
+uv run python dwm/mining/kmeans_clustering.py
 ```
 
 #### 4. Execute Failure Correlation Analysis
 ```powershell
-.\venv\Scripts\python.exe dwm/mining/correlation_analysis.py
+uv run python dwm/mining/correlation_analysis.py
 ```
 
 #### 5. Refresh Daily & Monthly OLAP Rollups
 ```powershell
-.\venv\Scripts\python.exe dwm/mining/rollups.py
+uv run python dwm/mining/rollups.py
 ```
 
 #### 6. Re-generate 10k Synthetic Datasets & Excel Workbooks
 ```powershell
 # Re-export live MySQL to Excel
-.\venv\Scripts\python.exe scripts/export_present_db_to_excel.py
+uv run python scripts/export_present_db_to_excel.py
 
 # Re-generate 10,000 synthetic datasets and master Excel
-.\venv\Scripts\python.exe scripts/generate_synthetic_10k_dwm.py
+uv run python scripts/generate_synthetic_10k_dwm.py
 ```
 
 ---
@@ -551,5 +551,5 @@ Once logged in, click the **"DWM Data Mining Hub"** tab to interact with all 4 t
 | **Correlation Analysis Engine** | [`dwm/mining/correlation_analysis.py`](dwm/mining/correlation_analysis.py) | ✅ Operational |
 | **OLAP Rollup Engine** | [`dwm/mining/rollups.py`](dwm/mining/rollups.py) | ✅ Operational |
 | **Backend REST Endpoints** | [`app/routes/dwm.py`](app/routes/dwm.py), [`backend/main.py`](backend/main.py) | ✅ Operational |
-| **Admin UI Hub & Views** | [`frontend/frontend/src/components/admin/DwmDashboardSection.jsx`](frontend/frontend/src/components/admin/DwmDashboardSection.jsx), [`AdminDashboard.jsx`](frontend/frontend/src/pages/AdminDashboard.jsx) | ✅ Operational |
+| **Admin UI Hub & Views** | [`DwmDashboardSection.jsx`](frontend/src/components/admin/DwmDashboardSection.jsx), [`AdminDashboard.jsx`](frontend/src/pages/AdminDashboard.jsx) | ✅ Operational |
 | **10k Datasets & Excel Workbooks**| [`dwm_exports/benchmark_10k/`](dwm_exports/benchmark_10k/), [`dwm_exports/present_data/`](dwm_exports/present_data/) | ✅ Operational |

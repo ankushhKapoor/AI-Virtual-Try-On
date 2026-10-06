@@ -199,7 +199,7 @@ def generate_10k_synthetic_dataset():
         name = f"{fname} {lname}"
         email = f"{fname.lower()}.{lname.lower()}{uid}@example.com"
         signup_dt = base_start_date + timedelta(days=random.randint(0, 180), hours=random.randint(0, 23))
-        
+
         users.append({
             "user_key": uid,
             "user_id": uid,
@@ -243,7 +243,7 @@ def generate_10k_synthetic_dataset():
     while event_id < TOTAL_EVENTS:
         # Pick an active user
         selected_user = random.choices(users, weights=user_weights, k=1)[0]
-        
+
         # Determine session time (ensure after signup date)
         min_seconds = max(0, int((datetime.combine(selected_user["signup_date"], datetime.min.time()) - start_sim_time).total_seconds()))
         event_sec_offset = random.randint(min_seconds, total_sim_seconds)
@@ -621,7 +621,7 @@ def generate_10k_synthetic_dataset():
     # H. Export Everything to CSV Files
     # ─────────────────────────────────────────────────────────
     print(f"[*] Exporting CSV files to {CSV_DIR} ...")
-    
+
     csv_datasets = [
         # DWH Star Schema
         ("fact_tryon_event_10k.csv", fact_events),
@@ -666,7 +666,7 @@ def generate_10k_synthetic_dataset():
 
     def style_sheet(ws, title, row_count, col_count, is_unified=False):
         ws.views.sheetView[0].showGridLines = True
-        
+
         # Premium Deep Navy / Indigo Theme
         header_color = "1B365D" if not is_unified else "004080"
         header_fill = PatternFill(start_color=header_color, end_color=header_color, fill_type="solid")

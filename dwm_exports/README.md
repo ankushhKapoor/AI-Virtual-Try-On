@@ -91,10 +91,10 @@ Both generation and export scripts are automated and located in `scripts/`:
 
 ### To Re-Export Live Database Data:
 ```powershell
-.\venv\Scripts\python.exe scripts/export_present_db_to_excel.py
+uv run python scripts/export_present_db_to_excel.py
 ```
 
 ### To Re-Generate 10k Synthetic Datasets:
 ```powershell
-.\venv\Scripts\python.exe scripts/generate_synthetic_10k_dwm.py
+uv run python scripts/generate_synthetic_10k_dwm.py
 ```
