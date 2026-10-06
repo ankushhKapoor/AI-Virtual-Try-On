@@ -4,10 +4,6 @@ function formatPercent(value) {
   return `${Math.round(value * 100)}%`
 }
 
-function formatSharpness(value) {
-  return Number(value).toFixed(4)
-}
-
 async function calculateLegacyMetrics(imageUrl) {
   if (!imageUrl) return null
   const image = new Image()
@@ -20,12 +16,10 @@ async function calculateLegacyMetrics(imageUrl) {
   context.drawImage(image, 0, 0)
   const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height)
   const luminance = new Float64Array(width * height)
-  let balanced = 0
   for (let index = 0; index < luminance.length; index += 1) {
     const offset = index * 4
     const value = (data[offset] * 0.299 + data[offset + 1] * 0.587 + data[offset + 2] * 0.114) / 255
     luminance[index] = value
-    if (value > 0.02 && value < 0.98) balanced += 1
   }
   let sum = 0
   let sumSquares = 0
@@ -40,7 +34,7 @@ async function calculateLegacyMetrics(imageUrl) {
     }
   }
   const sharpness = count ? (sumSquares / count) - (sum / count) ** 2 : 0
-  return { output_sharpness: sharpness, exposure_balance: balanced / luminance.length }
+  return { detail_quality_score: 100 * (1 - Math.exp(-sharpness / 0.0015)) }
 }
 
 function Metric({ label, value, note }) {
@@ -60,7 +54,8 @@ function EvaluationMetrics({ metrics, resultImage, className = '' }) {
   const values = metrics || legacyMetrics
   if (!values) return null
   const isLegacy = !metrics
-  return <section className={`rounded-md border border-line bg-surface p-5 sm:p-6 ${className}`} aria-label="Try-on quality evaluation"><p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Try-On Quality Checks</p><p className="mt-2 text-sm leading-6 text-muted">{isLegacy ? 'Output checks calculated for this previously saved look.' : 'Measured after generation. These are quality indicators, not a fit guarantee.'}</p><dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{values.person_background_ssim != null ? <Metric label="Person preservation" value={formatPercent(values.person_background_ssim)} note="Masked SSIM outside the edited garment area" /> : null}<Metric label="Output sharpness" value={formatSharpness(values.output_sharpness)} note="Laplacian variance; higher is sharper" /><Metric label="Exposure balance" value={formatPercent(values.exposure_balance)} note="Pixels retaining highlight and shadow detail" /></dl></section>
+  const detailScore = values.detail_quality_score ?? (values.output_sharpness == null ? null : 100 * (1 - Math.exp(-values.output_sharpness / 0.0015)))
+  return <section className={`rounded-md border border-line bg-surface p-5 sm:p-6 ${className}`} aria-label="Try-on quality evaluation"><p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Try-On Quality Checks</p><p className="mt-2 text-sm leading-6 text-muted">{isLegacy ? 'Output detail check calculated for this previously saved look.' : 'Measured after generation. These checks indicate technical quality, not real-world fit accuracy.'}</p><dl className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{values.person_background_ssim != null ? <Metric label="Person preservation" value={formatPercent(values.person_background_ssim)} note="Masked SSIM outside the edited garment area" /> : null}{values.garment_edit_strength != null ? <Metric label="Garment transformation" value={`${Math.round(values.garment_edit_strength)} / 100`} note="Confirms the selected clothing area visibly changed" /> : null}{detailScore != null ? <Metric label="Detail quality" value={`${Math.round(detailScore)} / 100`} note="Clarity score derived from image detail" /> : null}</dl></section>
 }
 
 export default EvaluationMetrics

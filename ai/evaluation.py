@@ -9,7 +9,6 @@ no-reference output-quality indicators and require no additional model files.
 
 from __future__ import annotations
 
-import math
 from typing import Any
 
 import numpy as np
@@ -61,6 +60,28 @@ def _sharpness_variance(rgb: np.ndarray) -> float:
     return float(laplacian.var())
 
 
+def _score_from_variance(variance: float) -> float:
+    """Map an unbounded Laplacian variance to an understandable 0–100 score."""
+    # 0.0015 is a practical reference point for the 1024px CatVTON output.
+    return float(np.clip(100 * (1 - np.exp(-variance / 0.0015)), 0, 100))
+
+
+def _garment_edit_strength(
+    reference: np.ndarray,
+    result: np.ndarray,
+    mask: Image.Image,
+) -> float:
+    """Measure the amount of visible change inside CatVTON's edited region."""
+    weights = np.asarray(mask.convert("L"), dtype=np.float64) / 255.0
+    total_weight = float(weights.sum())
+    if total_weight < 1.0:
+        return 0.0
+    mean_change = float((np.abs(result - reference).mean(axis=2) * weights).sum() / total_weight)
+    # This is an integrity signal, not an accuracy claim: 0 means no visible
+    # garment edit, while 100 means the intended region changed substantially.
+    return float(np.clip(100 * (1 - np.exp(-mean_change / 0.12)), 0, 100))
+
+
 def evaluate_tryon(
     person_image: Image.Image,
     result_image: Image.Image,
@@ -72,13 +93,11 @@ def evaluate_tryon(
     if person.shape != result.shape:
         raise ValueError("Person and result images must have identical dimensions.")
 
-    # Pixels close to absolute black/white often indicate clipped detail.
-    luminance = result[..., 0] * 0.299 + result[..., 1] * 0.587 + result[..., 2] * 0.114
-    exposure_balance = float(np.mean((luminance > 0.02) & (luminance < 0.98)))
+    sharpness_variance = _sharpness_variance(result)
 
     return {
         "person_background_ssim": round(_masked_ssim(person, result, garment_mask), 4),
-        "output_sharpness": round(_sharpness_variance(result), 6),
-        "exposure_balance": round(exposure_balance, 4),
-        "method": "masked_ssim_and_no_reference_quality",
+        "garment_edit_strength": round(_garment_edit_strength(person, result, garment_mask), 1),
+        "detail_quality_score": round(_score_from_variance(sharpness_variance), 1),
+        "method": "masked_ssim_and_no_reference_integrity_checks",
     }
