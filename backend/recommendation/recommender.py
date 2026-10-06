@@ -21,7 +21,7 @@ import re
 from typing import Any
 
 from .rules import (
-    resolve_complements,
+    resolve_outfit_plan,
     resolve_slot_categories,
     resolve_compatible_colors,
     GENDER_QUERY_SUFFIX,
@@ -84,6 +84,60 @@ _SLOT_CONTEXT: dict[str, str] = {
     "outerwear": "",
     "accessory": "",
 }
+
+# Product title words accepted for each recommended item. Marketplace search
+# can mix in the source garment even for a precise query, so this is a final
+# category guard before results reach the UI.
+_CATEGORY_TERMS: dict[str, tuple[str, ...]] = {
+    "t-shirt": ("t-shirt", "tshirt", "tee"), "shirt": ("shirt",),
+    "blouse": ("blouse",), "top": (" top",), "polo": ("polo",),
+    "jeans": ("jean", "denim"), "trousers": ("trouser", "pant"),
+    "pants": ("pant", "trouser"), "chinos": ("chino",), "shorts": ("short",),
+    "skirt": ("skirt",), "joggers": ("jogger",), "leggings": ("legging",),
+    "sneakers": ("sneaker",), "shoes": ("shoe",), "boots": ("boot",),
+    "sandals": ("sandal", "slipper", "flat"), "heels": ("heel", "pump"),
+    "loafers": ("loafer",), "formal shoes": ("formal shoe", "oxford", "derby"),
+    "watch": ("watch",), "belt": ("belt",), "handbag": ("handbag", "purse", "tote"),
+    "crossbody bag": ("crossbody", "sling bag", "shoulder bag"),
+    "clutch purse": ("clutch", "purse"), "bangles": ("bangle",),
+    "bracelet": ("bracelet",), "earrings": ("earring",), "ethnic sandals": ("sandal", "jutti", "kolhapuri"),
+}
+
+
+def _normalise_category(value: str | None) -> str:
+    value = (value or "").lower().replace("-", " ")
+    if "t shirt" in value or "tshirt" in value:
+        return "t-shirt"
+    if "sari" in value or "saree" in value:
+        return "saree"
+    for category, terms in _CATEGORY_TERMS.items():
+        if category in value or any(term in value for term in terms):
+            return category
+    return value.strip()
+
+
+def _filter_complementary_products(
+    products: list[dict], source_product: dict[str, Any], slot_category: str,
+) -> list[dict]:
+    """Keep complementary products and always remove the selected garment."""
+    source_asin = str(source_product.get("asin") or "").strip().upper()
+    source_category = _normalise_category(source_product.get("category"))
+    expected_terms = _CATEGORY_TERMS.get(_normalise_category(slot_category), ())
+    filtered: list[dict] = []
+    seen: set[str] = set()
+    for product in products:
+        asin = str(product.get("asin") or product.get("id") or "").strip().upper()
+        title = str(product.get("title") or product.get("name") or "").lower()
+        product_category = _normalise_category(product.get("category") or title)
+        if not asin or asin == source_asin or asin in seen:
+            continue
+        if source_category and product_category == source_category:
+            continue
+        if expected_terms and title and not any(term in title for term in expected_terms):
+            continue
+        seen.add(asin)
+        filtered.append(product)
+    return filtered
 
 
 def _build_query(
@@ -230,20 +284,39 @@ def build_recommendations(
     style     = attributes.get("style")
     gender    = attributes.get("gender")
 
-    # Determine which slots to fill
-    slots = resolve_complements(category)
+    # Last-line protection against broad catalog labels. This also covers any
+    # internal caller that bypasses the API router: a specific garment in the
+    # product title always wins over labels such as "Kids Clothing".
+    title_attributes: dict[str, Any] = {}
+    try:
+        from .classifier import _parse_title_attributes
+        title_attributes = _parse_title_attributes(source_product.get("title") or "")
+        category = title_attributes.get("category") or category
+        style = style or title_attributes.get("style")
+        gender = gender or title_attributes.get("gender")
+    except Exception:
+        pass
+
+    # Use curated plans where styling details matter, then generic complements.
+    slots, profile = resolve_outfit_plan(category, style, gender)
     _logger.info(
         "[RECOMMENDER] source_category=%r → slots=%s",
         category, slots,
     )
 
     color_hints = resolve_compatible_colors(color)
+    # Catalog metadata is occasionally absent. Preserve the detected category
+    # for the post-search exclusion check in that case.
+    source_context = {
+        **source_product,
+        "category": title_attributes.get("category") or source_product.get("category") or category,
+    }
 
     recommendations: list[dict] = []
 
     for slot in slots:
         # Choose the best category for this slot
-        slot_cats = resolve_slot_categories(slot, style, category)
+        slot_cats = profile.get(slot) or resolve_slot_categories(slot, style, category)
         slot_cat = slot_cats[0] if slot_cats else slot
 
         # Build search query
@@ -263,6 +336,7 @@ def build_recommendations(
         # Fetch products through the shared search service and its cache.
         try:
             products = _search_products(query, domain=domain)
+            products = _filter_complementary_products(products, source_context, slot_cat)
             products = _score_products(products, slot_cat, color_hints)
             products = products[:PRODUCTS_PER_SLOT]
         except Exception as exc:

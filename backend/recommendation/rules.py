@@ -23,7 +23,7 @@ from __future__ import annotations
 CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
     # Tops
     "t-shirt":      ["bottom", "footwear"],
-    "shirt":        ["bottom", "footwear"],
+    "shirt":        ["bottom", "footwear", "accessory"],
     "blouse":       ["bottom", "footwear", "accessory"],
     "top":          ["bottom", "footwear"],
     "polo":         ["bottom", "footwear"],
@@ -52,7 +52,7 @@ CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
     "jumpsuit":     ["footwear", "accessory"],
     "kurta":        ["bottom", "footwear"],
     "ethnic wear":  ["footwear", "accessory"],
-    "saree":        ["footwear", "accessory"],
+    "saree":        ["footwear", "bag", "jewellery"],
 
     # Footwear — recommend a full outfit
     "sneakers":     ["top", "bottom"],
@@ -82,7 +82,40 @@ SLOT_CATEGORIES: dict[str, list[str]] = {
     "bottom":    ["jeans", "trousers", "chinos", "shorts", "skirt", "joggers"],
     "footwear":  ["sneakers", "shoes", "boots", "sandals", "loafers", "heels"],
     "accessory": ["bag", "handbag", "watch", "belt", "sunglasses"],
+    "bag":       ["handbag", "crossbody bag", "clutch purse"],
+    "watch":     ["watch"],
+    "belt":      ["belt"],
+    "jewellery": ["bangles", "bracelet", "earrings"],
     "outerwear": ["jacket", "blazer", "coat", "cardigan", "hoodie"],
+}
+
+# Curated outfit plans take precedence over generic slots for the looks where
+# styling details matter most.  They intentionally name complementary pieces
+# only: the selected garment is never included in its own plan.
+LOOK_PROFILES: dict[str, dict[str, list[str]]] = {
+    "saree": {
+        "default": ["footwear", "bag", "jewellery"],
+        "footwear": ["ethnic sandals"],
+        "bag": ["clutch purse", "ethnic handbag"],
+        "jewellery": ["bangles", "bracelet"],
+    },
+    "ethnic wear": {
+        "default": ["footwear", "bag", "jewellery"],
+        "footwear": ["ethnic sandals"],
+        "bag": ["clutch purse", "handbag"],
+        "jewellery": ["bangles", "earrings"],
+    },
+    "dress": {
+        "casual": ["sandals", "watch"],
+        "formal": ["heels", "bag", "watch"],
+        "party": ["heels", "bag", "jewellery"],
+        "default": ["footwear", "accessory"],
+        "footwear": ["sandals", "sneakers", "heels"],
+        "accessory": ["watch", "crossbody bag", "handbag"],
+        "bag": ["handbag", "clutch purse"],
+        "watch": ["watch"],
+        "jewellery": ["earrings", "bracelet"],
+    },
 }
 
 # ---------------------------------------------------------------------------
@@ -215,7 +248,8 @@ def resolve_compatible_colors(color: str | None) -> list[str]:
 def resolve_complements(category: str | None) -> list[str]:
     """Return the outfit slots for a given detected clothing category."""
     if not category:
-        return ["top", "bottom", "footwear"]
+        # It is better to show no module than an unrelated generic outfit.
+        return []
     c = category.strip().lower()
     # Direct match
     if c in CATEGORY_COMPLEMENTS:
@@ -224,5 +258,39 @@ def resolve_complements(category: str | None) -> list[str]:
     for key, slots in CATEGORY_COMPLEMENTS.items():
         if key in c:
             return slots
-    # Default
-    return ["top", "bottom", "footwear"]
+    # A broad marketplace taxonomy (for example "Kids Clothing") is not a
+    # garment category. Do not turn it into a made-up outfit.
+    return []
+
+
+def resolve_outfit_plan(
+    category: str | None,
+    style: str | None,
+    gender: str | None,
+) -> tuple[list[str], dict[str, list[str]]]:
+    """Return slots and preferred categories for a contextual complete look."""
+    normalized_category = (category or "").strip().lower()
+    normalized_style = (style or "").strip().lower()
+
+    profile_key = next((key for key in LOOK_PROFILES if key in normalized_category), None)
+    if profile_key:
+        profile = LOOK_PROFILES[profile_key].copy()
+        # A style-specific plan can directly list item categories (e.g. sandals).
+        plan = profile.get(normalized_style) or profile["default"]
+        if all(item in SLOT_CATEGORIES or item in {"bag", "watch", "belt", "jewellery"} for item in plan):
+            return plan, profile
+        slots: list[str] = []
+        for item in plan:
+            if item in {"sandals", "heels", "sneakers"}:
+                slots.append("footwear")
+                profile["footwear"] = [item]
+            else:
+                slots.append(item)
+        return slots, profile
+
+    slots = resolve_complements(normalized_category)
+    # A watch and belt are useful finishing pieces for men's shirts, polos and
+    # trousers, but are not added to every outfit.
+    if gender == "men" and normalized_category in {"shirt", "polo", "trousers", "pants", "chinos"}:
+        slots = [*slots, "watch", "belt"]
+    return slots, {}

@@ -31,6 +31,13 @@ const SLOT_META = {
   outerwear: { label: 'Outerwear',   emoji: '🧥' },
 }
 
+Object.assign(SLOT_META, {
+  bag: { label: 'Bags & Purses', emoji: 'Bag' },
+  watch: { label: 'Watches', emoji: 'Watch' },
+  belt: { label: 'Belts', emoji: 'Belt' },
+  jewellery: { label: 'Jewellery', emoji: 'Jewellery' },
+})
+
 function SlotRow({ slot, category, products, onWishlist, onTryOn }) {
   const meta = SLOT_META[slot] || { label: slot, emoji: '•' }
 

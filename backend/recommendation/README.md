@@ -1,4 +1,4 @@
-# FashionCLIP Outfit Recommendation System
+# FashionSigLIP Outfit Recommendation System
 
 ## Overview
 
@@ -37,20 +37,22 @@ router.py  ──→  classifier.py  ──→  FashionCLIP (patrickjohncyh/fash
 
 ---
 
-## What FashionCLIP Does
+## What FashionSigLIP Does
 
-[patrickjohncyh/fashion-clip](https://huggingface.co/patrickjohncyh/fashion-clip) is
-a CLIP-based model fine-tuned on the FACAD fashion dataset (800K+ fashion image-text pairs).
+[Marqo/marqo-fashionSigLIP](https://huggingface.co/Marqo/marqo-fashionSigLIP) is
+Marqo FashionSigLIP, a fashion-tuned multimodal embedding model. Product-title
+and catalog metadata remain the fast primary path; image inference is used only
+when those inputs cannot identify the garment.
 
 It is used here for **zero-shot image classification**:
 
 1. The selected product's image is downloaded.
-2. FashionCLIP compares the image against candidate text labels
+2. FashionSigLIP compares the image against candidate text labels
    (e.g., `["t-shirt", "jacket", "jeans", "dress", …]`).
 3. The best-matching label becomes the detected **category**.
 4. The same approach classifies **color**, **style**, and **pattern**.
 
-FashionCLIP does NOT directly output "buy this product." It outputs semantic attributes
+FashionSigLIP does NOT directly output "buy this product." It outputs semantic attributes
 that drive the compatibility rules layer.
 
 ---
@@ -113,7 +115,7 @@ No second Oxylabs integration is created. No model weights are stored in the rep
 | Browser cache | `apiCache.js` (sessionStorage + Memory) | 30 min |
 
 Repeated `POST /recommendations` for the same ASIN returns instantly from the
-in-process cache (no FashionCLIP inference, no Oxylabs calls).
+in-process cache (no FashionSigLIP inference, no Oxylabs calls).
 
 ---
 
@@ -124,7 +126,7 @@ cd AI-Virtual-Try-On
 uv run --locked uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 ```
 
-On first request the FashionCLIP model (~600 MB) is downloaded from HuggingFace
+On the first image-fallback request, the FashionSigLIP model is downloaded from HuggingFace
 and cached in `~/.cache/huggingface/hub/`. Subsequent startups load from the cache
 (much faster).
 
