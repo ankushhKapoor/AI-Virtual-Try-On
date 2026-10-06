@@ -17,7 +17,7 @@ function HowItWorks() {
               Try on styles with confidence, step by step
             </h1>
             <p className="mt-6 text-base leading-8 text-muted">
-              Learn how VESTA AI turns a simple photo into a personalized styling experience. Discover the process, get inspired, and start your virtual try-on journey.
+              Learn how Trayo turns a simple photo into a personalized styling experience. Discover the process, get inspired, and start your virtual try-on journey.
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link to="/upload"><Button size="lg" icon={Sparkles}>Upload Your Photo</Button></Link>

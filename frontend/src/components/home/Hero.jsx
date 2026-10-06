@@ -173,7 +173,7 @@ function Hero() {
             <div className="flex items-center justify-between border-b border-white/60 px-6 py-4">
 
               <span className="text-xs font-bold uppercase tracking-[0.18em] text-accent">
-                Vesta / Edit
+                Trayo / Edit
               </span>
 
             </div>

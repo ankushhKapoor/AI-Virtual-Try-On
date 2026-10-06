@@ -94,7 +94,7 @@ function AuthProvider({ children }) {
   }
 
   if (isLoading) {
-    return <main className="flex min-h-screen items-center justify-center bg-canvas"><p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">Vesta AI</p></main>
+    return <main className="flex min-h-screen items-center justify-center bg-canvas"><p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">Trayo</p></main>
   }
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>

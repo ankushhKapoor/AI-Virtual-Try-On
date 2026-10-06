@@ -24,7 +24,7 @@ function Navbar() {
   return (
     <header className="relative z-40 border-b border-line bg-canvas/95 backdrop-blur-sm">
       <div className="mx-auto flex min-h-[4.5rem] max-w-7xl items-center justify-between gap-5 px-5 sm:px-8 lg:px-10">
-        <Link to="/" className="shrink-0 text-xl font-extrabold tracking-[0.18em] text-ink" aria-label="Vesta AI home">VESTA<span className="text-accent"> AI</span></Link>
+        <Link to="/" className="shrink-0 text-xl font-extrabold tracking-[0.18em] text-ink" aria-label="Trayo home">TRA<span className="text-accent">YO</span></Link>
         <nav className="hidden items-center gap-7 lg:flex" aria-label="Primary navigation">
           {links.map((link) => <NavLink key={link.label} to={link.to} className={linkClass}>{link.label}</NavLink>)}
         </nav>

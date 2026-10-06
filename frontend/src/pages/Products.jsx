@@ -21,41 +21,50 @@ import { API_BASE_URL } from '../services/urls'
 
 
 
-const categories = [
-  'All',
-  'Women',
-  'Men',
-  'Dresses',
-  'Tops',
-  'Shirts',
-  'Jeans',
-  'Jackets',
-  'Blazers',
-  'Skirts',
-  'T-Shirts',
-]
+const audiences = ['All', 'Women', 'Men', 'Kids']
 
+const subcategoriesByAudience = {
+  Women: ['Shirts', 'Tops', 'T-Shirts', 'Jeans', 'Skirts', 'Dresses', 'Jackets', 'Blazers', 'Accessories'],
+  Men: ['Shirts', 'T-Shirts', 'Pants', 'Jeans', 'Shorts', 'Kurtas', 'Jackets', 'Blazers', 'Watches', 'Accessories'],
+  Kids: ['T-Shirts', 'Tops', 'Shirts', 'Jeans', 'Shorts', 'Dresses', 'Jackets', 'Accessories'],
+}
 
-const categoryQueries = {
-  All: 'clothing',
+const audienceQueries = {
   Women: 'women clothing',
   Men: 'men clothing',
-  Dresses: 'dresses',
-  Tops: 'tops',
-  Shirts: 'shirts',
-  Jeans: 'jeans',
-  Jackets: 'jackets',
-  Blazers: 'blazers',
-  Skirts: 'skirts',
-  'T-Shirts': 't-shirts',
+  Kids: 'kids clothing',
 }
+
+const subcategoryQueries = Object.fromEntries(
+  [...new Set(Object.values(subcategoriesByAudience).flat())]
+    .map((subcategory) => [subcategory, subcategory.toLowerCase()]),
+)
 
 
 const defaultFilters = {
   price: [],
-  gender: [],
   color: [],
   size: [],
+}
+
+function getInitialSelection(searchParams) {
+  const requestedCategory = searchParams.get('category')
+  const requestedSubcategory = searchParams.get('subcategory')
+
+  if (audiences.includes(requestedCategory)) {
+    const validSubcategories = subcategoriesByAudience[requestedCategory] || []
+    return {
+      audience: requestedCategory,
+      subcategory: validSubcategories.includes(requestedSubcategory) ? requestedSubcategory : '',
+    }
+  }
+
+  const legacyAudience = Object.keys(subcategoriesByAudience)
+    .find((audience) => subcategoriesByAudience[audience].includes(requestedCategory))
+
+  return legacyAudience
+    ? { audience: legacyAudience, subcategory: requestedCategory }
+    : { audience: 'All', subcategory: '' }
 }
 
 
@@ -65,19 +74,17 @@ function Products() {
   const [searchParams, setSearchParams] =
     useSearchParams()
 
-  const initialCategory =
-    categories.includes(
-      searchParams.get('category')
-    )
-      ? searchParams.get('category')
-      : 'All'
+  const initialSelection = getInitialSelection(searchParams)
 
   const [search, setSearch] = useState(
     searchParams.get('search') || ''
   )
 
-  const [category, setCategory] =
-    useState(initialCategory)
+  const [audience, setAudience] =
+    useState(initialSelection.audience)
+
+  const [subcategory, setSubcategory] =
+    useState(initialSelection.subcategory)
 
   const [filters, setFilters] =
     useState(defaultFilters)
@@ -87,13 +94,6 @@ function Products() {
 
   const [amazonProducts, setAmazonProducts] =
     useState([])
-
-  const [availableFilters, setAvailableFilters] =
-    useState({
-      gender: [],
-      color: [],
-      size: [],
-    })
 
   const [loading, setLoading] =
     useState(false)
@@ -134,8 +134,9 @@ function Products() {
   }
 
 
-  function updateCategory(value) {
-    setCategory(value)
+  function updateAudience(value) {
+    setAudience(value)
+    setSubcategory('')
 
     setFilters(defaultFilters)
 
@@ -146,8 +147,10 @@ function Products() {
 
         if (value === 'All') {
           next.delete('category')
+          next.delete('subcategory')
         } else {
           next.set('category', value)
+          next.delete('subcategory')
         }
 
         return next
@@ -155,6 +158,21 @@ function Products() {
       {
         replace: true,
       }
+    )
+  }
+
+
+  function updateSubcategory(value) {
+    setSubcategory(value)
+
+    setSearchParams(
+      current => {
+        const next = new URLSearchParams(current)
+        next.set('category', audience)
+        next.set('subcategory', value)
+        return next
+      },
+      { replace: true }
     )
   }
 
@@ -177,7 +195,8 @@ function Products() {
 
   function clearAll() {
     setSearch('')
-    setCategory('All')
+    setAudience('All')
+    setSubcategory('')
     setFilters(defaultFilters)
 
     setSearchParams(
@@ -192,10 +211,11 @@ function Products() {
   useEffect(() => {
     let cancelled = false
 
-    const query =
-      search.trim() ||
-      categoryQueries[category] ||
-      'clothing'
+    const query = [
+      search.trim(),
+      audienceQueries[audience],
+      subcategoryQueries[subcategory],
+    ].filter(Boolean).join(' ') || 'clothing'
 
     setLoading(true)
     setError('')
@@ -252,9 +272,9 @@ function Products() {
                   'INR',
 
                 category:
-                  category === 'All'
-                    ? 'Amazon'
-                    : category,
+                  product.category ||
+                  subcategory ||
+                  (audience === 'All' ? 'Amazon' : audience),
 
                 gender:
                   product.gender || '',
@@ -324,29 +344,6 @@ function Products() {
           if (!cancelled) {
             setAmazonProducts(products)
 
-            setAvailableFilters({
-              gender:
-                Array.isArray(
-                  data.filters?.gender
-                )
-                  ? data.filters.gender
-                  : [],
-
-              color:
-                Array.isArray(
-                  data.filters?.color
-                )
-                  ? data.filters.color
-                  : [],
-
-              size:
-                Array.isArray(
-                  data.filters?.size
-                )
-                  ? data.filters.size
-                  : [],
-            })
-
             setFilters(defaultFilters)
           }
         } catch (requestError) {
@@ -357,12 +354,6 @@ function Products() {
 
           if (!cancelled) {
             setAmazonProducts([])
-
-            setAvailableFilters({
-              gender: [],
-              color: [],
-              size: [],
-            })
 
             setError(
               'Unable to load Amazon products.'
@@ -382,7 +373,7 @@ function Products() {
       cancelled = true
       clearTimeout(timer)
     }
-  }, [search, category])
+  }, [search, audience, subcategory])
 
 
   const filteredProducts = useMemo(() => {
@@ -416,12 +407,6 @@ function Products() {
               )
             ))
 
-          const genderMatch =
-            !filters.gender.length ||
-            filters.gender.includes(
-              product.gender
-            )
-
           const colorMatch =
             !filters.color.length ||
             filters.color.includes(
@@ -438,7 +423,6 @@ function Products() {
 
           return (
             priceMatch &&
-            genderMatch &&
             colorMatch &&
             sizeMatch
           )
@@ -536,7 +520,7 @@ function Products() {
         <div className="mx-auto max-w-7xl px-5 py-10 sm:px-8 lg:px-10 lg:py-16">
 
           <SectionHeading
-            eyebrow="The Vesta collection"
+            eyebrow="The Trayo collection"
             title="Explore Collection"
             description="Discover pieces you can visualize before you buy."
           />
@@ -560,9 +544,12 @@ function Products() {
           <div className="mt-7">
 
             <CategoryFilter
-              categories={categories}
-              value={category}
-              onChange={updateCategory}
+              categories={audiences}
+              value={audience}
+              onChange={updateAudience}
+              subcategories={subcategoriesByAudience[audience] || []}
+              selectedSubcategory={subcategory}
+              onSubcategoryChange={updateSubcategory}
             />
 
           </div>
@@ -575,9 +562,6 @@ function Products() {
               onChange={updateFilter}
               onClear={clearAll}
               activeCount={activeFilterCount}
-              availableFilters={
-                availableFilters
-              }
             />
 
 

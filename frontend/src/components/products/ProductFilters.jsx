@@ -5,7 +5,6 @@ import Modal from '../Modal'
 
 const filterGroups = [
   { key: 'price', label: 'Price', options: [{ value: 'under-1000', label: 'Under ₹1,000' }, { value: '1000-2000', label: '₹1,000–₹2,000' }, { value: '2000-3000', label: '₹2,000–₹3,000' }, { value: 'above-3000', label: 'Above ₹3,000' }] },
-  { key: 'gender', label: 'Gender', options: ['Women', 'Men', 'Unisex'].map((value) => ({ value, label: value })) },
   { key: 'color', label: 'Color', options: ['Black', 'White', 'Blue', 'Red', 'Beige', 'Green'].map((value) => ({ value, label: value })) },
   { key: 'size', label: 'Size', options: ['XS', 'S', 'M', 'L', 'XL'].map((value) => ({ value, label: value })) },
 ]

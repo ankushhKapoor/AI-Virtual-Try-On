@@ -64,7 +64,7 @@ function TryOnResult() {
     if (!result.resultImage) return
     const link = document.createElement('a')
     link.href = result.resultImage
-    link.download = `vesta-tryon-${result.id || 'look'}.png`
+    link.download = `trayo-tryon-${result.id || 'look'}.png`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -74,8 +74,8 @@ function TryOnResult() {
     if (navigator.share) {
       await navigator
         .share({
-          title: 'My VESTA AI Try-On',
-          text: `I tried on ${product.name || product.title} with VESTA AI.`,
+          title: 'My Trayo Try-On',
+          text: `I tried on ${product.name || product.title} with Trayo.`,
         })
         .catch(() => {})
     }

@@ -119,7 +119,7 @@ function AdminUsersSection() {
         <div className="flex flex-col gap-5 border-b border-line pb-6 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">
-              People on Vesta
+              People on Trayo
             </p>
             <h2 id="users-heading" className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">
               Users

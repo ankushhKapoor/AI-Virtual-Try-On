@@ -18,7 +18,7 @@ function ResultActions({
     } else if (result?.resultImage) {
       const link = document.createElement('a')
       link.href = result.resultImage
-      link.download = `vesta-tryon-${result.id || 'look'}.png`
+      link.download = `trayo-tryon-${result.id || 'look'}.png`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
