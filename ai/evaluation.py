@@ -1,10 +1,9 @@
 """Lightweight, per-image quality checks for CatVTON outputs.
 
 The project has no ground-truth photograph of a person wearing the selected
-garment, so PSNR, whole-image SSIM, LPIPS, FID, and KID would be misleading.
-Instead, SSIM is measured only outside CatVTON's garment mask, where the
-person and background should remain unchanged.  The remaining checks are
-no-reference output-quality indicators and require no additional model files.
+garment, so whole-image PSNR/SSIM, LPIPS, FID, and KID would be misleading.
+Instead, PSNR and SSIM are measured only outside CatVTON's garment mask,
+where the person and background should remain unchanged.
 """
 
 from __future__ import annotations
@@ -44,42 +43,15 @@ def _masked_ssim(reference: np.ndarray, result: np.ndarray, mask: Image.Image) -
     return float(np.clip(score.mean(), 0.0, 1.0))
 
 
-def _sharpness_variance(rgb: np.ndarray) -> float:
-    """Variance of a simple luminance Laplacian; higher generally means sharper."""
-    luminance = rgb[..., 0] * 0.299 + rgb[..., 1] * 0.587 + rgb[..., 2] * 0.114
-    center = luminance[1:-1, 1:-1]
-    if center.size == 0:
-        return 0.0
-    laplacian = (
-        luminance[:-2, 1:-1]
-        + luminance[2:, 1:-1]
-        + luminance[1:-1, :-2]
-        + luminance[1:-1, 2:]
-        - 4 * center
-    )
-    return float(laplacian.var())
-
-
-def _score_from_variance(variance: float) -> float:
-    """Map an unbounded Laplacian variance to an understandable 0–100 score."""
-    # 0.0015 is a practical reference point for the 1024px CatVTON output.
-    return float(np.clip(100 * (1 - np.exp(-variance / 0.0015)), 0, 100))
-
-
-def _garment_edit_strength(
-    reference: np.ndarray,
-    result: np.ndarray,
-    mask: Image.Image,
-) -> float:
-    """Measure the amount of visible change inside CatVTON's edited region."""
-    weights = np.asarray(mask.convert("L"), dtype=np.float64) / 255.0
+def _masked_psnr(reference: np.ndarray, result: np.ndarray, mask: Image.Image) -> float:
+    """Return PSNR (dB) outside the generated garment mask."""
+    weights = 1.0 - np.asarray(mask.convert("L"), dtype=np.float64) / 255.0
     total_weight = float(weights.sum())
     if total_weight < 1.0:
         return 0.0
-    mean_change = float((np.abs(result - reference).mean(axis=2) * weights).sum() / total_weight)
-    # This is an integrity signal, not an accuracy claim: 0 means no visible
-    # garment edit, while 100 means the intended region changed substantially.
-    return float(np.clip(100 * (1 - np.exp(-mean_change / 0.12)), 0, 100))
+    mse = float((((reference - result) ** 2 * weights[..., np.newaxis]).sum()) / (total_weight * 3))
+    # A perfect copy has infinite PSNR. Cap its display value for a stable API.
+    return 99.0 if mse <= 1e-12 else float(min(99.0, 10 * np.log10(1.0 / mse)))
 
 
 def evaluate_tryon(
@@ -93,11 +65,8 @@ def evaluate_tryon(
     if person.shape != result.shape:
         raise ValueError("Person and result images must have identical dimensions.")
 
-    sharpness_variance = _sharpness_variance(result)
-
     return {
         "person_background_ssim": round(_masked_ssim(person, result, garment_mask), 4),
-        "garment_edit_strength": round(_garment_edit_strength(person, result, garment_mask), 1),
-        "detail_quality_score": round(_score_from_variance(sharpness_variance), 1),
-        "method": "masked_ssim_and_no_reference_integrity_checks",
+        "person_background_psnr_db": round(_masked_psnr(person, result, garment_mask), 2),
+        "method": "masked_psnr_and_ssim",
     }
