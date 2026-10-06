@@ -17,11 +17,13 @@ import AdminDashboard from './pages/AdminDashboard'
 import TryOnProvider from './context/TryOnContext'
 import { AuthProvider } from './context/AuthContext'
 import { AdminRoute, GuestRoute } from './components/ProtectedRoute'
+import ScrollToTop from './components/ScrollToTop'
 import NotFound from './pages/NotFound'
 
 function App() {
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <AuthProvider>
         <TryOnProvider>
         <Routes>
