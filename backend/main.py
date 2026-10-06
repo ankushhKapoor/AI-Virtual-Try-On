@@ -180,7 +180,8 @@ def _search_key(query: str, domain: str, geo_location: str) -> str:
 # It covers adult, child, and gender-specific labels alike.
 _INTIMATE_APPAREL_PATTERN = re.compile(
     r"\b(?:"
-    r"underwear|underwears|undergarment(?:s)?|lingerie|bra(?:s|lette)?|brassiere|"
+    r"underwear|underwears|underclothes|innerwear|inner\s+wear|undergarment(?:s)?|"
+    r"lingerie|bra(?:s|lette)?|brassiere|"
     r"pant(?:y|ies)|brief(?:s)?|boxer(?:s|\s+briefs)?|trunk(?:s)?|thong(?:s)?|"
     r"g[ -]?string|jockstrap|athletic\s+supporter|cup\s+supporter|"
     r"shapewear|body\s*shaper|compression\s+(?:shorts|briefs|underwear)|"
