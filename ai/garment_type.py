@@ -13,7 +13,8 @@ _OVERALL_PATTERN = re.compile(
 )
 _LOWER_PATTERN = re.compile(
     r"\b(?:jeans?|trousers?|pants?|shorts?|skirts?|leggings?|jeggings?|joggers?|"
-    r"chinos?|cargos?|culottes?|palazzos?|salwars?|pyjamas?|pajamas?|dhoti(?:s)?)\b",
+    r"track[ -]?pants?|sweatpants?|chinos?|cargos?|culottes?|palazzos?|salwars?|"
+    r"pyjamas?|pajamas?|dhoti(?:s)?)\b",
     re.IGNORECASE,
 )
 _UPPER_PATTERN = re.compile(
