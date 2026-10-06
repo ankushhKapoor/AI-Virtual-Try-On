@@ -140,13 +140,15 @@ try:
     from app.routes.users import router as _users_router
     from app.routes.admin import router as _admin_router
     from app.routes.dwm import router as _dwm_router
+    from app.routes.tryon_record import router as _tryon_record_router
     from app.database.connection import create_all_tables as _create_all_tables
     app.include_router(_auth_router)
     app.include_router(_users_router)
     app.include_router(_admin_router)
     app.include_router(_dwm_router)
+    app.include_router(_tryon_record_router)
     _create_all_tables()
-    _logger.info("Auth, user, admin, and DWM analytics routes loaded successfully.")
+    _logger.info("Auth, user, admin, DWM analytics, and try-on record routes loaded successfully.")
 except Exception as _e:
     _logger.warning("Could not initialize auth/admin/dwm routes: %s", _e)
 

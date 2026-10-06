@@ -455,7 +455,7 @@ def get_kmeans_clusters(
         "silhouette_score": 0.382,
         "total_users": len(users),
         "profiles": formatted_profiles,
-        "users_sample": formatted_users[:100]
+        "users_sample": formatted_users
     }
 
 
@@ -514,7 +514,7 @@ def run_kmeans_clustering(
                 "cluster_id": u["cluster_id"],
                 "cluster_name": u["cluster_name"],
             }
-            for u in user_rows[:100]
+            for u in user_rows
         ]
 
         return {

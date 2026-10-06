@@ -97,9 +97,9 @@ function AdminDashboard() {
             }`}
           >
             <Cpu size={18} />
-            <span>DWM Data Mining Hub (4 Techniques)</span>
+            <span>Store Insights & Analytics (4 Tools)</span>
             <span className="rounded-full bg-accent px-2 py-0.5 text-[10px] font-extrabold text-white">
-              Star Schema
+              Smart Hub
             </span>
           </button>
 

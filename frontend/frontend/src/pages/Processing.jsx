@@ -12,6 +12,63 @@ import TryOnProgress from '../components/tryon/TryOnProgress'
 import useTryOn from '../hooks/useTryOn'
 import { API_BASE_URL, MODEL_BASE_URL } from '../services/urls'
 
+// ── Detect simple device type from UA ────────────────────────
+function detectDeviceType() {
+  const ua = navigator.userAgent || ''
+  if (/Mobi|Android/i.test(ua)) return 'Mobile'
+  if (/Tablet|iPad/i.test(ua)) return 'Tablet'
+  return 'Desktop'
+}
+
+// ── Fire-and-forget DWH recording (never throws) ─────────────
+async function recordTryOnEvent({ success, failureReason, product, processingTimeMs }) {
+  try {
+    let token = ''
+    try {
+      const session = JSON.parse(localStorage.getItem('vesta_auth_session') || '{}')
+      token = session?.accessToken || ''
+    } catch (_e) {}
+    if (!token) {
+      token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken') || ''
+    }
+    const cat = (product?.category || '').toLowerCase()
+    const price = product?.price
+    let priceBracket = 'Mid (₹1000–₹2999)'
+    if (typeof price === 'number') {
+      if (price < 500) priceBracket = 'Budget (Under ₹500)'
+      else if (price < 1000) priceBracket = 'Low (₹500–₹999)'
+      else if (price < 3000) priceBracket = 'Mid (₹1000–₹2999)'
+      else if (price < 7000) priceBracket = 'High (₹3000–₹6999)'
+      else priceBracket = 'Premium (₹7000+)'
+    }
+    let uploadMethod = 'File Upload'
+    const clothUrl = product?.image || (product?.images && product.images[0]) || ''
+    if (clothUrl.startsWith('http')) uploadMethod = 'Studio URL'
+
+    const body = {
+      success,
+      failure_reason: failureReason || 'None',
+      product_id: String(product?.id || product?.asin || 'unknown'),
+      product_category: product?.category || 'Unknown',
+      product_price_bracket: priceBracket,
+      device_type: detectDeviceType(),
+      upload_method: uploadMethod,
+      processing_time_ms: processingTimeMs ?? null,
+      quality_score: success ? 0.82 : null,   // placeholder until model returns a score
+    }
+    await fetch(`${API_BASE_URL}/tryon/record`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      body: JSON.stringify(body),
+    })
+  } catch (_err) {
+    // Silently swallow — never affect UX
+  }
+}
+
 
 function Processing() {
   const navigate = useNavigate()
@@ -42,6 +99,7 @@ function Processing() {
     setProgress(20)
 
     async function runTryOn() {
+      const startMs = Date.now()
       try {
         const formData = new FormData()
 
@@ -78,7 +136,7 @@ function Processing() {
             method: 'POST',
             body: formData,
           })
-        } catch {
+        } catch (_modelErr) {
           response = await fetch(API_BASE_URL + '/tryon', {
             method: 'POST',
             body: formData,
@@ -93,13 +151,23 @@ function Processing() {
         }
 
         const data = await response.json()
+        const processingTimeMs = Date.now() - startMs
         updateLook(resultId.current, { resultImage: data.result_image })
         setProgress(100)
+
+        // ── Record success in live DWH (fire-and-forget) ─────
+        recordTryOnEvent({ success: true, product: selectedProduct, processingTimeMs })
+
         setTimeout(() => navigate('/result/' + resultId.current), 400)
       } catch (err) {
+        const processingTimeMs = Date.now() - startMs
         console.error('Try-on API call failed:', err)
         setApiError(err.message || 'Unknown error')
         updateLook(resultId.current, { resultImage: null, error: err.message })
+
+        // ── Record failure in live DWH (fire-and-forget) ─────
+        recordTryOnEvent({ success: false, failureReason: err.message, product: selectedProduct, processingTimeMs })
+
         setTimeout(() => navigate('/result/' + resultId.current), 2000)
       }
     }
