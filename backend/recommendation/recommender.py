@@ -17,6 +17,7 @@ including its existing cache and Oxylabs integration.
 from __future__ import annotations
 
 import logging
+import hashlib
 import re
 from typing import Any
 
@@ -89,6 +90,9 @@ _SLOT_CONTEXT: dict[str, str] = {
 # can mix in the source garment even for a precise query, so this is a final
 # category guard before results reach the UI.
 _CATEGORY_TERMS: dict[str, tuple[str, ...]] = {
+    "kurta set": ("kurta set", "kurti set"), "short kurti": ("short kurti", "short kurta"),
+    "dress": ("dress", "frock", "gown"), "saree": ("saree", "sari"),
+    "kurta": ("kurta", "kurti"), "pajamas": ("pajama", "pyjama", "nightwear"),
     "t-shirt": ("t-shirt", "tshirt", "tee"), "shirt": ("shirt",),
     "blouse": ("blouse",), "top": (" top",), "polo": ("polo",),
     "jeans": ("jean", "denim"), "trousers": ("trouser", "pant"),
@@ -96,15 +100,66 @@ _CATEGORY_TERMS: dict[str, tuple[str, ...]] = {
     "skirt": ("skirt",), "joggers": ("jogger",), "leggings": ("legging",),
     "sneakers": ("sneaker",), "shoes": ("shoe",), "boots": ("boot",),
     "sandals": ("sandal", "slipper", "flat"), "heels": ("heel", "pump"),
+    "ballet flats": ("ballet flat", "flat shoe", "flat"),
+    "casual sneakers": ("sneaker",), "formal flats": ("formal flat", "flat shoe"),
+    "sports sneakers": ("sneaker", "sports shoe", "running shoe"),
+    "running shoes": ("running shoe", "sports shoe", "sneaker"),
+    "dress sandals": ("sandal",), "party sandals": ("sandal",), "dress flats": ("flat", "flat shoe"),
     "loafers": ("loafer",), "formal shoes": ("formal shoe", "oxford", "derby"),
     "watch": ("watch",), "belt": ("belt",), "handbag": ("handbag", "purse", "tote"),
     "crossbody bag": ("crossbody", "sling bag", "shoulder bag"),
+    "crossbody handbag": ("crossbody", "sling bag", "shoulder bag"),
+    "tote handbag": ("tote", "handbag"), "shoulder handbag": ("shoulder bag", "handbag"),
+    "structured handbag": ("handbag", "satchel", "tote"),
+    "elegant shoulder bag": ("shoulder bag", "handbag"),
+    "party handbag": ("party bag", "handbag", "clutch"),
+    "mini shoulder bag": ("mini bag", "shoulder bag", "handbag"),
+    "potli bag": ("potli", "clutch", "ethnic bag"),
     "clutch purse": ("clutch", "purse"), "bangles": ("bangle",),
     "bracelet": ("bracelet",), "earrings": ("earring",), "ethnic sandals": ("sandal", "jutti", "kolhapuri"),
     "night slippers": ("slipper", "house slipper", "flip flop"),
     "college backpack": ("backpack", "college bag", "rucksack"),
     "office laptop bag": ("laptop bag", "office bag", "briefcase", "messenger bag"),
+    "canvas backpack": ("backpack", "college bag", "rucksack"),
+    "sling bag": ("sling bag", "crossbody", "shoulder bag"),
+    "leather briefcase": ("briefcase", "laptop bag", "office bag"),
+    "messenger bag": ("messenger bag", "laptop bag", "office bag"),
+    "leather strap watch": ("watch",),
+    "metal strap watch": ("watch",),
+    "formal trousers": ("trouser", "formal pant"),
+    "formal pants": ("formal pant", "trouser"),
+    "oxford shoes": ("oxford", "formal shoe", "derby"),
+    "palazzo pants": ("palazzo", "wide leg pant"),
+    "ethnic skirt": ("skirt", "lehenga"),
+    "jutti footwear": ("jutti", "mojari", "ethnic shoe"),
+    "kolhapuri sandals": ("kolhapuri", "sandal"),
+    "bracelet bangles": ("bangle", "bracelet"),
+    "jhumka earrings": ("jhumka", "earring"),
+    "ethnic earrings": ("ethnic earring", "jhumka", "earring"),
 }
+
+
+def _select_variant(
+    candidates: list[str],
+    slot: str,
+    source_product: dict[str, Any],
+    color: str | None,
+    style: str | None,
+) -> str:
+    """Return a stable, product-specific compatible choice, never a fixed first item."""
+    if not candidates:
+        return slot
+    if len(candidates) == 1:
+        return candidates[0]
+    identity = "|".join((
+        str(source_product.get("asin") or ""),
+        str(source_product.get("title") or "").lower(),
+        str(color or ""),
+        str(style or ""),
+        slot,
+    ))
+    index = int(hashlib.sha256(identity.encode("utf-8")).hexdigest()[:8], 16) % len(candidates)
+    return candidates[index]
 
 
 def _normalise_category(value: str | None) -> str:
@@ -133,6 +188,9 @@ def _filter_complementary_products(
         title = str(product.get("title") or product.get("name") or "").lower()
         product_category = _normalise_category(product.get("category") or title)
         if not asin or asin == source_asin or asin in seen:
+            continue
+        # Shorts are intentionally never part of this recommendation system.
+        if re.search(r"\bshorts?\b", title):
             continue
         if source_category and product_category == source_category:
             continue
@@ -296,7 +354,7 @@ def build_recommendations(
         title_attributes = _parse_title_attributes(source_product.get("title") or "")
         category = title_attributes.get("category") or category
         style = style or title_attributes.get("style")
-        gender = gender or title_attributes.get("gender")
+        gender = title_attributes.get("gender") or gender
     except Exception:
         pass
 
@@ -320,7 +378,7 @@ def build_recommendations(
     for slot in slots:
         # Choose the best category for this slot
         slot_cats = profile.get(slot) or resolve_slot_categories(slot, style, category)
-        slot_cat = slot_cats[0] if slot_cats else slot
+        slot_cat = _select_variant(slot_cats, slot, source_product, color, style)
 
         # Build search query
         query = _build_query(

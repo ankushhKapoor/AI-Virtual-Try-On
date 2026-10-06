@@ -38,7 +38,7 @@ CATEGORY_CANDIDATES: list[str] = [
     "t-shirt", "shirt", "blouse", "top", "polo",
     "jacket", "blazer", "coat", "hoodie", "sweatshirt", "cardigan", "sweater",
     "jeans", "trousers", "pants", "shorts", "skirt", "leggings", "chinos", "joggers",
-    "dress", "jumpsuit", "kurta", "kurta set", "ethnic wear", "saree", "pajamas",
+    "dress", "jumpsuit", "kurta", "kurta set", "short kurti", "ethnic wear", "saree", "pajamas",
     "sneakers", "shoes", "boots", "sandals", "heels", "loafers", "formal shoes",
     "bag", "handbag", "watch", "belt", "hat", "sunglasses", "accessories",
 ]
@@ -159,6 +159,7 @@ def _classify_all_attributes(image) -> dict:
 
 _TITLE_CATEGORY_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r'\bpajamas?\b|\bpyjamas?\b|\bnightwear\b|\bnight suit\b', re.I), "pajamas"),
+    (re.compile(r'\bshort\s+kurti\b|\bshort\s+kurta\b', re.I), "short kurti"),
     (re.compile(r'\bkurta\s*(?:pant|palazzo|set|with)\b|\bkurti\s*(?:set|with)\b', re.I), "kurta set"),
     (re.compile(r'\bt.?shirt\b', re.I), "t-shirt"),
     (re.compile(r'\bjeans?\b', re.I), "jeans"),
@@ -256,6 +257,8 @@ def _parse_title_attributes(title: str) -> dict[str, Any]:
     # Style heuristics from title
     if re.search(r'\bformal\b|\boffice\b|\bbusiness\b|\bprofessional\b|\bworkwear\b', title, re.I):
         attrs["style"] = "formal"
+    elif re.search(r'\bparty\b|\bevening\b|\bwedding\b|\boccasion\b', title, re.I):
+        attrs["style"] = "party"
     elif re.search(r'\bsporty\b|\bsport\b|\bgym\b|\bactive\b', title, re.I):
         attrs["style"] = "sporty"
     elif re.search(r'\bstreet\b|\burban\b|\boversi[sz]ed\b|\bbaggy\b', title, re.I):

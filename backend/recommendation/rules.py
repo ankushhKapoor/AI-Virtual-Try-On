@@ -41,7 +41,6 @@ CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
     "jeans":        ["top", "footwear"],
     "trousers":     ["top", "footwear"],
     "pants":        ["top", "footwear"],
-    "shorts":       ["top", "footwear"],
     "skirt":        ["top", "footwear", "accessory"],
     "leggings":     ["top", "footwear"],
     "chinos":       ["top", "footwear"],
@@ -52,6 +51,7 @@ CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
     "jumpsuit":     ["footwear", "accessory"],
     "kurta":        ["footwear", "bag", "jewellery"],
     "kurta set":    ["footwear", "bag", "jewellery"],
+    "short kurti":  ["bottom", "footwear", "bangles", "earrings"],
     "ethnic wear":  ["footwear", "accessory"],
     "saree":        ["footwear", "bag", "jewellery"],
     "pajamas":      ["footwear"],
@@ -81,17 +81,17 @@ CATEGORY_COMPLEMENTS: dict[str, list[str]] = {
 
 SLOT_CATEGORIES: dict[str, list[str]] = {
     "top":       ["t-shirt", "shirt", "blouse", "top", "polo", "sweatshirt"],
-    "bottom":    ["jeans", "trousers", "chinos", "shorts", "skirt", "joggers"],
+    "bottom":    ["jeans", "trousers", "chinos", "skirt", "joggers"],
     "footwear":  ["sneakers", "shoes", "boots", "sandals", "loafers", "heels"],
     "accessory": ["bag", "handbag", "watch", "belt", "sunglasses"],
-    "bag":       ["handbag", "crossbody bag", "clutch purse"],
-    "watch":     ["watch"],
-    "belt":      ["belt"],
+    "bag":       ["handbag", "crossbody bag", "clutch purse", "sling bag"],
+    "watch":     ["classic analog watch", "casual watch", "sports watch"],
+    "belt":      ["leather belt", "casual belt"],
     "jewellery": ["bangles", "bracelet", "earrings"],
     "bangles":   ["bangles"],
     "earrings":  ["earrings"],
-    "college_bag": ["college backpack"],
-    "office_bag":  ["office laptop bag"],
+    "college_bag": ["college backpack", "canvas backpack", "sling bag"],
+    "office_bag":  ["office laptop bag", "leather briefcase", "messenger bag"],
     "outerwear": ["jacket", "blazer", "coat", "cardigan", "hoodie"],
 }
 
@@ -101,37 +101,65 @@ SLOT_CATEGORIES: dict[str, list[str]] = {
 LOOK_PROFILES: dict[str, dict[str, list[str]]] = {
     "saree": {
         "default": ["footwear", "bag", "bangles", "earrings"],
-        "footwear": ["ethnic sandals"],
-        "bag": ["clutch purse", "ethnic handbag"],
+        "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
+        "bag": ["clutch purse", "potli bag", "ethnic handbag"],
+        "bangles": ["bangles", "bracelet bangles"],
+        "earrings": ["jhumka earrings", "ethnic earrings"],
     },
     "ethnic wear": {
         "default": ["footwear", "bag", "bangles", "earrings"],
-        "footwear": ["ethnic sandals"],
-        "bag": ["clutch purse", "handbag"],
+        "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
+        "bag": ["clutch purse", "potli bag", "ethnic handbag"],
+        "bangles": ["bangles", "bracelet bangles"],
+        "earrings": ["jhumka earrings", "ethnic earrings"],
     },
     "kurta set": {
         "default": ["footwear", "bag", "bangles", "earrings"],
-        "footwear": ["ethnic sandals"],
-        "bag": ["clutch purse", "ethnic handbag"],
+        "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
+        "bag": ["clutch purse", "potli bag", "ethnic handbag"],
+        "bangles": ["bangles", "bracelet bangles"],
+        "earrings": ["jhumka earrings", "ethnic earrings"],
     },
     "kurta": {
         "default": ["footwear", "bag", "bangles", "earrings"],
-        "footwear": ["ethnic sandals"],
-        "bag": ["clutch purse", "ethnic handbag"],
+        "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
+        "bag": ["clutch purse", "potli bag", "ethnic handbag"],
+        "bangles": ["bangles", "bracelet bangles"],
+        "earrings": ["jhumka earrings", "ethnic earrings"],
+    },
+    "short kurti": {
+        "default": ["bottom", "footwear", "bangles", "earrings"],
+        "bottom": ["palazzo pants", "leggings", "ethnic skirt"],
+        "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
     },
     "pajamas": {
         "default": ["footwear"],
         "footwear": ["night slippers"],
     },
     "dress": {
-        "casual": ["sandals", "bag", "watch"],
-        "formal": ["heels", "bag", "watch"],
-        "party": ["heels", "bag", "jewellery"],
+        "casual": ["footwear", "bag", "watch"],
+        "formal": ["footwear", "bag", "watch"],
+        "party": ["footwear", "bag", "jewellery"],
         "default": ["footwear", "bag", "watch"],
-        "footwear": ["sandals", "sneakers", "heels"],
-        "accessory": ["watch", "crossbody bag", "handbag"],
-        "bag": ["handbag", "clutch purse"],
-        "watch": ["watch"],
+        "footwear": ["sandals", "ballet flats", "casual sneakers"],
+        "bag": ["crossbody handbag", "tote handbag", "shoulder handbag"],
+        "watch": ["casual watch", "classic analog watch"],
+        "jewellery": ["earrings", "bracelet"],
+    },
+}
+
+# Per-occasion overrides for dresses. Keeping these in the rule configuration
+# means marketplace queries stay fashion-appropriate while still varying per
+# selected product.
+DRESS_STYLE_VARIANTS: dict[str, dict[str, list[str]]] = {
+    "formal": {
+        "footwear": ["heels", "formal flats", "dress sandals"],
+        "bag": ["structured handbag", "elegant shoulder bag", "clutch purse"],
+        "watch": ["classic analog watch", "metal strap watch"],
+    },
+    "party": {
+        "footwear": ["heels", "party sandals", "dress flats"],
+        "bag": ["clutch purse", "party handbag", "mini shoulder bag"],
         "jewellery": ["earrings", "bracelet"],
     },
 }
@@ -143,7 +171,7 @@ LOOK_PROFILES: dict[str, dict[str, list[str]]] = {
 STYLE_SLOT_PREFERENCES: dict[str, dict[str, list[str]]] = {
     "casual": {
         "top":      ["t-shirt", "polo", "sweatshirt"],
-        "bottom":   ["jeans", "chinos", "shorts", "joggers"],
+        "bottom":   ["jeans", "chinos", "joggers"],
         "footwear": ["sneakers", "sandals"],
     },
     "formal": {
@@ -159,12 +187,12 @@ STYLE_SLOT_PREFERENCES: dict[str, dict[str, list[str]]] = {
     },
     "streetwear": {
         "top":      ["t-shirt", "hoodie", "sweatshirt"],
-        "bottom":   ["jeans", "joggers", "shorts"],
+        "bottom":   ["jeans", "joggers", "chinos"],
         "footwear": ["sneakers", "boots"],
     },
     "sporty": {
         "top":      ["t-shirt", "polo", "sweatshirt"],
-        "bottom":   ["shorts", "joggers", "leggings"],
+        "bottom":   ["joggers", "leggings", "track pants"],
         "footwear": ["sneakers"],
     },
     "ethnic": {
@@ -290,9 +318,24 @@ def resolve_outfit_plan(
     normalized_category = (category or "").strip().lower()
     normalized_style = (style or "").strip().lower()
 
-    profile_key = next((key for key in LOOK_PROFILES if key in normalized_category), None)
+    # Men's kurtas/kurtis are styled with a bottom and ethnic footwear only.
+    # Never send women's jewellery, bags, or another kurta.
+    if gender == "men" and "kurta" in normalized_category:
+        return ["bottom", "footwear"], {
+            "bottom": ["jeans", "trousers"],
+            "footwear": ["ethnic sandals", "jutti footwear", "kolhapuri sandals"],
+        }
+
+    # Prefer the most-specific category ("kurta set" before "kurta") so a
+    # broad keyword cannot accidentally select an unsuitable profile.
+    profile_key = next(
+        (key for key in sorted(LOOK_PROFILES, key=len, reverse=True) if key in normalized_category),
+        None,
+    )
     if profile_key:
         profile = LOOK_PROFILES[profile_key].copy()
+        if profile_key == "dress" and normalized_style in DRESS_STYLE_VARIANTS:
+            profile.update(DRESS_STYLE_VARIANTS[normalized_style])
         # A style-specific plan can directly list item categories (e.g. sandals).
         plan = profile.get(normalized_style) or profile["default"]
         if all(item in SLOT_CATEGORIES or item in {"bag", "watch", "belt", "jewellery", "college_bag", "office_bag"} for item in plan):
@@ -307,16 +350,31 @@ def resolve_outfit_plan(
         return slots, profile
 
     slots = resolve_complements(normalized_category)
+    contextual_profile: dict[str, list[str]] = {}
     if gender == "men":
         office_categories = {"shirt", "blazer", "trousers", "pants", "chinos"}
         casual_categories = {"t-shirt", "polo", "hoodie", "sweatshirt", "jeans", "shorts", "joggers"}
         if normalized_style in {"formal", "business casual"} and normalized_category in office_categories:
             # Replace generic accessories with work-appropriate finishing pieces.
             slots = [slot for slot in slots if slot != "accessory"]
-            slots.extend(["watch", "belt", "office_bag"])
+            slots.extend(["watch", "belt"])
+            contextual_profile = {
+                "bottom": ["formal trousers", "formal pants"],
+                "footwear": ["formal shoes", "loafers", "oxford shoes"],
+                "watch": ["classic analog watch", "leather strap watch"],
+                "belt": ["leather belt"],
+            }
         elif normalized_style in {"casual", "streetwear", "sporty"} or normalized_category in casual_categories:
             slots = [slot for slot in slots if slot != "accessory"]
-            slots.extend(["watch", "college_bag"])
+            slots.append("watch")
+            # Casual tees must not inherit the generic casual "shorts" rule.
+            # Their footwear is deliberately restricted to sport/casual shoes.
+            if normalized_category in {"t-shirt", "polo", "hoodie", "sweatshirt"}:
+                contextual_profile = {
+                    "bottom": ["jeans", "chinos", "joggers"],
+                    "footwear": ["sports sneakers", "running shoes", "casual sneakers"],
+                    "watch": ["casual watch", "sports watch", "classic analog watch"],
+                }
 
     # Preserve order while avoiding duplicate rows.
-    return list(dict.fromkeys(slots)), {}
+    return list(dict.fromkeys(slots)), contextual_profile
