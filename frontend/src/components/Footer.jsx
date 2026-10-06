@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 
 const groups = [
   { title: 'Explore', links: [['Home', '/'], ['Categories', '/products'], ['Try On', '/upload']] },
-  { title: 'My Collection', links: [['Wishlist', '/wishlist'], ['Saved Looks', '/saved-looks'], ['Try-On History', '/history']] },
+  { title: 'My Collection', links: [['Wishlist', '/wishlist'], ['Saved Looks', '/saved-looks']] },
   { title: 'Company', links: [['About', '/'], ['How It Works', '/how-it-works'], ['Contact', '/']] },
 ]
 

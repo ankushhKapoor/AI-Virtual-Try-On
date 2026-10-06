@@ -18,7 +18,8 @@ function TryOnResult() {
   const navigate = useNavigate()
   const { tryOnResult, looks, updateLook } = useTryOn()
   const { savedLooks, saveLook, isSaved } = useSavedLooks()
-  const result = savedLooks.find((look) => look.id === id) || (tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id)) || null
+  const sessionResult = tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id)
+  const result = sessionResult || savedLooks.find((look) => look.id === id) || null
 
   if (!result) {
     return (

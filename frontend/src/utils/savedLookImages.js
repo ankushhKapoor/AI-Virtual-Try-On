@@ -15,20 +15,19 @@ function openDatabase() {
   })
 }
 
-async function readPhotoBlob(photo) {
-  if (photo?.file instanceof Blob) return photo.file
-  if (!photo?.previewUrl) return null
+async function readImageBlob(image) {
+  if (image instanceof Blob) return image
+  if (!image) return null
 
-  const response = await fetch(photo.previewUrl)
-  if (!response.ok) throw new Error('Could not preserve the original photo.')
+  const response = await fetch(image)
+  if (!response.ok) throw new Error('Could not preserve this image.')
   return response.blob()
 }
 
-export async function saveOriginalPhoto(lookId, photo) {
-  const blob = await readPhotoBlob(photo)
+async function saveImage(key, image) {
+  const blob = await readImageBlob(image)
   if (!blob) return null
 
-  const key = `before:${lookId}`
   const database = await openDatabase()
   try {
     await new Promise((resolve, reject) => {
@@ -40,6 +39,14 @@ export async function saveOriginalPhoto(lookId, photo) {
   } finally {
     database.close()
   }
+}
+
+export function saveOriginalPhoto(lookId, photo) {
+  return saveImage(`before:${lookId}`, photo?.file || photo?.previewUrl)
+}
+
+export function saveResultImage(lookId, resultImage) {
+  return saveImage(`after:${lookId}`, resultImage)
 }
 
 export async function loadOriginalPhoto(key) {
