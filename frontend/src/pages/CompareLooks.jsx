@@ -31,9 +31,9 @@ function CompareLooks() {
     setSelectedIds((current) => current.includes(lookId) ? current.filter((id) => id !== lookId) : current.length < 4 ? [...current, lookId] : current)
   }
 
-  function saveSessionLook(look) {
-    saveLook({ id: look.id, productId: look.productId, product: look.product, userPhoto: look.userPhoto, resultImage: look.resultImage, createdAt: look.createdAt })
-    updateLook(look.id, { saved: true })
+  async function saveSessionLook(look) {
+    const savedSuccessfully = await saveLook({ id: look.id, productId: look.productId, product: look.product, userPhoto: look.userPhoto, resultImage: look.resultImage, createdAt: look.createdAt })
+    if (savedSuccessfully) updateLook(look.id, { saved: true })
   }
 
   function tryLookAgain(look) {

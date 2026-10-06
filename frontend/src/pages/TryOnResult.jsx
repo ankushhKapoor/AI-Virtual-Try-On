@@ -17,8 +17,8 @@ function TryOnResult() {
   const { id } = useParams()
   const navigate = useNavigate()
   const { tryOnResult, looks, updateLook } = useTryOn()
-  const { saveLook, isSaved } = useSavedLooks()
-  const result = tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id) || null
+  const { savedLooks, saveLook, isSaved } = useSavedLooks()
+  const result = savedLooks.find((look) => look.id === id) || (tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id)) || null
 
   if (!result) {
     return (
@@ -48,8 +48,8 @@ function TryOnResult() {
   const saved = result.saved || isSaved(result.id)
   const otherLooks = looks.filter((look) => look.id !== result.id)
 
-  function handleSave() {
-    saveLook({
+  async function handleSave() {
+    const savedSuccessfully = await saveLook({
       id: result.id,
       productId: result.productId || product.asin || product.id,
       product,
@@ -57,7 +57,7 @@ function TryOnResult() {
       resultImage: result.resultImage,
       createdAt: result.createdAt || new Date().toISOString(),
     })
-    updateLook(result.id, { saved: true })
+    if (savedSuccessfully) updateLook(result.id, { saved: true })
   }
 
   function handleDownload() {

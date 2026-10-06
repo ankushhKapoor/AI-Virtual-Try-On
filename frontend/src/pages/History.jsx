@@ -19,9 +19,9 @@ function History() {
   const sortedHistory = useMemo(() => [...history].sort((first, second) => sort === 'oldest' ? new Date(first.createdAt) - new Date(second.createdAt) : new Date(second.createdAt) - new Date(first.createdAt)), [history, sort])
   const groups = useMemo(() => sortedHistory.reduce((result, look) => { const date = new Date(look.createdAt); const days = Number.isNaN(date.getTime()) ? 999 : Math.floor((Date.now() - date.getTime()) / 86400000); const label = days === 0 ? 'Today' : days === 1 ? 'Yesterday' : days < 7 ? 'This Week' : 'Earlier'; (result[label] ||= []).push(look); return result }, {}), [sortedHistory])
 
-  function saveHistoryLook(look) {
-    saveLook({ id: look.id, productId: look.productId, product: look.product, userPhoto: look.userPhoto, resultImage: look.resultImage, createdAt: look.createdAt })
-    updateHistoryLook(look.id, { saved: true })
+  async function saveHistoryLook(look) {
+    const savedSuccessfully = await saveLook({ id: look.id, productId: look.productId, product: look.product, userPhoto: look.userPhoto, resultImage: look.resultImage, createdAt: look.createdAt })
+    if (savedSuccessfully) updateHistoryLook(look.id, { saved: true })
   }
 
   function tryAgain(look) {
