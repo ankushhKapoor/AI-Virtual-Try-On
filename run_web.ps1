@@ -14,7 +14,11 @@ Write-Host "  Frontend UI:  http://localhost:5173" -ForegroundColor Green
 Write-Host ""
 
 # 1. Start Backend API in a new terminal window
-Start-Process "powershell" -ArgumentList "-NoExit", "-Command", "`$host.ui.RawUI.WindowTitle = 'Backend API (Port 8000)'; cd '$root'; uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload"
+if (Test-Path "$root\venv\Scripts\python.exe") {
+    Start-Process "powershell" -ArgumentList "-NoExit", "-Command", "`$host.ui.RawUI.WindowTitle = 'Backend API (Port 8000)'; cd '$root'; .\venv\Scripts\python.exe -m uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload"
+} else {
+    Start-Process "powershell" -ArgumentList "-NoExit", "-Command", "`$host.ui.RawUI.WindowTitle = 'Backend API (Port 8000)'; cd '$root'; uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000 --reload"
+}
 
 # 2. Start Frontend dev server in a new terminal window
 Start-Process "powershell" -ArgumentList "-NoExit", "-Command", "`$host.ui.RawUI.WindowTitle = 'Frontend UI (Port 5173)'; cd '$root\frontend'; npm run dev"
