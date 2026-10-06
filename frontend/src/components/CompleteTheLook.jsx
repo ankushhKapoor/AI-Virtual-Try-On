@@ -31,6 +31,17 @@ const SLOT_META = {
   outerwear: { label: 'Outerwear',   emoji: '🧥' },
 }
 
+Object.assign(SLOT_META, {
+  bag: { label: 'Bags & Purses', emoji: 'Bag' },
+  watch: { label: 'Watches', emoji: 'Watch' },
+  belt: { label: 'Belts', emoji: 'Belt' },
+  jewellery: { label: 'Jewellery', emoji: 'Jewellery' },
+  bangles: { label: 'Bangles', emoji: 'Jewellery' },
+  earrings: { label: 'Earrings', emoji: 'Jewellery' },
+  college_bag: { label: 'College Bags', emoji: 'Bag' },
+  office_bag: { label: 'Office Bags', emoji: 'Bag' },
+})
+
 function SlotRow({ slot, category, products, onWishlist, onTryOn }) {
   const meta = SLOT_META[slot] || { label: slot, emoji: '•' }
 
@@ -137,7 +148,10 @@ function CompleteTheLook({ product, onWishlist, onTryOn }) {
 
     fetchRecommendations()
     return () => { cancelled = true }
-  }, [product?.asin])
+  // Product detail data can be enriched after the initial ASIN is loaded.
+  // Re-run when those outfit attributes arrive so recommendations never stay
+  // attached to a stale generic category.
+  }, [product?.asin, product?.title, product?.name, product?.category, product?.gender, product?.color])
 
   // ── Loading ──
   if (recommendations === null) {

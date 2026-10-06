@@ -13,6 +13,8 @@ The router is registered in backend/main.py with a single include_router() call.
 
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
 from typing import Any
 
@@ -60,7 +62,7 @@ def get_recommendations(
 
     Pipeline:
       1. Check in-process recommendation cache (ASIN-keyed, 30 min TTL)
-      2. Classify the product via FashionCLIP (or title fallback)
+      2. Classify the product via FashionSigLIP (or title fallback)
       3. Determine outfit slots from compatibility rules
       4. For each slot: build a search query → call the shared product-search
          service (which uses the server-side TTL cache + Oxylabs)
@@ -71,11 +73,16 @@ def get_recommendations(
     """
     product = body.product
     asin    = product.asin.strip().upper()
+    cache_identity = json.dumps({
+        "v": 12, "asin": asin, "title": product.title, "category": product.category,
+        "gender": product.gender, "color": product.color, "domain": product.domain,
+    }, sort_keys=True)
+    cache_key = f"rec-v2:{hashlib.sha256(cache_identity.encode()).hexdigest()}"
 
     # ------------------------------------------------------------------
     # 1. Recommendation cache hit?
     # ------------------------------------------------------------------
-    cached = _rec_cache_get(asin)
+    cached = _rec_cache_get(cache_key)
     if cached is not None:
         _logger.info(
             "[RECOMMENDATIONS] Cache HIT for asin=%s", asin
@@ -131,8 +138,19 @@ def get_recommendations(
                 title=product.title,
             )
 
-        # Merge: prefer Amazon metadata > title fallback > FashionCLIP
-        attributes: dict[str, Any] = {**clip_attrs, **pre_known}
+        # Product taxonomies often contain broad labels such as "Kids",
+        # "Clothing" or "Amazon Fashion". A specific garment found in the
+        # title (frock/dress, t-shirt, saree, etc.) is much more reliable and
+        # must win over those labels. Color and gender supplied by the catalog
+        # remain preferred when present.
+        attributes: dict[str, Any] = {
+            **clip_attrs,
+            "category": title_attrs.get("category") or pre_known.get("category") or clip_attrs.get("category"),
+            "color": pre_known.get("color") or clip_attrs.get("color"),
+            # Title gender (for example "Men's Kurta") is more precise than
+            # broad or incorrect marketplace metadata.
+            "gender": title_attrs.get("gender") or pre_known.get("gender") or clip_attrs.get("gender"),
+        }
 
         _logger.info(
             "[RECOMMENDATIONS] Attributes for asin=%s: %s", asin, attributes
@@ -189,7 +207,7 @@ def get_recommendations(
         "recommendations": recommendations,
     }
 
-    _rec_cache_set(asin, response)
+    _rec_cache_set(cache_key, response)
     _logger.info(
         "[RECOMMENDATIONS] Done for asin=%s — %d slots returned",
         asin, len(recommendations),

@@ -47,6 +47,33 @@ const defaultFilters = {
   size: [],
 }
 
+const colorNames = ['sky blue', 'teal', 'turquoise', 'olive', 'beige', 'cream', 'brown', 'black', 'white', 'grey', 'navy', 'blue', 'green', 'pink', 'peach', 'red', 'maroon', 'burgundy', 'orange', 'yellow', 'mustard', 'purple', 'lavender', 'gold', 'silver', 'multicolor']
+const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL']
+
+function inferColor(product) {
+  const text = `${product.color || ''} ${product.title || ''}`.toLowerCase()
+  const normalized = text.replace(/gray/g, 'grey').replace(/multi[-\s]?colour/g, 'multicolor')
+  return colorNames.find(color => new RegExp(`\\b${color}\\b`, 'i').test(normalized)) || ''
+}
+
+function normaliseSizes(product) {
+  const supplied = Array.isArray(product.sizes) ? product.sizes : []
+  const text = [...supplied, product.title || ''].join(' ').toUpperCase()
+  return sizeOrder.filter(size => new RegExp(`(^|[^A-Z0-9])${size}(?=$|[^A-Z0-9])`).test(text))
+}
+
+function matchesPriceRange(range, price) {
+  if (!Number.isFinite(price) || price <= 0) return false
+  if (range === 'under-300') return price < 300
+  if (range === '300-500') return price >= 300 && price <= 500
+  if (range === '500-1000') return price > 500 && price <= 1000
+  if (range === '1000-1500') return price > 1000 && price <= 1500
+  if (range === '1500-2000') return price > 1500 && price <= 2000
+  if (range === '2000-3000') return price > 2000 && price <= 3000
+  if (range === '3000-5000') return price > 3000 && price <= 5000
+  return range === 'above-5000' && price > 5000
+}
+
 function getInitialSelection(searchParams) {
   const requestedCategory = searchParams.get('category')
   const requestedSubcategory = searchParams.get('subcategory')
@@ -279,8 +306,7 @@ function Products() {
                 gender:
                   product.gender || '',
 
-                color:
-                  product.color || '',
+                color: inferColor(product),
 
                 image:
                   product.image ||
@@ -303,12 +329,7 @@ function Products() {
                 description:
                   product.title,
 
-                sizes:
-                  Array.isArray(
-                    product.sizes
-                  )
-                    ? product.sizes
-                    : [],
+                sizes: normaliseSizes(product),
 
                 rating:
                   typeof product.rating ===
@@ -382,43 +403,16 @@ function Products() {
         product => {
           const priceMatch =
             !filters.price.length ||
-            filters.price.some(range => (
-              (
-                range ===
-                  'under-1000' &&
-                product.price < 1000
-              ) ||
-              (
-                range ===
-                  '1000-2000' &&
-                product.price >= 1000 &&
-                product.price <= 2000
-              ) ||
-              (
-                range ===
-                  '2000-3000' &&
-                product.price > 2000 &&
-                product.price <= 3000
-              ) ||
-              (
-                range ===
-                  'above-3000' &&
-                product.price > 3000
-              )
-            ))
+            filters.price.some(range => matchesPriceRange(range, product.price))
 
           const colorMatch =
             !filters.color.length ||
-            filters.color.includes(
-              product.color
-            )
+            filters.color.includes(product.color.toLowerCase())
 
           const sizeMatch =
             !filters.size.length ||
             filters.size.some(size =>
-              product.sizes.includes(
-                size
-              )
+              product.sizes.includes(size.toUpperCase())
             )
 
           return (
@@ -466,6 +460,12 @@ function Products() {
     filters,
     sort,
   ])
+
+  const availableFilterOptions = useMemo(() => {
+    const colors = [...new Set([...colorNames, ...amazonProducts.map(product => product.color).filter(Boolean)])]
+    const sizes = sizeOrder.filter(size => amazonProducts.some(product => product.sizes.includes(size)))
+    return { colors, sizes }
+  }, [amazonProducts])
 
 
   const activeFilterCount =
@@ -559,6 +559,7 @@ function Products() {
 
             <ProductFilters
               filters={filters}
+              availableOptions={availableFilterOptions}
               onChange={updateFilter}
               onClear={clearAll}
               activeCount={activeFilterCount}

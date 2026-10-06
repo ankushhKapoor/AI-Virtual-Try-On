@@ -1,9 +1,9 @@
 ﻿"""
 backend/recommendation/model.py
 ---------------------------------
-FashionCLIP singleton model manager.
+FashionSigLIP singleton model manager.
 
-Loads `patrickjohncyh/fashion-clip` exactly once (lazy, on first request).
+Loads Marqo FashionSigLIP exactly once (lazy, on first request).
 After loading, the model and processor are kept in memory for all subsequent
 inference calls.
 
@@ -17,20 +17,21 @@ from __future__ import annotations
 
 import concurrent.futures
 import logging
+import os
 import threading
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import torch
-    from transformers import CLIPModel, CLIPProcessor
+    from transformers import AutoModel, AutoProcessor
 
 _logger = logging.getLogger(__name__)
 
-_MODEL_NAME = "patrickjohncyh/fashion-clip"
+_MODEL_NAME = os.getenv("RECOMMENDATION_MODEL", "Marqo/marqo-fashionSigLIP")
 
 # Module-level singletons — populated once by _ensure_loaded()
-_model: "CLIPModel | None" = None
-_processor: "CLIPProcessor | None" = None
+_model: "AutoModel | None" = None
+_processor: "AutoProcessor | None" = None
 _device: "torch.device | None" = None
 _load_lock = threading.Lock()
 _load_failed = False   # Set True if loading fails; stops repeated retries
@@ -90,22 +91,18 @@ def _ensure_loaded() -> bool:
 
         try:
             _logger.info(
-                "[RECOMMENDATION] Loading FashionCLIP (%s) — first request "
+                "[RECOMMENDATION] Loading FashionSigLIP (%s) — first request "
                 "(model will be cached by HuggingFace)...",
                 _MODEL_NAME,
             )
 
             import torch
-            from transformers import CLIPModel, CLIPProcessor
+            from transformers import AutoModel, AutoProcessor
 
             device = _detect_device()
 
-            processor = CLIPProcessor.from_pretrained(
-                _MODEL_NAME,
-                clean_up_tokenization_spaces=True,
-            )
-
-            model = CLIPModel.from_pretrained(_MODEL_NAME)
+            processor = AutoProcessor.from_pretrained(_MODEL_NAME, trust_remote_code=True)
+            model = AutoModel.from_pretrained(_MODEL_NAME, trust_remote_code=True)
             model.to(device)
             model.eval()
 
@@ -121,7 +118,7 @@ def _ensure_loaded() -> bool:
             _device = device
 
             _logger.info(
-                "[RECOMMENDATION] FashionCLIP loaded successfully on %s",
+                "[RECOMMENDATION] FashionSigLIP loaded successfully on %s",
                 device,
             )
             return True
@@ -182,10 +179,9 @@ def get_image_embedding(image):
     import torch
 
     model, processor, device = get_model_and_processor()
-    inputs = processor(images=image, return_tensors="pt").to(device)
+    inputs = processor(images=[image], return_tensors="pt").to(device)
     with torch.no_grad():
-        feats = model.get_image_features(**inputs)
-        feats = feats / feats.norm(dim=-1, keepdim=True)
+        feats = model.get_image_features(inputs["pixel_values"], normalize=True)
     return feats.cpu()
 
 
@@ -197,14 +193,7 @@ def get_text_embedding(text: str):
     import torch
 
     model, processor, device = get_model_and_processor()
-    inputs = processor(
-        text=[text],
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=77,
-    ).to(device)
+    inputs = processor(text=[text], return_tensors="pt", padding="max_length", truncation=True).to(device)
     with torch.no_grad():
-        feats = model.get_text_features(**inputs)
-        feats = feats / feats.norm(dim=-1, keepdim=True)
+        feats = model.get_text_features(inputs["input_ids"], normalize=True)
     return feats.cpu()

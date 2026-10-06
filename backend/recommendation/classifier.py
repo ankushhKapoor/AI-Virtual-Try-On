@@ -1,10 +1,10 @@
 ﻿"""
 backend/recommendation/classifier.py
 --------------------------------------
-Uses FashionCLIP to classify a clothing item from its image URL and/or title.
+Uses FashionSigLIP to classify a clothing item from its image URL and/or title.
 
 Primary path:
-  image URL → PIL.Image → FashionCLIP zero-shot classification → attributes
+  image URL → PIL.Image → FashionSigLIP zero-shot classification → attributes
 
 Fallback (when image is unavailable or download fails):
   product title → keyword/regex parsing → approximate attributes
@@ -38,7 +38,7 @@ CATEGORY_CANDIDATES: list[str] = [
     "t-shirt", "shirt", "blouse", "top", "polo",
     "jacket", "blazer", "coat", "hoodie", "sweatshirt", "cardigan", "sweater",
     "jeans", "trousers", "pants", "shorts", "skirt", "leggings", "chinos", "joggers",
-    "dress", "jumpsuit", "kurta", "ethnic wear", "saree",
+    "dress", "jumpsuit", "kurta", "kurta set", "short kurti", "ethnic wear", "saree", "pajamas",
     "sneakers", "shoes", "boots", "sandals", "heels", "loafers", "formal shoes",
     "bag", "handbag", "watch", "belt", "hat", "sunglasses", "accessories",
 ]
@@ -93,7 +93,7 @@ def _classify_candidates(
     candidates: list[str],
 ) -> tuple[str, float]:
     """
-    Run FashionCLIP zero-shot classification on `image` with `candidates`.
+    Run FashionSigLIP zero-shot classification on `image` with `candidates`.
     Returns (best_label, probability).
     Runs inside the dedicated FashionCLIP executor thread.
     """
@@ -102,18 +102,12 @@ def _classify_candidates(
 
     model, processor, device = get_model_and_processor()
 
-    inputs = processor(
-        text=candidates,
-        images=image,
-        return_tensors="pt",
-        padding=True,
-        truncation=True,
-        max_length=77,
-    ).to(device)
+    inputs = processor(text=candidates, images=[image], return_tensors="pt", padding="max_length").to(device)
 
     with torch.inference_mode():
-        outputs = model(**inputs)
-        probs = outputs.logits_per_image.softmax(dim=1)[0]
+        image_features = model.get_image_features(inputs["pixel_values"], normalize=True)
+        text_features = model.get_text_features(inputs["input_ids"], normalize=True)
+        probs = (100.0 * image_features @ text_features.T).softmax(dim=1)[0]
 
     best_idx = int(probs.argmax())
     return candidates[best_idx], float(probs[best_idx])
@@ -121,15 +115,35 @@ def _classify_candidates(
 
 def _classify_all_attributes(image) -> dict:
     """
-    Run all four FashionCLIP classification calls in sequence
+    Run all four FashionSigLIP classification calls in sequence
     inside the dedicated executor thread. Returns a dict of results.
     This batches all calls into a single executor submission to
     avoid repeated thread-hop overhead.
     """
-    cat,  cat_conf = _classify_candidates(image, CATEGORY_CANDIDATES)
-    col,  _        = _classify_candidates(image, COLOR_CANDIDATES)
-    sty,  _        = _classify_candidates(image, STYLE_CANDIDATES)
-    pat,  _        = _classify_candidates(image, PATTERN_CANDIDATES)
+    # Encode the image once and all labels in one text batch. The prior
+    # implementation made four full image-encoder passes, which was the main
+    # source of delay whenever image fallback was needed.
+    import torch
+    from .model import get_model_and_processor
+
+    model, processor, device = get_model_and_processor()
+    groups = [CATEGORY_CANDIDATES, COLOR_CANDIDATES, STYLE_CANDIDATES, PATTERN_CANDIDATES]
+    labels = [label for group in groups for label in group]
+    inputs = processor(text=labels, images=[image], return_tensors="pt", padding="max_length").to(device)
+    with torch.inference_mode():
+        image_features = model.get_image_features(inputs["pixel_values"], normalize=True)
+        text_features = model.get_text_features(inputs["input_ids"], normalize=True)
+        similarities = 100.0 * image_features @ text_features.T
+
+    start = 0
+    winners: list[tuple[str, float]] = []
+    for group in groups:
+        probabilities = similarities[:, start:start + len(group)].softmax(dim=1)[0]
+        index = int(probabilities.argmax())
+        winners.append((group[index], float(probabilities[index])))
+        start += len(group)
+
+    (cat, cat_conf), (col, _), (sty, _), (pat, _) = winners
     return {
         "category": cat if cat_conf >= _CONFIDENCE_THRESHOLD else None,
         "color":    col,
@@ -144,12 +158,15 @@ def _classify_all_attributes(image) -> dict:
 # ---------------------------------------------------------------------------
 
 _TITLE_CATEGORY_PATTERNS: list[tuple[re.Pattern, str]] = [
+    (re.compile(r'\bpajamas?\b|\bpyjamas?\b|\bnightwear\b|\bnight suit\b', re.I), "pajamas"),
+    (re.compile(r'\bshort\s+kurti\b|\bshort\s+kurta\b', re.I), "short kurti"),
+    (re.compile(r'\bkurta\s*(?:pant|palazzo|set|with)\b|\bkurti\s*(?:set|with)\b', re.I), "kurta set"),
     (re.compile(r'\bt.?shirt\b', re.I), "t-shirt"),
     (re.compile(r'\bjeans?\b', re.I), "jeans"),
     (re.compile(r'\btrousers?\b', re.I), "trousers"),
     (re.compile(r'\bshorts?\b', re.I), "shorts"),
     (re.compile(r'\bskirt\b', re.I), "skirt"),
-    (re.compile(r'\bdress\b', re.I), "dress"),
+    (re.compile(r'\bdress\b|\bfrock\b|\bgown\b', re.I), "dress"),
     (re.compile(r'\bjacket\b', re.I), "jacket"),
     (re.compile(r'\bblazer\b', re.I), "blazer"),
     (re.compile(r'\bcoat\b', re.I), "coat"),
@@ -157,7 +174,7 @@ _TITLE_CATEGORY_PATTERNS: list[tuple[re.Pattern, str]] = [
     (re.compile(r'\bsweatshirt\b', re.I), "sweatshirt"),
     (re.compile(r'\bsweater\b', re.I), "sweater"),
     (re.compile(r'\bcardigan\b', re.I), "cardigan"),
-    (re.compile(r'\bkurta\b', re.I), "kurta"),
+    (re.compile(r'\bkurta\b|\bkurti\b', re.I), "kurta"),
     (re.compile(r'\bsaree|sari\b', re.I), "saree"),
     (re.compile(r'\bsneakers?\b', re.I), "sneakers"),
     (re.compile(r'\bboots?\b', re.I), "boots"),
@@ -238,11 +255,13 @@ def _parse_title_attributes(title: str) -> dict[str, Any]:
             break
 
     # Style heuristics from title
-    if re.search(r'\bformal\b|\boffice\b|\bbusiness\b', title, re.I):
+    if re.search(r'\bformal\b|\boffice\b|\bbusiness\b|\bprofessional\b|\bworkwear\b', title, re.I):
         attrs["style"] = "formal"
+    elif re.search(r'\bparty\b|\bevening\b|\bwedding\b|\boccasion\b', title, re.I):
+        attrs["style"] = "party"
     elif re.search(r'\bsporty\b|\bsport\b|\bgym\b|\bactive\b', title, re.I):
         attrs["style"] = "sporty"
-    elif re.search(r'\bstreet\b|\burban\b', title, re.I):
+    elif re.search(r'\bstreet\b|\burban\b|\boversi[sz]ed\b|\bbaggy\b', title, re.I):
         attrs["style"] = "streetwear"
     elif re.search(r'\bethnic\b|\bkurta\b|\btraditional\b', title, re.I):
         attrs["style"] = "ethnic"
