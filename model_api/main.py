@@ -38,6 +38,7 @@ else:
     MODEL_CACHE_DIR = Path(os.getenv('HF_HUB_CACHE', '~/.cache/huggingface/hub')).expanduser()
 
 from app.networking import frontend_origins, service_port
+from ai.garment_type import resolve_garment_type
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO)
@@ -137,7 +138,9 @@ async def tryon(
     person_image: UploadFile = File(...),
     cloth_url: Optional[str] = Form(None),
     cloth_image: Optional[UploadFile] = File(None),
-    cloth_type: str = Form('upper'),
+    cloth_type: Optional[str] = Form(None),
+    garment_name: Optional[str] = Form(None),
+    garment_category: Optional[str] = Form(None),
     num_inference_steps: int = Form(50),
     guidance_scale: float = Form(2.5),
     seed: int = Form(42),
@@ -163,6 +166,18 @@ async def tryon(
         except Exception as exc:
             raise HTTPException(status_code=422, detail=f'Invalid cloth image: {exc}') from exc
 
+    resolved_cloth_type = resolve_garment_type(
+        cloth_type,
+        garment_name,
+        garment_category,
+    )
+    logger.info(
+        'Try-on garment type resolved to %s (name=%r, category=%r)',
+        resolved_cloth_type,
+        garment_name,
+        garment_category,
+    )
+
     try:
         service = get_service()
     except RuntimeError as exc:
@@ -175,7 +190,7 @@ async def tryon(
         output = service.try_on(
             person_image=person_pil,
             cloth_image=cloth_pil,
-            cloth_type=cloth_type,
+            cloth_type=resolved_cloth_type,
             num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
             seed=seed,

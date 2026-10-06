@@ -11,6 +11,7 @@ import ProcessingSteps from '../components/tryon/ProcessingSteps'
 import TryOnProgress from '../components/tryon/TryOnProgress'
 import useTryOn from '../hooks/useTryOn'
 import { API_BASE_URL, MODEL_BASE_URL } from '../services/urls'
+import { detectClothType } from '../utils/clothType'
 
 // ── Detect simple device type from UA ────────────────────────
 function detectDeviceType() {
@@ -116,15 +117,10 @@ function Processing() {
         if (!clothImageUrl) throw new Error('No clothing image URL found for this product.')
         formData.append('cloth_url', clothImageUrl)
 
-        const cat = (selectedProduct.category || '').toLowerCase()
-        let clothType = 'upper'
-        if (cat.includes('trouser') || cat.includes('jean') ||
-            cat.includes('pant') || cat.includes('skirt')) {
-          clothType = 'lower'
-        } else if (cat.includes('dress') || cat.includes('overall') || cat.includes('suit')) {
-          clothType = 'overall'
-        }
+        const clothType = detectClothType(selectedProduct)
         formData.append('cloth_type', clothType)
+        formData.append('garment_name', selectedProduct.title || selectedProduct.name || '')
+        formData.append('garment_category', selectedProduct.category || '')
         formData.append('num_inference_steps', '50')
         formData.append('guidance_scale', '2.5')
         formData.append('seed', '42')
