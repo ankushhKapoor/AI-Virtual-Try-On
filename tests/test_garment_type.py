@@ -18,6 +18,14 @@ class GarmentTypeTests(unittest.TestCase):
         ("Men Cotton Pyjamas", "lower"),
         ("Men Linen Blazer", "upper"),
         ("Men Casual Jacket", "upper"),
+        ("Women Straight Kurta", "upper"),
+        ("Women Printed Kurti", "upper"),
+        ("Women Kurta with Pyjama", "overall"),
+        ("Women Kurti Palazzo Set", "overall"),
+        ("Palazo Pants with Kurta", "overall"),
+        ("Embroidered Kurta and Churidar", "overall"),
+        ("Festive Kurti Sharara Set", "overall"),
+        ("Women Anarkali Suit", "overall"),
         ]
         for title, expected in cases:
             with self.subTest(title=title):
