@@ -105,23 +105,20 @@ def _ensure_loaded() -> bool:
             )
 
             import torch
-            from transformers import AutoModel, AutoProcessor
+            from transformers import AutoConfig, AutoModel, AutoProcessor
 
             device = _detect_device()
 
             processor = AutoProcessor.from_pretrained(_MODEL_NAME, trust_remote_code=True)
-            # Marqo FashionSigLIP's trusted model code creates its OpenCLIP
-            # backbone inside ``__init__`` and moves it to the target device.
-            # Transformers' low-memory path initializes that backbone on the
-            # meta device, which makes OpenCLIP's ``model.to(...)`` fail with
-            # "Cannot copy out of meta tensor". Load this custom model with
-            # real CPU tensors instead; it is deliberately kept on CPU for
-            # post-generation evaluation and recommendation work.
-            model = AutoModel.from_pretrained(
-                _MODEL_NAME,
-                trust_remote_code=True,
-                low_cpu_mem_usage=False,
-            )
+            # Marqo's remote wrapper loads its OpenCLIP weights itself from
+            # ``open_clip_model_name`` in its constructor. Transformers 5's
+            # ``from_pretrained`` creates that custom constructor on the meta
+            # device—even with low_cpu_mem_usage=False—then OpenCLIP fails on
+            # its internal ``model.to(...)``. Build from the downloaded config
+            # instead, which uses normal CPU tensors and still lets Marqo's
+            # wrapper load the cached OpenCLIP checkpoint.
+            config = AutoConfig.from_pretrained(_MODEL_NAME, trust_remote_code=True)
+            model = AutoModel.from_config(config, trust_remote_code=True)
             model.to(device)
             model.eval()
 
