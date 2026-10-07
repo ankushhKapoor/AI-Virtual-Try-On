@@ -110,7 +110,18 @@ def _ensure_loaded() -> bool:
             device = _detect_device()
 
             processor = AutoProcessor.from_pretrained(_MODEL_NAME, trust_remote_code=True)
-            model = AutoModel.from_pretrained(_MODEL_NAME, trust_remote_code=True)
+            # Marqo FashionSigLIP's trusted model code creates its OpenCLIP
+            # backbone inside ``__init__`` and moves it to the target device.
+            # Transformers' low-memory path initializes that backbone on the
+            # meta device, which makes OpenCLIP's ``model.to(...)`` fail with
+            # "Cannot copy out of meta tensor". Load this custom model with
+            # real CPU tensors instead; it is deliberately kept on CPU for
+            # post-generation evaluation and recommendation work.
+            model = AutoModel.from_pretrained(
+                _MODEL_NAME,
+                trust_remote_code=True,
+                low_cpu_mem_usage=False,
+            )
             model.to(device)
             model.eval()
 
@@ -134,7 +145,7 @@ def _ensure_loaded() -> bool:
         except Exception as exc:
             _load_failed = True
             _logger.error(
-                "[RECOMMENDATION] Failed to load FashionCLIP: %s", exc,
+                "[RECOMMENDATION] Failed to load FashionSigLIP: %s", exc,
                 exc_info=True,
             )
             return False
@@ -159,7 +170,7 @@ def get_model_and_processor():
     """
     if not _ensure_loaded():
         raise RuntimeError(
-            "FashionCLIP model is not available. "
+            "FashionSigLIP model is not available. "
             "Check logs for the original error."
         )
     return _model, _processor, _device
