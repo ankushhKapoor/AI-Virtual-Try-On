@@ -9,10 +9,13 @@ compare the selected product image with the generated garment region.
 
 from __future__ import annotations
 
+import logging
 from typing import Any
 
 import numpy as np
 from PIL import Image
+
+logger = logging.getLogger(__name__)
 
 
 def _as_rgb_array(image: Image.Image) -> np.ndarray:
@@ -122,5 +125,6 @@ def evaluate_tryon(
         except Exception as exc:
             # The semantic model is optional. Its first load/download must not
             # discard preservation metrics or fail a completed try-on.
+            logger.exception("FashionSigLIP garment evaluation failed")
             metrics["garment_siglip_error"] = str(exc)
     return metrics
