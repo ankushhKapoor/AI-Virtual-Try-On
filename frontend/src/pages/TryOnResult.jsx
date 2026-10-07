@@ -20,7 +20,11 @@ function TryOnResult() {
   const { tryOnResult, looks, updateLook } = useTryOn()
   const { savedLooks, saveLook, isSaved } = useSavedLooks()
   const sessionResult = tryOnResult?.id === id ? tryOnResult : looks.find((look) => look.id === id)
-  const result = sessionResult || savedLooks.find((look) => look.id === id) || null
+  const savedResult = savedLooks.find((look) => look.id === id)
+  // A session look references the current upload's temporary blob URL. Once a
+  // different photo is selected that URL is revoked, while the saved look has
+  // its own durable IndexedDB copy. Always render that copy for saved looks.
+  const result = savedResult || sessionResult || null
 
   if (!result) {
     return (
