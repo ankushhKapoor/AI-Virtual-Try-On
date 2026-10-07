@@ -37,6 +37,10 @@ if _configured_cache_dir:
 else:
     MODEL_CACHE_DIR = Path(os.getenv('HF_HUB_CACHE', '~/.cache/huggingface/hub')).expanduser()
 
+# Keep CatVTON's GPU VRAM available. FashionSigLIP is only used after generation
+# to evaluate garment semantic similarity, so its CPU execution is acceptable.
+os.environ.setdefault('RECOMMENDATION_MODEL_DEVICE', 'cpu')
+
 from app.networking import frontend_origins, service_port
 from ai.evaluation import evaluate_tryon
 from ai.garment_type import resolve_garment_type
@@ -207,6 +211,7 @@ async def tryon(
             person_image=output['person_image'],
             result_image=result_image,
             garment_mask=output['garment_mask'],
+            cloth_image=cloth_pil,
         )
     except Exception:
         # Quality reporting must never make an otherwise valid try-on fail.

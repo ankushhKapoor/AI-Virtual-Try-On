@@ -44,6 +44,14 @@ _load_failed = False   # Set True if loading fails; stops repeated retries
 def _detect_device() -> "torch.device":
     import torch
 
+    configured_device = os.getenv(
+        "RECOMMENDATION_MODEL_DEVICE",
+        os.getenv("FASHION_CLIP_DEVICE", ""),
+    ).strip().lower()
+    if configured_device == "cpu":
+        _logger.info("[RECOMMENDATION] FashionSigLIP device=cpu (configured)")
+        return torch.device("cpu")
+
     # Intel XPU (Arc GPU) — requires intel-extension-for-pytorch
     try:
         if hasattr(torch, "xpu") and torch.xpu.is_available():
