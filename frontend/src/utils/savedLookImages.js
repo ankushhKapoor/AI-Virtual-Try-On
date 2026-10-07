@@ -41,6 +41,10 @@ async function saveImage(key, image) {
   }
 }
 
+export function saveImageBlob(key, image) {
+  return saveImage(key, image)
+}
+
 export function saveOriginalPhoto(lookId, photo) {
   return saveImage(`before:${lookId}`, photo?.file || photo?.previewUrl)
 }

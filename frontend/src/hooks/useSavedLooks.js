@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import { deleteOriginalPhoto, loadOriginalPhoto, saveOriginalPhoto, saveResultImage } from '../utils/savedLookImages'
+import { downloadSavedLooksBackup, restoreSavedLooksBackup } from '../utils/savedLookTransfer'
 
 const storageKey = 'vesta_saved_looks'
 
@@ -146,6 +147,14 @@ function useSavedLooks() {
     setSavedLooks((current) => current.filter((item) => item.id !== lookId))
   }, [savedLooks])
 
+  const exportSavedLooks = useCallback(() => downloadSavedLooksBackup(savedLooks), [savedLooks])
+
+  const importSavedLooks = useCallback(async (file) => {
+    const restoredLooks = await restoreSavedLooksBackup(file, savedLooks.map((look) => look.id))
+    if (restoredLooks.length) setSavedLooks((current) => [...current, ...restoredLooks])
+    return restoredLooks.length
+  }, [savedLooks])
+
   const hydratedLooks = savedLooks.map((look) => ({
     ...look,
     userPhoto: photoUrls[look.id]
@@ -154,7 +163,7 @@ function useSavedLooks() {
     resultImage: resultUrls[look.id] || look.resultImage || null,
   }))
 
-  return { savedLooks: hydratedLooks, saveLook, removeSavedLook, isSaved: (lookId) => savedLooks.some((look) => look.id === lookId) }
+  return { savedLooks: hydratedLooks, saveLook, removeSavedLook, exportSavedLooks, importSavedLooks, isSaved: (lookId) => savedLooks.some((look) => look.id === lookId) }
 }
 
 export default useSavedLooks
