@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
+import { Link as LinkIcon } from 'lucide-react'
 
+import Button from '../components/Button'
 import EmptyState from '../components/EmptyState'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
@@ -60,6 +62,41 @@ function normaliseSizes(product) {
   const supplied = Array.isArray(product.sizes) ? product.sizes : []
   const text = [...supplied, product.title || ''].join(' ').toUpperCase()
   return sizeOrder.filter(size => new RegExp(`(^|[^A-Z0-9])${size}(?=$|[^A-Z0-9])`).test(text))
+}
+
+function linkedProductCategory(product) {
+  const categories = Array.isArray(product.categories) ? product.categories : []
+  const labels = [product.category, ...categories].map((item) => {
+    if (typeof item === 'string') return item
+    if (item && typeof item === 'object') return item.name || item.title || ''
+    return ''
+  }).filter(Boolean)
+  return labels.at(-1) || 'Amazon Clothing'
+}
+
+function toLinkedTryOnProduct(product) {
+  const images = Array.isArray(product.images) ? product.images.filter(Boolean) : []
+  const image = product.image || images[0] || null
+  return {
+    id: product.asin,
+    asin: product.asin,
+    name: product.title || 'Amazon Clothing',
+    title: product.title || 'Amazon Clothing',
+    brand: product.brand || '',
+    price: Number(product.price) || 0,
+    currency: product.currency || 'INR',
+    rating: Number(product.rating) || 0,
+    reviewCount: Number(product.reviews_count) || 0,
+    image,
+    images: images.length ? images : image ? [image] : [],
+    url: product.url || '',
+    category: linkedProductCategory(product),
+    description: product.title || '',
+    sizes: normaliseSizes(product),
+    available: product.stock ? true : product.available !== false,
+    stock: product.stock || '',
+    visualClass: 'bg-[#e8e5dc]',
+  }
 }
 
 function matchesPriceRange(range, price) {
@@ -127,6 +164,10 @@ function Products() {
 
   const [error, setError] =
     useState('')
+
+  const [amazonLink, setAmazonLink] = useState('')
+  const [linkError, setLinkError] = useState('')
+  const [linkLoading, setLinkLoading] = useState(false)
 
   const {
     toggleWishlist,
@@ -232,6 +273,40 @@ function Products() {
         replace: true,
       }
     )
+  }
+
+  async function fetchAmazonLink(event) {
+    event.preventDefault()
+    const url = amazonLink.trim()
+    if (!url) {
+      setLinkError('Paste an Amazon clothing product link first.')
+      return
+    }
+
+    setLinkLoading(true)
+    setLinkError('')
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/from-url?url=${encodeURIComponent(url)}`,
+      )
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.detail || 'Unable to fetch this Amazon product.')
+      }
+
+      const product = toLinkedTryOnProduct(data)
+      if (!product.asin || !product.image) {
+        throw new Error('This clothing product does not have an image available for try-on.')
+      }
+      selectProduct(product)
+      navigate('/upload', {
+        state: { productId: product.id, productName: product.name, asin: product.asin, product },
+      })
+    } catch (requestError) {
+      setLinkError(requestError.message || 'Unable to fetch this Amazon product.')
+    } finally {
+      setLinkLoading(false)
+    }
   }
 
 
@@ -524,6 +599,23 @@ function Products() {
             title="Explore Collection"
             description="Discover pieces you can visualize before you buy."
           />
+
+          <section className="mt-8 rounded-md border border-line bg-surface p-5 sm:p-6" aria-labelledby="amazon-link-title">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Try any Amazon clothing item</p>
+              <h2 id="amazon-link-title" className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Paste an Amazon product link</h2>
+              <p className="mt-2 text-sm text-muted">We’ll fetch the clothing item and take you straight to photo upload. Only clothing links are supported.</p>
+            </div>
+            <form onSubmit={fetchAmazonLink} className="mt-4 flex flex-col gap-3 sm:flex-row">
+              <label htmlFor="amazon-product-link" className="sr-only">Amazon clothing product link</label>
+              <div className="relative min-w-0 flex-1">
+                <LinkIcon size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-subtle" aria-hidden="true" />
+                <input id="amazon-product-link" type="url" value={amazonLink} onChange={(event) => setAmazonLink(event.target.value)} placeholder="https://www.amazon.in/dp/..." className="min-h-12 w-full rounded-md border border-line bg-canvas pl-11 pr-4 text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none" />
+              </div>
+              <Button type="submit" loading={linkLoading} disabled={!amazonLink.trim()} className="shrink-0">Fetch Clothing</Button>
+            </form>
+            {linkError ? <p className="mt-3 text-sm font-medium text-danger" role="alert">{linkError}</p> : null}
+          </section>
 
           <div className="mt-10 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
 
