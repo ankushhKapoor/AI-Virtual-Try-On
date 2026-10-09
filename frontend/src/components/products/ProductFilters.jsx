@@ -9,9 +9,6 @@ const priceOptions = [
   { value: '500-1000', label: '₹500–₹1,000' },
   { value: '1000-1500', label: '₹1,000–₹1,500' },
   { value: '1500-2000', label: '₹1,500–₹2,000' },
-  { value: '2000-3000', label: '₹2,000–₹3,000' },
-  { value: '3000-5000', label: '₹3,000–₹5,000' },
-  { value: 'above-5000', label: 'Above ₹5,000' },
 ]
 
 function labelColor(color) {

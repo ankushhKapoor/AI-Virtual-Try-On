@@ -865,6 +865,19 @@ def normalize_search_product(
         "title":
             title,
 
+        # Keep source attributes so the collection's colour and size filters
+        # can normalize real Amazon metadata rather than only guessing from
+        # the listing title.
+        "color":
+            product.get("color")
+            or product.get("colour")
+            or product.get("color_name"),
+
+        "sizes":
+            product.get("sizes")
+            or product.get("size")
+            or [],
+
         "price":
             numeric_price,
 

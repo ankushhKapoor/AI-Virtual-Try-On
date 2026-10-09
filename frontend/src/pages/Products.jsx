@@ -47,19 +47,62 @@ const defaultFilters = {
   size: [],
 }
 
-const colorNames = ['sky blue', 'teal', 'turquoise', 'olive', 'beige', 'cream', 'brown', 'black', 'white', 'grey', 'navy', 'blue', 'green', 'pink', 'peach', 'red', 'maroon', 'burgundy', 'orange', 'yellow', 'mustard', 'purple', 'lavender', 'gold', 'silver', 'multicolor']
-const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL']
+const colorOptions = [
+  { value: 'black', pattern: /\bblack\b/i },
+  { value: 'white', pattern: /\bwhite\b/i },
+  { value: 'blue', pattern: /\b(?:blue|navy|teal|turquoise)\b/i },
+  { value: 'red', pattern: /\b(?:red|maroon|burgundy)\b/i },
+  { value: 'green', pattern: /\b(?:green|olive)\b/i },
+  { value: 'pink', pattern: /\b(?:pink|peach)\b/i },
+  { value: 'yellow', pattern: /\b(?:yellow|mustard|gold)\b/i },
+  { value: 'purple', pattern: /\b(?:purple|lavender)\b/i },
+  { value: 'brown', pattern: /\b(?:brown|beige|cream)\b/i },
+  { value: 'grey', pattern: /\b(?:grey|gray|silver)\b/i },
+  { value: 'multicolor', pattern: /\b(?:multi[-\s]?(?:color|colour)|printed)\b/i },
+]
 
-function inferColor(product) {
-  const text = `${product.color || ''} ${product.title || ''}`.toLowerCase()
-  const normalized = text.replace(/gray/g, 'grey').replace(/multi[-\s]?colour/g, 'multicolor')
-  return colorNames.find(color => new RegExp(`\\b${color}\\b`, 'i').test(normalized)) || ''
+const sizeDefinitions = [
+  { value: 'XXS', pattern: /\b(?:XXS|EXTRA[ -]?EXTRA[ -]?SMALL)\b/i },
+  { value: 'XS', pattern: /\b(?:XS|EXTRA[ -]?SMALL)\b/i },
+  { value: 'S', pattern: /\b(?:S|SMALL)\b/i },
+  { value: 'M', pattern: /\b(?:M|MEDIUM)\b/i },
+  { value: 'L', pattern: /\b(?:L|LARGE)\b/i },
+  { value: 'XL', pattern: /\b(?:XL|X[ -]?LARGE|EXTRA[ -]?LARGE)\b/i },
+  { value: 'XXL', pattern: /\b(?:XXL|2XL|DOUBLE[ -]?XL|2X[ -]?LARGE)\b/i },
+  { value: '3XL', pattern: /\b(?:3XL|3X[ -]?LARGE)\b/i },
+  { value: '4XL', pattern: /\b(?:4XL|4X[ -]?LARGE)\b/i },
+  { value: '5XL', pattern: /\b(?:5XL|5X[ -]?LARGE)\b/i },
+  { value: 'Free Size', pattern: /\b(?:FREE|ONE)[ -]?SIZE\b/i },
+]
+
+const sizeOrder = sizeDefinitions.map(({ value }) => value)
+
+function productFilterText(product) {
+  const values = (value) => {
+    if (Array.isArray(value)) return value.flatMap(values)
+    if (value && typeof value === 'object') return Object.values(value).flatMap(values)
+    return typeof value === 'string' || typeof value === 'number' ? [String(value)] : []
+  }
+  return [
+    ...values(product.color),
+    ...values(product.colour),
+    ...values(product.color_name),
+    ...values(product.size),
+    ...values(product.sizes),
+    ...values(product.title),
+    ...values(product.description),
+    ...values(product.url),
+  ].join(' ').replace(/[_,/|;:()[\]{}]+/g, ' ')
+}
+
+function inferColors(product) {
+  const text = productFilterText(product)
+  return colorOptions.filter(({ pattern }) => pattern.test(text)).map(({ value }) => value)
 }
 
 function normaliseSizes(product) {
-  const supplied = Array.isArray(product.sizes) ? product.sizes : []
-  const text = [...supplied, product.title || ''].join(' ').toUpperCase()
-  return sizeOrder.filter(size => new RegExp(`(^|[^A-Z0-9])${size}(?=$|[^A-Z0-9])`).test(text))
+  const text = productFilterText(product)
+  return sizeDefinitions.filter(({ pattern }) => pattern.test(text)).map(({ value }) => value)
 }
 
 function linkedProductCategory(product) {
@@ -90,6 +133,8 @@ function toLinkedTryOnProduct(product) {
     url: product.url || '',
     category: linkedProductCategory(product),
     description: product.title || '',
+    color: inferColors(product)[0] || '',
+    colors: inferColors(product),
     sizes: normaliseSizes(product),
     available: product.stock ? true : product.available !== false,
     stock: product.stock || '',
@@ -384,7 +429,9 @@ function Products() {
                 gender:
                   product.gender || '',
 
-                color: inferColor(product),
+                color: inferColors(product)[0] || '',
+
+                colors: inferColors(product),
 
                 image:
                   product.image ||
@@ -485,12 +532,12 @@ function Products() {
 
           const colorMatch =
             !filters.color.length ||
-            filters.color.includes(product.color.toLowerCase())
+            filters.color.some(color => product.colors?.includes(color))
 
           const sizeMatch =
             !filters.size.length ||
             filters.size.some(size =>
-              product.sizes.includes(size.toUpperCase())
+              product.sizes.includes(size)
             )
 
           return (
@@ -540,7 +587,8 @@ function Products() {
   ])
 
   const availableFilterOptions = useMemo(() => {
-    const colors = [...new Set([...colorNames, ...amazonProducts.map(product => product.color).filter(Boolean)])]
+    const availableColors = new Set(amazonProducts.flatMap(product => product.colors || []))
+    const colors = colorOptions.map(({ value }) => value).filter(color => availableColors.has(color))
     const sizes = sizeOrder.filter(size => amazonProducts.some(product => product.sizes.includes(size)))
     return { colors, sizes }
   }, [amazonProducts])
