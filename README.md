@@ -118,6 +118,24 @@ Do not create or activate a virtual environment in a subdirectory.
 
 > First run downloads PyTorch (~2 GB). This is automatic.
 
+### Try-on evaluation metrics
+
+Each new try-on reports two source-image diagnostics in the result screen:
+
+- **Overall SSIM** compares the complete generated result with the input photo.
+  It naturally drops when the clothing changes, so it is not a realism score.
+- **Masked background SSIM** compares only pixels outside CatVTON's garment
+  mask, showing whether the person/background was preserved.
+
+For offline evaluation with paired data, the Model API also supports:
+
+- **LPIPS** — add a `ground_truth_image` file to `POST /tryon`; lower is better.
+- **FID** — submit a generated/reference image set to `POST /evaluation/fid`;
+  lower is better. FID is intentionally not calculated for one try-on because
+  it is a distribution-level metric.
+
+Run `uv sync` after pulling these changes to install the LPIPS/FID packages.
+
 ### 5. Install frontend npm packages
 
 ```bash
