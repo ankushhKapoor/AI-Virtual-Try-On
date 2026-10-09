@@ -20,6 +20,10 @@ import {
   Info,
 } from 'lucide-react'
 import Button from '../Button'
+import AprioriStrengthChart from './charts/AprioriStrengthChart'
+import KMeansClusterChart from './charts/KMeansClusterChart'
+import CorrelationsRiskChart from './charts/CorrelationsRiskChart'
+import RollupsTrendChart from './charts/RollupsTrendChart'
 import {
   getDwmStats,
   getDwmApriori,
@@ -625,6 +629,11 @@ export default function DwmDashboardSection({ accessToken }) {
             </div>
           </div>
 
+          {/* Interactive Outfit Pairing Visual Graph */}
+          {!aprioriLoading && aprioriData?.rules?.length > 0 && (
+            <AprioriStrengthChart rules={aprioriData.rules} />
+          )}
+
           {/* Rules Display List */}
           {aprioriLoading ? (
             <div className="space-y-3">
@@ -739,6 +748,16 @@ export default function DwmDashboardSection({ accessToken }) {
               Update Customer Groups ({kmeansK} Profiles)
             </Button>
           </div>
+
+          {/* Interactive Shopper Cluster Map & Base Share */}
+          {!kmeansLoading && kmeansData?.profiles?.length > 0 && (
+            <KMeansClusterChart
+              profiles={kmeansData.profiles}
+              usersSample={kmeansData.users_sample || []}
+              selectedCluster={selectedClusterFilter}
+              onSelectCluster={setSelectedClusterFilter}
+            />
+          )}
 
           {/* Customer Group Profile Cards */}
           {kmeansLoading ? (
@@ -1032,6 +1051,14 @@ export default function DwmDashboardSection({ accessToken }) {
                 </div>
               </div>
 
+              {/* Interactive Risk & Reliability Impact Graph */}
+              {correlationsData?.correlations?.length > 0 && (
+                <CorrelationsRiskChart
+                  correlations={correlationsData.correlations}
+                  selectedDimension={selectedDimension}
+                />
+              )}
+
               {/* Correlation Table */}
               <div className="overflow-x-auto rounded-xl border border-line bg-surface">
                 <table className="w-full text-left text-xs">
@@ -1181,6 +1208,14 @@ export default function DwmDashboardSection({ accessToken }) {
               <p className="text-lg font-bold text-accent">{rollupPeriod === 'daily' ? 'Past 60 Days' : 'Past 7 Months'}</p>
             </div>
           </div>
+
+          {/* Interactive Store Activity Trends Dual-Axis Chart */}
+          {!rollupsLoading && rollupsData?.rollups?.length > 0 && (
+            <RollupsTrendChart
+              rollups={rollupsData.rollups}
+              period={rollupPeriod}
+            />
+          )}
 
           {/* Rollup Records Table */}
           <div className="overflow-x-auto rounded-xl border border-line bg-surface">
