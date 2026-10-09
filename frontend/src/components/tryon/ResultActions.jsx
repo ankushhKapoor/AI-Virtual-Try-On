@@ -50,7 +50,7 @@ function ResultActions({
               : 'Download becomes available when a generated result exists'
           }
         >
-          Download Protected Copy
+          Download Copy
         </Button>
       </div>
     </div>

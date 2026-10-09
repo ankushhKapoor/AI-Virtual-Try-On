@@ -72,8 +72,8 @@ function TryOnResult() {
     try {
       await downloadProtectedTryOn(result.resultImage, result.id)
     } catch (error) {
-      console.error('Unable to create protected try-on download:', error)
-      window.alert(error.message || 'Unable to prepare the protected download.')
+      console.error('Unable to create try-on download copy:', error)
+      window.alert(error.message || 'Unable to prepare the download copy.')
     }
   }
 

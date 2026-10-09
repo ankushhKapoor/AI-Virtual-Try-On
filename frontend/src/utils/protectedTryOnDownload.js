@@ -1,5 +1,6 @@
 const MAX_DOWNLOAD_EDGE = 1280
-const DOWNLOAD_SCALE = 0.72
+const DOWNLOAD_SCALE = 0.5
+const DOWNLOAD_JPEG_QUALITY = 0.5
 
 function loadImage(source) {
   return new Promise((resolve, reject) => {
@@ -14,14 +15,14 @@ function canvasToBlob(canvas) {
   return new Promise((resolve, reject) => {
     canvas.toBlob((blob) => {
       if (blob) resolve(blob)
-      else reject(new Error('The protected download could not be created.'))
-    }, 'image/jpeg', 0.8)
+      else reject(new Error('The download copy could not be created.'))
+    }, 'image/jpeg', DOWNLOAD_JPEG_QUALITY)
   })
 }
 
 /**
  * The displayed try-on remains the original output. Downloads are intentionally
- * rendered as a separate, lower-resolution JPEG with a visible watermark.
+ * rendered as a separate 50%-resolution JPEG with a visible watermark.
  */
 export async function downloadProtectedTryOn(source, lookId = 'look') {
   if (!source) throw new Error('No try-on image is available to download.')
@@ -39,7 +40,7 @@ export async function downloadProtectedTryOn(source, lookId = 'look') {
   canvas.height = height
 
   const context = canvas.getContext('2d')
-  if (!context) throw new Error('Your browser cannot create the protected download.')
+  if (!context) throw new Error('Your browser cannot create the download copy.')
 
   context.fillStyle = '#ffffff'
   context.fillRect(0, 0, width, height)
