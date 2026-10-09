@@ -47,19 +47,99 @@ const defaultFilters = {
   size: [],
 }
 
-const colorNames = ['sky blue', 'teal', 'turquoise', 'olive', 'beige', 'cream', 'brown', 'black', 'white', 'grey', 'navy', 'blue', 'green', 'pink', 'peach', 'red', 'maroon', 'burgundy', 'orange', 'yellow', 'mustard', 'purple', 'lavender', 'gold', 'silver', 'multicolor']
-const sizeOrder = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL', '5XL']
+const colorOptions = [
+  { value: 'black', pattern: /\bblack\b/i },
+  { value: 'white', pattern: /\bwhite\b/i },
+  { value: 'blue', pattern: /\b(?:blue|navy|teal|turquoise)\b/i },
+  { value: 'red', pattern: /\b(?:red|maroon|burgundy)\b/i },
+  { value: 'green', pattern: /\b(?:green|olive)\b/i },
+  { value: 'pink', pattern: /\b(?:pink|peach)\b/i },
+  { value: 'yellow', pattern: /\b(?:yellow|mustard|gold)\b/i },
+  { value: 'purple', pattern: /\b(?:purple|lavender)\b/i },
+  { value: 'brown', pattern: /\b(?:brown|beige|cream)\b/i },
+  { value: 'grey', pattern: /\b(?:grey|gray|silver)\b/i },
+  { value: 'multicolor', pattern: /\b(?:multi[-\s]?(?:color|colour)|printed)\b/i },
+]
 
-function inferColor(product) {
-  const text = `${product.color || ''} ${product.title || ''}`.toLowerCase()
-  const normalized = text.replace(/gray/g, 'grey').replace(/multi[-\s]?colour/g, 'multicolor')
-  return colorNames.find(color => new RegExp(`\\b${color}\\b`, 'i').test(normalized)) || ''
+const sizeDefinitions = [
+  { value: 'XXS', pattern: /\b(?:XXS|EXTRA[ -]?EXTRA[ -]?SMALL)\b/i },
+  { value: 'XS', pattern: /\b(?:XS|EXTRA[ -]?SMALL)\b/i },
+  { value: 'S', pattern: /\b(?:S|SMALL)\b/i },
+  { value: 'M', pattern: /\b(?:M|MEDIUM)\b/i },
+  { value: 'L', pattern: /\b(?:L|LARGE)\b/i },
+  { value: 'XL', pattern: /\b(?:XL|X[ -]?LARGE|EXTRA[ -]?LARGE)\b/i },
+  { value: 'XXL', pattern: /\b(?:XXL|2XL|DOUBLE[ -]?XL|2X[ -]?LARGE)\b/i },
+  { value: '3XL', pattern: /\b(?:3XL|3X[ -]?LARGE)\b/i },
+  { value: '4XL', pattern: /\b(?:4XL|4X[ -]?LARGE)\b/i },
+  { value: '5XL', pattern: /\b(?:5XL|5X[ -]?LARGE)\b/i },
+  { value: 'Free Size', pattern: /\b(?:FREE|ONE)[ -]?SIZE\b/i },
+]
+
+const sizeOrder = sizeDefinitions.map(({ value }) => value)
+
+function productFilterText(product) {
+  const values = (value) => {
+    if (Array.isArray(value)) return value.flatMap(values)
+    if (value && typeof value === 'object') return Object.values(value).flatMap(values)
+    return typeof value === 'string' || typeof value === 'number' ? [String(value)] : []
+  }
+  return [
+    ...values(product.color),
+    ...values(product.colour),
+    ...values(product.color_name),
+    ...values(product.size),
+    ...values(product.sizes),
+    ...values(product.title),
+    ...values(product.description),
+    ...values(product.url),
+  ].join(' ').replace(/[_,/|;:()[\]{}]+/g, ' ')
+}
+
+function inferColors(product) {
+  const text = productFilterText(product)
+  return colorOptions.filter(({ pattern }) => pattern.test(text)).map(({ value }) => value)
 }
 
 function normaliseSizes(product) {
-  const supplied = Array.isArray(product.sizes) ? product.sizes : []
-  const text = [...supplied, product.title || ''].join(' ').toUpperCase()
-  return sizeOrder.filter(size => new RegExp(`(^|[^A-Z0-9])${size}(?=$|[^A-Z0-9])`).test(text))
+  const text = productFilterText(product)
+  return sizeDefinitions.filter(({ pattern }) => pattern.test(text)).map(({ value }) => value)
+}
+
+function linkedProductCategory(product) {
+  const categories = Array.isArray(product.categories) ? product.categories : []
+  const labels = [product.category, ...categories].map((item) => {
+    if (typeof item === 'string') return item
+    if (item && typeof item === 'object') return item.name || item.title || ''
+    return ''
+  }).filter(Boolean)
+  return labels.at(-1) || 'Amazon Clothing'
+}
+
+function toLinkedTryOnProduct(product) {
+  const images = Array.isArray(product.images) ? product.images.filter(Boolean) : []
+  const image = product.image || images[0] || null
+  return {
+    id: product.asin,
+    asin: product.asin,
+    name: product.title || 'Amazon Clothing',
+    title: product.title || 'Amazon Clothing',
+    brand: product.brand || '',
+    price: Number(product.price) || 0,
+    currency: product.currency || 'INR',
+    rating: Number(product.rating) || 0,
+    reviewCount: Number(product.reviews_count) || 0,
+    image,
+    images: images.length ? images : image ? [image] : [],
+    url: product.url || '',
+    category: linkedProductCategory(product),
+    description: product.title || '',
+    color: inferColors(product)[0] || '',
+    colors: inferColors(product),
+    sizes: normaliseSizes(product),
+    available: product.stock ? true : product.available !== false,
+    stock: product.stock || '',
+    visualClass: 'bg-[#e8e5dc]',
+  }
 }
 
 function matchesPriceRange(range, price) {
@@ -128,6 +208,9 @@ function Products() {
   const [error, setError] =
     useState('')
 
+  const [linkError, setLinkError] = useState('')
+  const [linkLoading, setLinkLoading] = useState(false)
+
   const {
     toggleWishlist,
     isWishlisted,
@@ -140,6 +223,7 @@ function Products() {
 
   function updateSearch(value) {
     setSearch(value)
+    setLinkError('')
 
     setSearchParams(
       current => {
@@ -234,6 +318,45 @@ function Products() {
     )
   }
 
+  async function fetchAmazonLink(value) {
+    const url = value.trim()
+    if (!url) {
+      setLinkError('Paste an Amazon clothing product link first.')
+      return
+    }
+
+    setLinkLoading(true)
+    setLinkError('')
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/products/from-url?url=${encodeURIComponent(url)}`,
+      )
+      const data = await response.json().catch(() => ({}))
+      if (!response.ok) {
+        throw new Error(data.detail || 'Unable to fetch this Amazon product.')
+      }
+
+      const product = toLinkedTryOnProduct(data)
+      if (!product.asin || !product.image) {
+        throw new Error('This clothing product does not have an image available for try-on.')
+      }
+      selectProduct(product)
+      navigate('/upload', {
+        state: { productId: product.id, productName: product.name, asin: product.asin, product },
+      })
+    } catch (requestError) {
+      setLinkError(requestError.message || 'Unable to fetch this Amazon product.')
+    } finally {
+      setLinkLoading(false)
+    }
+  }
+
+  function handleSearchSubmit(value) {
+    if (/^https?:\/\/(?:www\.|m\.)?amazon\./i.test(value.trim())) {
+      fetchAmazonLink(value)
+    }
+  }
+
 
   useEffect(() => {
     let cancelled = false
@@ -306,7 +429,9 @@ function Products() {
                 gender:
                   product.gender || '',
 
-                color: inferColor(product),
+                color: inferColors(product)[0] || '',
+
+                colors: inferColors(product),
 
                 image:
                   product.image ||
@@ -407,12 +532,12 @@ function Products() {
 
           const colorMatch =
             !filters.color.length ||
-            filters.color.includes(product.color.toLowerCase())
+            filters.color.some(color => product.colors?.includes(color))
 
           const sizeMatch =
             !filters.size.length ||
             filters.size.some(size =>
-              product.sizes.includes(size.toUpperCase())
+              product.sizes.includes(size)
             )
 
           return (
@@ -462,7 +587,8 @@ function Products() {
   ])
 
   const availableFilterOptions = useMemo(() => {
-    const colors = [...new Set([...colorNames, ...amazonProducts.map(product => product.color).filter(Boolean)])]
+    const availableColors = new Set(amazonProducts.flatMap(product => product.colors || []))
+    const colors = colorOptions.map(({ value }) => value).filter(color => availableColors.has(color))
     const sizes = sizeOrder.filter(size => amazonProducts.some(product => product.sizes.includes(size)))
     return { colors, sizes }
   }, [amazonProducts])
@@ -530,7 +656,8 @@ function Products() {
             <SearchBar
               value={search}
               onChange={updateSearch}
-              placeholder="Search dresses, shirts, jackets..."
+              onSearch={handleSearchSubmit}
+              placeholder="Search for shirts, dresses, etc. or paste any Amazon clothing link"
             />
 
             <ProductSort
@@ -539,6 +666,9 @@ function Products() {
             />
 
           </div>
+
+          {linkLoading ? <p className="mt-3 text-sm font-medium text-muted" role="status">Fetching Amazon clothing item…</p> : null}
+          {linkError ? <p className="mt-3 text-sm font-medium text-danger" role="alert">{linkError}</p> : null}
 
 
           <div className="mt-7">

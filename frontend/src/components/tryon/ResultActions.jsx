@@ -13,16 +13,7 @@ function ResultActions({
   const hasImage = Boolean(result?.resultImage)
 
   function handleDownloadClick() {
-    if (onDownload) {
-      onDownload(result)
-    } else if (result?.resultImage) {
-      const link = document.createElement('a')
-      link.href = result.resultImage
-      link.download = `trayo-tryon-${result.id || 'look'}.png`
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    }
+    if (onDownload) onDownload(result)
   }
 
   return (
@@ -55,11 +46,11 @@ function ResultActions({
           icon={Download}
           title={
             hasImage
-              ? 'Download result locally'
+              ? 'Download a watermarked, reduced-resolution copy'
               : 'Download becomes available when a generated result exists'
           }
         >
-          Download
+          Download Copy
         </Button>
       </div>
     </div>

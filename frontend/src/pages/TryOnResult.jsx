@@ -13,6 +13,7 @@ import TryOnProgress from '../components/tryon/TryOnProgress'
 import EvaluationMetrics from '../components/tryon/EvaluationMetrics'
 import useSavedLooks from '../hooks/useSavedLooks'
 import useTryOn from '../hooks/useTryOn'
+import { downloadProtectedTryOn } from '../utils/protectedTryOnDownload'
 
 function TryOnResult() {
   const { id } = useParams()
@@ -67,14 +68,13 @@ function TryOnResult() {
     if (savedSuccessfully) updateLook(result.id, { saved: true })
   }
 
-  function handleDownload() {
-    if (!result.resultImage) return
-    const link = document.createElement('a')
-    link.href = result.resultImage
-    link.download = `trayo-tryon-${result.id || 'look'}.png`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+  async function handleDownload() {
+    try {
+      await downloadProtectedTryOn(result.resultImage, result.id)
+    } catch (error) {
+      console.error('Unable to create try-on download copy:', error)
+      window.alert(error.message || 'Unable to prepare the download copy.')
+    }
   }
 
   async function handleShare() {

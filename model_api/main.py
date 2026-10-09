@@ -42,7 +42,7 @@ else:
 os.environ.setdefault('RECOMMENDATION_MODEL_DEVICE', 'cpu')
 
 from app.networking import frontend_origins, service_port
-from ai.evaluation import evaluate_tryon
+from ai.evaluation import calculate_fid, evaluate_tryon
 from ai.garment_type import resolve_garment_type
 
 logger = logging.getLogger(__name__)
@@ -111,6 +111,13 @@ def _fetch_image_from_url(url):
         ) from exc
 
 
+async def _read_uploaded_image(upload: UploadFile, label: str) -> Image.Image:
+    try:
+        return Image.open(io.BytesIO(await upload.read())).convert('RGB')
+    except Exception as exc:
+        raise HTTPException(status_code=422, detail=f'Invalid {label} image: {exc}') from exc
+
+
 @app.get('/')
 def root():
     return {
@@ -119,6 +126,7 @@ def root():
         'endpoints': {
             'health': '/health',
             'tryon': 'POST /tryon',
+            'fid_benchmark': 'POST /evaluation/fid',
         },
     }
 
@@ -149,6 +157,7 @@ async def tryon(
     num_inference_steps: int = Form(50),
     guidance_scale: float = Form(2.5),
     seed: int = Form(42),
+    ground_truth_image: Optional[UploadFile] = File(None),
 ):
     if not cloth_url and cloth_image is None:
         raise HTTPException(
@@ -170,6 +179,10 @@ async def tryon(
             cloth_pil = Image.open(io.BytesIO(cloth_bytes)).convert('RGB')
         except Exception as exc:
             raise HTTPException(status_code=422, detail=f'Invalid cloth image: {exc}') from exc
+
+    ground_truth_pil = None
+    if ground_truth_image is not None:
+        ground_truth_pil = await _read_uploaded_image(ground_truth_image, 'ground-truth')
 
     resolved_cloth_type = resolve_garment_type(
         cloth_type,
@@ -212,6 +225,7 @@ async def tryon(
             result_image=result_image,
             garment_mask=output['garment_mask'],
             cloth_image=cloth_pil,
+            ground_truth_image=ground_truth_pil,
         )
     except Exception:
         # Quality reporting must never make an otherwise valid try-on fail.
@@ -226,6 +240,36 @@ async def tryon(
         'image_info': output['image_info'],
         'evaluation_metrics': evaluation_metrics,
     })
+
+
+@app.post('/evaluation/fid')
+async def evaluate_fid_benchmark(
+    generated_images: list[UploadFile] = File(...),
+    ground_truth_images: list[UploadFile] = File(...),
+):
+    """Calculate FID for a generated/reference benchmark image set.
+
+    This deliberately lives outside `/tryon`: FID is a distribution metric and
+    cannot truthfully be reported from a single generated result.
+    """
+    generated = [await _read_uploaded_image(image, 'generated') for image in generated_images]
+    ground_truth = [await _read_uploaded_image(image, 'ground-truth') for image in ground_truth_images]
+    try:
+        fid = calculate_fid(generated, ground_truth)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except Exception as exc:
+        logger.exception('FID benchmark evaluation failed')
+        raise HTTPException(status_code=500, detail=f'FID evaluation failed: {exc}') from exc
+
+    return {
+        'fid': round(fid, 4),
+        'generated_count': len(generated),
+        'ground_truth_count': len(ground_truth),
+        'summary': 'FID over the supplied generated and ground-truth image sets; lower is better.',
+    }
 
 
 if __name__ == '__main__':

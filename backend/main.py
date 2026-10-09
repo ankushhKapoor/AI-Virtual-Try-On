@@ -11,6 +11,7 @@ import requests
 import threading
 import time
 import tempfile
+from urllib.parse import parse_qs, urlparse
 
 
 from pathlib import Path
@@ -204,6 +205,25 @@ _SUPPORTIVE_INNERWEAR_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
+# CatVTON is designed for clothing, not Amazon's wider catalogue. Keep this
+# allow-list deliberately garment-focused so a pasted electronics, beauty, or
+# home-product link cannot be sent to the try-on service.
+_TRYON_CLOTHING_PATTERN = re.compile(
+    r"\b(?:"
+    r"clothing|apparel|garment|outfit|"
+    r"dress(?:es)?|gown(?:s)?|jumpsuit(?:s)?|romper(?:s)?|"
+    r"shirt(?:s)?|t[ -]?shirt(?:s)?|tee(?:s)?|top(?:s)?|blouse(?:s)?|"
+    r"sweater(?:s)?|cardigan(?:s)?|hoodie(?:s)?|sweatshirt(?:s)?|"
+    r"jacket(?:s)?|blazer(?:s)?|coat(?:s)?|overcoat(?:s)?|"
+    r"jeans|denim|trouser(?:s)?|pant(?:s)?|short(?:s)?|skirt(?:s)?|"
+    r"legging(?:s)?|jogger(?:s)?|track ?pant(?:s)?|pajama(?:s)?|pyjama(?:s)?|"
+    r"kurta(?:s)?|kurti(?:s)?|anarkali(?:s)?|saree(?:s)?|sari(?:s)?|"
+    r"lehenga(?:s)?|choli(?:s)?|salwar|kameez|palazzo(?:s)?|plazo(?:s)?|"
+    r"sherwani(?:s)?|dhoti(?:s)?|mundu|lungi(?:s)?|kaftan(?:s)?"
+    r")\b",
+    re.IGNORECASE,
+)
+
 
 def _product_text(value) -> str:
     """Flatten product metadata into searchable text without assuming a schema."""
@@ -233,6 +253,20 @@ def is_restricted_intimate_product(product: dict) -> bool:
         _INTIMATE_APPAREL_PATTERN.search(product_text)
         or _SUPPORTIVE_INNERWEAR_PATTERN.search(product_text)
     )
+
+
+def is_tryon_clothing_product(product: dict) -> bool:
+    """Whether Amazon metadata describes a garment supported by virtual try-on."""
+    if not isinstance(product, dict) or is_restricted_intimate_product(product):
+        return False
+    metadata = (
+        product.get("title"),
+        product.get("category"),
+        product.get("categories"),
+        product.get("category_path"),
+        product.get("product_overview"),
+    )
+    return bool(_TRYON_CLOTHING_PATTERN.search(_product_text(metadata)))
 
 
 def filter_allowed_products(products: list[dict]) -> list[dict]:
@@ -343,6 +377,35 @@ def clean_url(value):
         return url_match.group(0).strip()
 
     return None
+
+
+def parse_amazon_product_url(value: str) -> tuple[str, str]:
+    """Extract an ASIN and supported marketplace from a canonical Amazon URL."""
+    url = clean_url(value)
+    if not url:
+        raise ValueError("Please paste a valid Amazon product link.")
+
+    parsed = urlparse(url)
+    hostname = (parsed.hostname or "").lower()
+    hostname = re.sub(r"^(?:www\.|m\.)", "", hostname)
+    if not hostname.startswith("amazon."):
+        raise ValueError("Please paste a valid Amazon product link.")
+
+    domain = hostname.removeprefix("amazon.")
+    if domain not in ALLOWED_DOMAINS:
+        raise ValueError("This Amazon marketplace is not supported.")
+
+    asin_match = re.search(
+        r"/(?:dp|gp/product|gp/aw/d)/([A-Za-z0-9]{10})(?:/|$)",
+        parsed.path,
+        re.IGNORECASE,
+    )
+    query_asin = parse_qs(parsed.query).get("asin", [None])[0]
+    asin = asin_match.group(1) if asin_match else query_asin
+    if not isinstance(asin, str) or not re.fullmatch(r"[A-Za-z0-9]{10}", asin):
+        raise ValueError("Please paste a valid Amazon product link.")
+
+    return asin.upper(), domain
 
 
 def clean_images(raw_images):
@@ -802,6 +865,19 @@ def normalize_search_product(
         "title":
             title,
 
+        # Keep source attributes so the collection's colour and size filters
+        # can normalize real Amazon metadata rather than only guessing from
+        # the listing title.
+        "color":
+            product.get("color")
+            or product.get("colour")
+            or product.get("color_name"),
+
+        "sizes":
+            product.get("sizes")
+            or product.get("size")
+            or [],
+
         "price":
             numeric_price,
 
@@ -1167,6 +1243,8 @@ def get_product(
 
     geo_location: str = "",
 
+    require_tryon_clothing: bool = False,
+
 ):
 
     asin = asin.strip().upper()
@@ -1220,6 +1298,11 @@ def get_product(
         _logger.info("[CACHE HIT]  /products  key=%s", _key)
         if is_restricted_intimate_product(_hit):
             raise HTTPException(status_code=404, detail="Product is not available.")
+        if require_tryon_clothing and not is_tryon_clothing_product(_hit):
+            raise HTTPException(
+                status_code=422,
+                detail="Please paste a link only for clothes.",
+            )
         return JSONResponse(
             content=_hit,
             headers={"Cache-Control": f"private, max-age={_PRODUCT_TTL}"},
@@ -1277,6 +1360,11 @@ def get_product(
 
     if is_restricted_intimate_product(_body):
         raise HTTPException(status_code=404, detail="Product is not available.")
+    if require_tryon_clothing and not is_tryon_clothing_product(_body):
+        raise HTTPException(
+            status_code=422,
+            detail="Please paste a link only for clothes.",
+        )
 
     _product_cache.set(_key, _body, ttl=_PRODUCT_TTL)
     _logger.info("[CACHE SET]  /products  key=%s  (TTL=%ds)", _key, _PRODUCT_TTL)
@@ -1285,6 +1373,17 @@ def get_product(
         content=_body,
         headers={"Cache-Control": f"private, max-age={_PRODUCT_TTL}"},
     )
+
+
+@app.get("/products/from-url")
+def get_product_from_amazon_url(url: str):
+    """Fetch a try-on-eligible Amazon product from its canonical listing URL."""
+    try:
+        asin, domain = parse_amazon_product_url(url)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+
+    return get_product(asin=asin, domain=domain, require_tryon_clothing=True)
 
 
 def search_products_data(
