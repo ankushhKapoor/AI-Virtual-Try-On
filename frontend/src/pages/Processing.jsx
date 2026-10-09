@@ -55,9 +55,7 @@ async function recordTryOnEvent({ success, failureReason, product, processingTim
       device_type: detectDeviceType(),
       upload_method: uploadMethod,
       processing_time_ms: processingTimeMs ?? null,
-      quality_score: success
-        ? evaluationMetrics?.garment_visual_match ?? evaluationMetrics?.fit_placement_plausibility ?? null
-        : null,
+      quality_score: success ? (evaluationMetrics?.person_background_ssim ?? null) : null,
     }
     await fetch(`${API_BASE_URL}/tryon/record`, {
       method: 'POST',

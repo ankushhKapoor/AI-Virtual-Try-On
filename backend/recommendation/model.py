@@ -201,7 +201,7 @@ def get_image_embedding(image):
     return feats.cpu()
 
 
-def get_text_embedding(text: str | list[str]):
+def get_text_embedding(text: str):
     """
     Return a normalised text embedding tensor for `text`.
     Shape: (1, embedding_dim)
@@ -209,8 +209,7 @@ def get_text_embedding(text: str | list[str]):
     import torch
 
     model, processor, device = get_model_and_processor()
-    texts = [text] if isinstance(text, str) else text
-    inputs = processor(text=texts, return_tensors="pt", padding="max_length", truncation=True).to(device)
+    inputs = processor(text=[text], return_tensors="pt", padding="max_length", truncation=True).to(device)
     with torch.no_grad():
         feats = model.get_text_features(inputs["input_ids"], normalize=True)
     return feats.cpu()

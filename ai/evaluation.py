@@ -3,10 +3,8 @@
 The project has no ground-truth photograph of a person wearing the selected
 garment, so whole-image PSNR/SSIM, LPIPS, FID, and KID would be misleading.
 PSNR and SSIM are measured only outside CatVTON's garment mask, where the
-person and background should remain unchanged. They are retained as diagnostics,
-not presented as an output-quality grade. FashionSigLIP evaluates product
-appearance alignment and an explicitly-labelled fit/placement plausibility
-estimate; neither can replace a human review or ground-truth try-on photo.
+person and background should remain unchanged. FashionSigLIP image embeddings
+compare the selected product image with the generated garment region.
 """
 
 from __future__ import annotations
@@ -80,45 +78,8 @@ def _generated_garment_crop(result_image: Image.Image, garment_mask: Image.Image
     return white_background.crop(crop_box)
 
 
-def _garment_visual_similarity(
-    product_image: Image.Image,
-    generated_garment: Image.Image,
-) -> tuple[float, float, float]:
-    """Compare garment semantics, palette, and fine-detail distribution.
-
-    Product listings often have a different pose/background from the generated
-    look, so this is an appearance-alignment estimate rather than pixel truth.
-    """
-    product = _as_rgb_array(product_image)
-    generated = _as_rgb_array(generated_garment)
-
-    def signature(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-        # Ignore near-white listing/crop background where possible. This makes
-        # the lightweight palette/detail checks focus on the garment itself.
-        saturation = image.max(axis=2) - image.min(axis=2)
-        foreground = (image.min(axis=2) < 0.94) | (saturation > 0.08)
-        if int(foreground.sum()) < 128:
-            foreground = np.ones(image.shape[:2], dtype=bool)
-        pixels = image[foreground]
-        colour = np.concatenate([
-            np.histogram(pixels[:, channel], bins=16, range=(0, 1), density=False)[0]
-            for channel in range(3)
-        ]).astype(np.float64)
-        colour /= max(float(colour.sum()), 1.0)
-
-        grey = image.mean(axis=2)
-        gradient_y, gradient_x = np.gradient(grey)
-        magnitude = np.hypot(gradient_x, gradient_y)[foreground]
-        detail = np.histogram(np.clip(magnitude, 0, 0.5), bins=16, range=(0, 0.5))[0]
-        detail = detail.astype(np.float64)
-        detail /= max(float(detail.sum()), 1.0)
-        return colour, detail
-
-    product_colour, product_detail = signature(product)
-    generated_colour, generated_detail = signature(generated)
-    palette_match = float(np.minimum(product_colour, generated_colour).sum())
-    detail_match = float(np.minimum(product_detail, generated_detail).sum())
-
+def _garment_siglip_similarity(product_image: Image.Image, generated_garment: Image.Image) -> float:
+    """FashionSigLIP cosine similarity of the selected garment and output region."""
     # Reuse the existing FashionSigLIP recommendation model and its serialized
     # inference executor. The Model API configures it for CPU to preserve GPU
     # VRAM for CatVTON.
@@ -129,40 +90,7 @@ def _garment_visual_similarity(
         output_embedding = get_image_embedding(generated_garment)
         return float((product_embedding * output_embedding).sum().item())
 
-    semantic = float(np.clip(_run_in_executor(compare), -1.0, 1.0))
-    # Semantic agreement is useful for garment type/pattern; palette and
-    # detail-distribution terms make texture/colour loss affect the estimate.
-    visual_match = 0.55 * semantic + 0.30 * palette_match + 0.15 * detail_match
-    return float(np.clip(visual_match, 0.0, 1.0)), palette_match, detail_match
-
-
-def _fit_placement_plausibility(result_image: Image.Image) -> float:
-    """Zero-shot FashionSigLIP estimate of natural garment fit and placement."""
-    from backend.recommendation.model import (
-        _run_in_executor,
-        get_image_embedding,
-        get_text_embedding,
-    )
-
-    positive_prompt = "a realistic fashion photo of a person wearing a naturally fitted garment"
-    negative_prompts = (
-        "a person wearing warped and distorted clothing",
-        "a garment floating away from the person's body",
-        "a badly placed and ill-fitting garment on a person",
-    )
-
-    def compare() -> float:
-        image_embedding = get_image_embedding(result_image)
-        text_embeddings = get_text_embedding([positive_prompt, *negative_prompts])
-        similarities = (image_embedding * text_embeddings).sum(dim=1).numpy()
-        # Convert the positive-vs-negative margin into a bounded, readable
-        # estimate. Temperature prevents tiny cosine differences looking like
-        # certainty while still separating clearly implausible outputs.
-        logits = np.asarray(similarities, dtype=np.float64) * 8.0
-        probabilities = np.exp(logits - logits.max())
-        return float(probabilities[0] / probabilities.sum())
-
-    return float(np.clip(_run_in_executor(compare), 0.0, 1.0))
+    return float(np.clip(_run_in_executor(compare), -1.0, 1.0))
 
 
 def evaluate_tryon(
@@ -186,19 +114,13 @@ def evaluate_tryon(
     metrics = {
         "person_background_ssim": round(_masked_ssim(person, result, garment_mask), 4),
         "person_background_psnr_db": round(_masked_psnr(person, result, garment_mask), 2),
-        "method": "masked_diagnostics_fashionsiglip_visual_fit_estimate",
+        "method": "masked_psnr_ssim_and_fashionsiglip",
     }
     if cloth_image is not None:
         try:
             garment_crop = _generated_garment_crop(result_image, garment_mask)
-            garment_match, palette_match, detail_match = _garment_visual_similarity(
-                cloth_image, garment_crop
-            )
-            metrics["garment_visual_match"] = round(garment_match, 4)
-            metrics["garment_palette_match"] = round(palette_match, 4)
-            metrics["garment_detail_match"] = round(detail_match, 4)
-            metrics["fit_placement_plausibility"] = round(
-                _fit_placement_plausibility(result_image), 4
+            metrics["garment_siglip_similarity"] = round(
+                _garment_siglip_similarity(cloth_image, garment_crop), 4
             )
         except Exception as exc:
             # The semantic model is optional. Its first load/download must not
