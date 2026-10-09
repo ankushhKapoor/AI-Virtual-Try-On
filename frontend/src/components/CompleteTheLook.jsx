@@ -24,26 +24,26 @@ import { API_BASE_URL } from '../services/urls'
 
 // Slot display metadata
 const SLOT_META = {
-  top:       { label: 'Tops',        emoji: '👕' },
-  bottom:    { label: 'Bottoms',     emoji: '👖' },
-  footwear:  { label: 'Footwear',    emoji: '👟' },
-  accessory: { label: 'Accessories', emoji: '👜' },
-  outerwear: { label: 'Outerwear',   emoji: '🧥' },
+  top:       { label: 'Tops' },
+  bottom:    { label: 'Bottoms' },
+  footwear:  { label: 'Footwear' },
+  accessory: { label: 'Accessories' },
+  outerwear: { label: 'Outerwear' },
 }
 
 Object.assign(SLOT_META, {
-  bag: { label: 'Bags & Purses', emoji: 'Bag' },
-  watch: { label: 'Watches', emoji: 'Watch' },
-  belt: { label: 'Belts', emoji: 'Belt' },
-  jewellery: { label: 'Jewellery', emoji: 'Jewellery' },
-  bangles: { label: 'Bangles', emoji: 'Jewellery' },
-  earrings: { label: 'Earrings', emoji: 'Jewellery' },
-  college_bag: { label: 'College Bags', emoji: 'Bag' },
-  office_bag: { label: 'Office Bags', emoji: 'Bag' },
+  bag: { label: 'Bags & Purses' },
+  watch: { label: 'Watches' },
+  belt: { label: 'Belts' },
+  jewellery: { label: 'Jewellery' },
+  bangles: { label: 'Bangles' },
+  earrings: { label: 'Earrings' },
+  college_bag: { label: 'College Bags' },
+  office_bag: { label: 'Office Bags' },
 })
 
 function SlotRow({ slot, category, products, onWishlist, onTryOn }) {
-  const meta = SLOT_META[slot] || { label: slot, emoji: '•' }
+  const meta = SLOT_META[slot] || { label: slot }
 
   if (!products || products.length === 0) return null
 
@@ -67,14 +67,10 @@ function SlotRow({ slot, category, products, onWishlist, onTryOn }) {
   return (
     <div className="mb-10">
       {/* Slot heading */}
-      <div className="mb-5 flex items-center gap-2">
-        <span className="text-lg" aria-hidden="true">{meta.emoji}</span>
+      <div className="mb-5">
         <h3 className="text-lg font-semibold tracking-[-0.02em] text-ink">
           {meta.label}
         </h3>
-        <span className="ml-1 rounded-full bg-surface px-2 py-0.5 text-xs font-medium text-muted border border-line">
-          {normalized.length}
-        </span>
       </div>
 
       {/* Product cards grid */}
