@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Link as LinkIcon } from 'lucide-react'
 
-import Button from '../components/Button'
 import EmptyState from '../components/EmptyState'
 import Footer from '../components/Footer'
 import Navbar from '../components/Navbar'
@@ -165,7 +163,6 @@ function Products() {
   const [error, setError] =
     useState('')
 
-  const [amazonLink, setAmazonLink] = useState('')
   const [linkError, setLinkError] = useState('')
   const [linkLoading, setLinkLoading] = useState(false)
 
@@ -181,6 +178,7 @@ function Products() {
 
   function updateSearch(value) {
     setSearch(value)
+    setLinkError('')
 
     setSearchParams(
       current => {
@@ -275,9 +273,8 @@ function Products() {
     )
   }
 
-  async function fetchAmazonLink(event) {
-    event.preventDefault()
-    const url = amazonLink.trim()
+  async function fetchAmazonLink(value) {
+    const url = value.trim()
     if (!url) {
       setLinkError('Paste an Amazon clothing product link first.')
       return
@@ -306,6 +303,12 @@ function Products() {
       setLinkError(requestError.message || 'Unable to fetch this Amazon product.')
     } finally {
       setLinkLoading(false)
+    }
+  }
+
+  function handleSearchSubmit(value) {
+    if (/^https?:\/\/(?:www\.|m\.)?amazon\./i.test(value.trim())) {
+      fetchAmazonLink(value)
     }
   }
 
@@ -600,29 +603,13 @@ function Products() {
             description="Discover pieces you can visualize before you buy."
           />
 
-          <section className="mt-8 rounded-md border border-line bg-surface p-5 sm:p-6" aria-labelledby="amazon-link-title">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-accent">Try any Amazon clothing item</p>
-              <h2 id="amazon-link-title" className="mt-2 text-xl font-semibold tracking-[-0.03em] text-ink">Paste an Amazon product link</h2>
-              <p className="mt-2 text-sm text-muted">We’ll fetch the clothing item and take you straight to photo upload. Only clothing links are supported.</p>
-            </div>
-            <form onSubmit={fetchAmazonLink} className="mt-4 flex flex-col gap-3 sm:flex-row">
-              <label htmlFor="amazon-product-link" className="sr-only">Amazon clothing product link</label>
-              <div className="relative min-w-0 flex-1">
-                <LinkIcon size={18} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-subtle" aria-hidden="true" />
-                <input id="amazon-product-link" type="url" value={amazonLink} onChange={(event) => setAmazonLink(event.target.value)} placeholder="https://www.amazon.in/dp/..." className="min-h-12 w-full rounded-md border border-line bg-canvas pl-11 pr-4 text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none" />
-              </div>
-              <Button type="submit" loading={linkLoading} disabled={!amazonLink.trim()} className="shrink-0">Fetch Clothing</Button>
-            </form>
-            {linkError ? <p className="mt-3 text-sm font-medium text-danger" role="alert">{linkError}</p> : null}
-          </section>
-
           <div className="mt-10 grid gap-3 md:grid-cols-[minmax(0,1fr)_auto]">
 
             <SearchBar
               value={search}
               onChange={updateSearch}
-              placeholder="Search dresses, shirts, jackets..."
+              onSearch={handleSearchSubmit}
+              placeholder="Search for shirts, dresses, etc. or paste any Amazon clothing link"
             />
 
             <ProductSort
@@ -631,6 +618,9 @@ function Products() {
             />
 
           </div>
+
+          {linkLoading ? <p className="mt-3 text-sm font-medium text-muted" role="status">Fetching Amazon clothing item…</p> : null}
+          {linkError ? <p className="mt-3 text-sm font-medium text-danger" role="alert">{linkError}</p> : null}
 
 
           <div className="mt-7">
