@@ -1,7 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Chart } from 'chart.js'
-import './chartSetup'
-import { CLUSTER_PALETTE, defaultTooltipStyle } from './chartSetup'
+import { Chart, CLUSTER_PALETTE, defaultTooltipStyle } from './chartSetup'
 import { Users, PieChart as PieIcon, Crosshair } from 'lucide-react'
 
 export default function KMeansClusterChart({

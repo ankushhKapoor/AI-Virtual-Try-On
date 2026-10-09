@@ -20,7 +20,6 @@ import {
   Info,
 } from 'lucide-react'
 import Button from '../Button'
-import AprioriStrengthChart from './charts/AprioriStrengthChart'
 import KMeansClusterChart from './charts/KMeansClusterChart'
 import CorrelationsRiskChart from './charts/CorrelationsRiskChart'
 import RollupsTrendChart from './charts/RollupsTrendChart'
@@ -628,11 +627,6 @@ export default function DwmDashboardSection({ accessToken }) {
               </button>
             </div>
           </div>
-
-          {/* Interactive Outfit Pairing Visual Graph */}
-          {!aprioriLoading && aprioriData?.rules?.length > 0 && (
-            <AprioriStrengthChart rules={aprioriData.rules} />
-          )}
 
           {/* Rules Display List */}
           {aprioriLoading ? (

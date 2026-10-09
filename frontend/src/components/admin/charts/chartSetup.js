@@ -1,32 +1,6 @@
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-} from 'chart.js'
+import Chart from 'chart.js/auto'
 
-// Register all required Chart.js controllers and plugins
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  BarElement,
-  ArcElement,
-  RadialLinearScale,
-  Title,
-  Tooltip,
-  Legend,
-  Filler
-)
+export { Chart }
 
 // Curated modern color palettes matching the app's clean aesthetic
 export const CHART_COLORS = {

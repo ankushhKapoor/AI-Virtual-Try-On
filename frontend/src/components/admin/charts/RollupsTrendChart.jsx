@@ -1,7 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Chart } from 'chart.js'
-import './chartSetup'
-import { CHART_COLORS, defaultTooltipStyle } from './chartSetup'
+import { Chart, CHART_COLORS, defaultTooltipStyle } from './chartSetup'
 import { TrendingUp, Activity, Zap, Users } from 'lucide-react'
 
 export default function RollupsTrendChart({ rollups = [], period = 'daily' }) {

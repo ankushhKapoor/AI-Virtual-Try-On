@@ -1,7 +1,5 @@
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import { Chart } from 'chart.js'
-import './chartSetup'
-import { defaultTooltipStyle } from './chartSetup'
+import { Chart, defaultTooltipStyle } from './chartSetup'
 import { AlertTriangle, BarChart3, CheckCircle2, Sliders } from 'lucide-react'
 
 export default function CorrelationsRiskChart({ correlations = [], selectedDimension = 'all' }) {
