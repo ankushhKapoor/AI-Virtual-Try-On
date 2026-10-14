@@ -13,6 +13,13 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
     return correlations.filter((c) => c.dimension_name === selectedDimension)
   }, [correlations, selectedDimension])
 
+  // Dynamic chart height based on number of items
+  const chartHeight = useMemo(() => {
+    const minH = 280
+    const perBar = 36
+    return Math.max(minH, filteredItems.length * perBar + 60)
+  }, [filteredItems])
+
   useEffect(() => {
     if (!canvasRef.current || !filteredItems.length) return
 
@@ -21,22 +28,28 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
     }
 
     const ctx = canvasRef.current.getContext('2d')
-    const labels = filteredItems.map((c) => `${c.dimension_value} (${c.dimension_name})`)
+    const labels = filteredItems.map((c) => c.dimension_value)
 
     if (metricView === 'diverging') {
       // Diverging bar chart: correlation_with_failure (-0.20 to +0.20)
       const values = filteredItems.map((c) => Number(c.correlation_with_failure || 0))
+
+      // Create gradient-style colors for a more professional look
       const bgColors = values.map((v) => {
-        if (v < -0.02) return 'rgba(16, 185, 129, 0.85)' // Protective (Green)
-        if (v > 0.04) return 'rgba(225, 29, 72, 0.85)'  // High Risk (Red)
-        if (v > 0) return 'rgba(245, 158, 11, 0.85)'    // Mild Risk (Amber)
-        return 'rgba(100, 116, 139, 0.7)'              // Neutral
+        if (v < -0.03) return 'rgba(16, 185, 129, 0.75)'   // Strong Protective (Green)
+        if (v < -0.01) return 'rgba(52, 211, 153, 0.65)'   // Mild Protective (Light green)
+        if (v > 0.06) return 'rgba(225, 29, 72, 0.80)'     // High Risk (Red)
+        if (v > 0.03) return 'rgba(251, 146, 60, 0.75)'    // Moderate Risk (Orange)
+        if (v > 0) return 'rgba(245, 158, 11, 0.65)'       // Mild Risk (Amber)
+        return 'rgba(148, 163, 184, 0.55)'                 // Neutral (Slate)
       })
       const borderColors = values.map((v) => {
-        if (v < -0.02) return '#059669'
-        if (v > 0.04) return '#b91c1c'
+        if (v < -0.03) return '#059669'
+        if (v < -0.01) return '#34d399'
+        if (v > 0.06) return '#be123c'
+        if (v > 0.03) return '#ea580c'
         if (v > 0) return '#d97706'
-        return '#475569'
+        return '#94a3b8'
       })
 
       chartInstanceRef.current = new Chart(ctx, {
@@ -50,7 +63,9 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
               backgroundColor: bgColors,
               borderColor: borderColors,
               borderWidth: 1.5,
-              borderRadius: 5,
+              borderRadius: 6,
+              borderSkipped: false,
+              barThickness: 22,
             },
           ],
         },
@@ -58,6 +73,13 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 700,
+            easing: 'easeOutQuart',
+          },
+          layout: {
+            padding: { left: 4, right: 16, top: 8, bottom: 8 },
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
@@ -66,7 +88,7 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
                 title: (items) => {
                   const idx = items[0]?.dataIndex ?? 0
                   const item = filteredItems[idx]
-                  return `${item.dimension_value} [${item.dimension_name}]`
+                  return `${item.dimension_value}  •  ${item.dimension_name}`
                 },
                 label: (context) => {
                   const idx = context.dataIndex
@@ -74,11 +96,11 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
                   const corr = context.parsed.x
                   const isProtective = corr < 0
                   return [
-                    `Issue Impact: ${corr > 0 ? '+' : ''}${corr.toFixed(3)} (${isProtective ? 'Protective / Highly Smooth' : corr > 0.04 ? 'Elevated Issue Risk' : 'Normal'})`,
-                    `Success Rate: ${(Number(item.success_rate || 0) * 100).toFixed(1)}%`,
-                    `Issue Rate: ${(Number(item.failure_rate || 0) * 100).toFixed(1)}%`,
-                    `Total Tested Sessions: ${item.total_events?.toLocaleString()}`,
-                    `Risk Multiplier: ${item.relative_risk !== undefined ? `${Number(item.relative_risk).toFixed(2)}x average` : '—'}`,
+                    `  Impact Score: ${corr > 0 ? '+' : ''}${corr.toFixed(3)} (${isProtective ? 'Protective' : corr > 0.04 ? 'Elevated Risk' : 'Normal'})`,
+                    `  Success Rate: ${(Number(item.success_rate || 0) * 100).toFixed(1)}%`,
+                    `  Issue Rate: ${(Number(item.failure_rate || 0) * 100).toFixed(1)}%`,
+                    `  Total Sessions: ${item.total_events?.toLocaleString()}`,
+                    `  Risk Multiplier: ${item.relative_risk !== undefined ? `${Number(item.relative_risk).toFixed(2)}x avg` : '—'}`,
                   ]
                 },
               },
@@ -88,21 +110,30 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
             x: {
               title: {
                 display: true,
-                text: '◄ Lower Risk / Reliable   |   Elevated Issue Risk ►',
-                font: { size: 11, weight: 'bold' },
+                text: '◄  Lower Risk / Reliable   │   Elevated Issue Risk  ►',
+                font: { family: 'Manrope, sans-serif', size: 11, weight: '700' },
                 color: '#68716b',
+                padding: { top: 10 },
               },
               grid: {
-                color: (context) => (context.tick.value === 0 ? '#1f2421' : 'rgba(229, 231, 227, 0.6)'),
+                color: (context) => (context.tick.value === 0 ? '#374151' : 'rgba(229, 231, 227, 0.45)'),
                 lineWidth: (context) => (context.tick.value === 0 ? 2 : 1),
               },
-              ticks: { font: { size: 10 } },
+              border: { display: false },
+              ticks: {
+                font: { family: 'Manrope, sans-serif', size: 10, weight: '600' },
+                color: '#68716b',
+                padding: 4,
+              },
             },
             y: {
               grid: { display: false },
+              border: { display: false },
               ticks: {
-                font: { family: 'Manrope, sans-serif', size: 10, weight: '600' },
+                font: { family: 'Manrope, sans-serif', size: 11, weight: '600' },
                 color: '#1f2421',
+                padding: 8,
+                crossAlign: 'far',
               },
             },
           },
@@ -112,6 +143,22 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
       // Direct Success Rate % Comparison
       const successData = filteredItems.map((c) => Number(((c.success_rate || 0) * 100).toFixed(1)))
 
+      // Gradient-style coloring based on success rate thresholds
+      const bgColors = successData.map((s) => {
+        if (s >= 90) return 'rgba(16, 185, 129, 0.75)'
+        if (s >= 85) return 'rgba(52, 211, 153, 0.65)'
+        if (s >= 78) return 'rgba(245, 158, 11, 0.65)'
+        if (s >= 70) return 'rgba(251, 146, 60, 0.75)'
+        return 'rgba(225, 29, 72, 0.75)'
+      })
+      const borderColors = successData.map((s) => {
+        if (s >= 90) return '#059669'
+        if (s >= 85) return '#34d399'
+        if (s >= 78) return '#d97706'
+        if (s >= 70) return '#ea580c'
+        return '#be123c'
+      })
+
       chartInstanceRef.current = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -120,10 +167,12 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
             {
               label: 'Try-On Success Rate (%)',
               data: successData,
-              backgroundColor: successData.map((s) => (s >= 88 ? 'rgba(16, 185, 129, 0.85)' : s >= 75 ? 'rgba(245, 158, 11, 0.85)' : 'rgba(225, 29, 72, 0.85)')),
-              borderColor: successData.map((s) => (s >= 88 ? '#059669' : s >= 75 ? '#d97706' : '#b91c1c')),
+              backgroundColor: bgColors,
+              borderColor: borderColors,
               borderWidth: 1.5,
-              borderRadius: 5,
+              borderRadius: 6,
+              borderSkipped: false,
+              barThickness: 22,
             },
           ],
         },
@@ -131,18 +180,30 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
           indexAxis: 'y',
           responsive: true,
           maintainAspectRatio: false,
+          animation: {
+            duration: 700,
+            easing: 'easeOutQuart',
+          },
+          layout: {
+            padding: { left: 4, right: 16, top: 8, bottom: 8 },
+          },
           plugins: {
             legend: { display: false },
             tooltip: {
               ...defaultTooltipStyle,
               callbacks: {
+                title: (items) => {
+                  const idx = items[0]?.dataIndex ?? 0
+                  const item = filteredItems[idx]
+                  return `${item.dimension_value}  •  ${item.dimension_name}`
+                },
                 label: (context) => {
                   const idx = context.dataIndex
                   const item = filteredItems[idx]
                   return [
-                    `Success Rate: ${context.parsed.x}%`,
-                    `Issue Rate: ${(Number(item.failure_rate || 0) * 100).toFixed(1)}%`,
-                    `Total Sessions: ${item.total_events?.toLocaleString()}`,
+                    `  Success Rate: ${context.parsed.x}%`,
+                    `  Issue Rate: ${(Number(item.failure_rate || 0) * 100).toFixed(1)}%`,
+                    `  Total Sessions: ${item.total_events?.toLocaleString()}`,
                   ]
                 },
               },
@@ -155,16 +216,29 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
               title: {
                 display: true,
                 text: 'Try-On Success Rate (%)',
-                font: { size: 11, weight: 'bold' },
+                font: { family: 'Manrope, sans-serif', size: 11, weight: '700' },
                 color: '#68716b',
+                padding: { top: 10 },
               },
-              ticks: { callback: (val) => `${val}%`, font: { size: 10 } },
+              grid: {
+                color: 'rgba(229, 231, 227, 0.45)',
+              },
+              border: { display: false },
+              ticks: {
+                callback: (val) => `${val}%`,
+                font: { family: 'Manrope, sans-serif', size: 10, weight: '600' },
+                color: '#68716b',
+                padding: 4,
+              },
             },
             y: {
               grid: { display: false },
+              border: { display: false },
               ticks: {
-                font: { family: 'Manrope, sans-serif', size: 10, weight: '600' },
+                font: { family: 'Manrope, sans-serif', size: 11, weight: '600' },
                 color: '#1f2421',
+                padding: 8,
+                crossAlign: 'far',
               },
             },
           },
@@ -192,7 +266,7 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
             </span>
             <h4 className="text-sm font-bold text-ink">Risk & Reliability Impact Analysis</h4>
             <span className="rounded-full bg-red-50 px-2 py-0.5 text-[10px] font-extrabold uppercase text-red-700">
-              Diverging Impact
+              {metricView === 'diverging' ? 'Diverging Impact' : 'Success Comparison'}
             </span>
           </div>
           <p className="mt-1 text-xs text-muted">
@@ -227,25 +301,29 @@ export default function CorrelationsRiskChart({ correlations = [], selectedDimen
         </div>
       </div>
 
-      {/* Chart Canvas */}
-      <div className="relative mt-4 h-72 w-full">
+      {/* Chart Canvas — Dynamic height based on data */}
+      <div className="relative mt-4 w-full" style={{ height: `${chartHeight}px` }}>
         <canvas ref={canvasRef} />
       </div>
 
       {/* Chart Legend / Guidance strip */}
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-line/60 pt-3 text-[11px] text-muted">
-        <div className="flex items-center gap-4">
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line/60 pt-3 text-[11px] text-muted">
+        <div className="flex items-center gap-5">
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-emerald-500" />
-            <strong className="text-ink">Green (Left)</strong>: High reliability factors (minimal retry rates).
+            <span className="size-2.5 rounded-full bg-emerald-500" />
+            <strong className="text-ink">Green</strong>: High reliability (minimal retries).
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-full bg-red-600" />
-            <strong className="text-ink">Red (Right)</strong>: High friction factors (require better lighting or fit tips).
+            <span className="size-2.5 rounded-full bg-amber-500" />
+            <strong className="text-ink">Amber</strong>: Moderate friction.
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-2.5 rounded-full bg-red-600" />
+            <strong className="text-ink">Red</strong>: Elevated issue risk.
           </span>
         </div>
         <span className="font-semibold text-ink">
-          Showing {filteredItems.length} factors across {selectedDimension === 'all' ? 'All Dimensions' : selectedDimension}
+          {filteredItems.length} factors  •  {selectedDimension === 'all' ? 'All Dimensions' : selectedDimension}
         </span>
       </div>
     </div>

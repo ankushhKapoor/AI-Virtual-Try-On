@@ -23,6 +23,7 @@ import Button from '../Button'
 import KMeansClusterChart from './charts/KMeansClusterChart'
 import CorrelationsRiskChart from './charts/CorrelationsRiskChart'
 import RollupsTrendChart from './charts/RollupsTrendChart'
+import { getClusterTheme } from './charts/chartSetup'
 import {
   getDwmStats,
   getDwmApriori,
@@ -43,7 +44,7 @@ function formatFailureReasons(val) {
 
 export default function DwmDashboardSection({ accessToken }) {
   const [activeTab, setActiveTab] = useState('apriori') // 'apriori', 'kmeans', 'correlations', 'rollups'
-  const [source, setSource] = useState('benchmark_10k') // 'benchmark_10k' or 'live'
+  const [source] = useState('benchmark_10k') // Always use benchmark data
 
   // High-level Stats
   const [stats, setStats] = useState(null)
@@ -334,49 +335,20 @@ export default function DwmDashboardSection({ accessToken }) {
 
   return (
     <section className="mt-12 rounded-xl border border-line bg-surface p-6 shadow-sm sm:p-8" aria-labelledby="dwm-heading">
-      {/* Header & Source Dataset Controls */}
-      <div className="flex flex-col gap-6 border-b border-line pb-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="flex items-center gap-2.5">
-            <span className="inline-flex size-8 items-center justify-center rounded-lg bg-accent text-white">
-              <Cpu size={18} />
-            </span>
-            <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">Store Intelligence & Analytics</p>
-          </div>
-          <h2 id="dwm-heading" className="mt-2 text-2xl font-bold tracking-tight text-ink">
-            Customer & Try-On Analytics Hub
-          </h2>
-          <p className="mt-1 text-sm text-muted">
-            Discover customer shopping patterns, outfit pairings, user segments, and try-on performance trends.
-          </p>
+      {/* Header */}
+      <div className="border-b border-line pb-6">
+        <div className="flex items-center gap-2.5">
+          <span className="inline-flex size-8 items-center justify-center rounded-lg bg-accent text-white">
+            <Cpu size={18} />
+          </span>
+          <p className="text-xs font-bold uppercase tracking-[0.16em] text-accent">Store Intelligence & Analytics</p>
         </div>
-
-        {/* Source Toggle */}
-        <div className="flex flex-wrap items-center gap-3">
-          <span className="text-xs font-semibold text-muted">Data Source:</span>
-          <div className="inline-flex rounded-lg border border-line bg-canvas p-1 text-xs font-semibold">
-            <button
-              onClick={() => setSource('benchmark_10k')}
-              className={`rounded-md px-3 py-1.5 transition-all ${
-                source === 'benchmark_10k'
-                  ? 'bg-accent text-white shadow-sm'
-                  : 'text-muted hover:text-ink'
-              }`}
-            >
-              ⭐ Demo Store Data (10,000 Sessions)
-            </button>
-            <button
-              onClick={() => setSource('live')}
-              className={`rounded-md px-3 py-1.5 transition-all ${
-                source === 'live'
-                  ? 'bg-accent text-white shadow-sm'
-                  : 'text-muted hover:text-ink'
-              }`}
-            >
-              🔄 Live Store Records
-            </button>
-          </div>
-        </div>
+        <h2 id="dwm-heading" className="mt-2 text-2xl font-bold tracking-tight text-ink">
+          Customer & Try-On Analytics Hub
+        </h2>
+        <p className="mt-1 text-sm text-muted">
+          Discover customer shopping patterns, outfit pairings, user segments, and try-on performance trends.
+        </p>
       </div>
 
       {/* Action Toast Feedback */}
@@ -396,18 +368,7 @@ export default function DwmDashboardSection({ accessToken }) {
         </div>
       )}
 
-      {/* Live Store Empty Banner */}
-      {isLiveEmpty && (
-        <div className="mt-4 flex items-start gap-3 rounded-lg border border-amber-500/30 bg-amber-500/10 p-4 text-amber-900">
-          <AlertTriangle className="size-5 shrink-0 text-amber-600 mt-0.5" />
-          <div className="text-xs space-y-1">
-            <p className="font-bold text-sm text-amber-950">No Live Try-On Records Yet</p>
-            <p className="text-amber-800">
-              Your live store currently has no customer try-on sessions recorded. Showing insights from the 10,000 session demo dataset so you can explore the analytics tools. Once customers start using virtual try-on, live data will appear here.
-            </p>
-          </div>
-        </div>
-      )}
+
 
       {/* KPI Overview Cards */}
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
@@ -628,55 +589,63 @@ export default function DwmDashboardSection({ accessToken }) {
             </div>
           </div>
 
-          {/* Rules Display List */}
+          {/* Rules Display Table */}
           {aprioriLoading ? (
             <div className="space-y-3">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-20 animate-pulse rounded-lg bg-canvas" />
+                <div key={i} className="h-14 animate-pulse rounded-lg bg-canvas" />
               ))}
             </div>
           ) : aprioriData?.rules?.length ? (
-            <div className="space-y-3">
-              {aprioriData.rules.map((rule, idx) => (
-                <div
-                  key={idx}
-                  className="flex flex-col justify-between gap-4 rounded-lg border border-line bg-surface p-4 transition-all hover:border-accent/40 hover:shadow-sm sm:flex-row sm:items-center"
-                >
-                  <div className="space-y-1.5">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded bg-accent-soft px-2 py-0.5 text-xs font-bold text-accent">
-                        WHEN A SHOPPER TRIES:
-                      </span>
-                      <span className="font-semibold text-ink">{rule.antecedents}</span>
-                      <span className="text-xs text-muted">({rule.antecedent_categories})</span>
-                      <ArrowRight size={14} className="text-accent" />
-                      <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-bold text-emerald-700">
-                        FREQUENTLY PAIRED WITH:
-                      </span>
-                      <span className="font-semibold text-ink">{rule.consequents}</span>
-                      <span className="text-xs text-muted">({rule.consequent_categories})</span>
-                    </div>
-                    <p className="text-xs text-muted">
-                      Shoppers who try on this item are <strong className="text-ink">{(rule.confidence * 100).toFixed(1)}% likely</strong> to also try the recommended piece (<strong className="text-accent">{rule.lift.toFixed(2)}x stronger pairing</strong> than random chance).
-                    </p>
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-3">
-                    <div className="text-right">
-                      <span className="text-[10px] font-bold uppercase text-muted">Popularity</span>
-                      <p className="text-xs font-bold text-ink">{(rule.support * 100).toFixed(1)}%</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="text-[10px] font-bold uppercase text-muted">Match Chance</span>
-                      <p className="text-xs font-bold text-emerald-600">{(rule.confidence * 100).toFixed(1)}%</p>
-                    </div>
-                    <div className="rounded-lg bg-accent px-3 py-1.5 text-center text-white">
-                      <span className="block text-[10px] font-bold uppercase opacity-80">Pair Strength</span>
-                      <p className="text-sm font-extrabold">{rule.lift.toFixed(2)}x</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-line bg-canvas text-[11px] font-bold uppercase text-muted">
+                    <th className="py-3 px-4 w-8">#</th>
+                    <th className="py-3 px-4">Shopper Tries</th>
+                    <th className="py-3 px-4 text-center w-10"></th>
+                    <th className="py-3 px-4">Frequently Paired With</th>
+                    <th className="py-3 px-4 text-right">Popularity</th>
+                    <th className="py-3 px-4 text-right">Match Chance</th>
+                    <th className="py-3 px-4 text-right">Pair Strength</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {aprioriData.rules.map((rule, idx) => (
+                    <tr key={idx} className="hover:bg-canvas/50 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-muted">{idx + 1}</td>
+                      <td className="py-3 px-4">
+                        <p className="font-semibold text-ink">{rule.antecedents}</p>
+                        <span className="text-[11px] text-muted">{rule.antecedent_categories}</span>
+                      </td>
+                      <td className="py-3 px-4 text-center">
+                        <ArrowRight size={14} className="text-accent mx-auto" />
+                      </td>
+                      <td className="py-3 px-4">
+                        <p className="font-semibold text-ink">{rule.consequents}</p>
+                        <span className="text-[11px] text-muted">{rule.consequent_categories}</span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className="font-bold text-ink">{(rule.support * 100).toFixed(1)}%</span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className="font-bold text-emerald-600">{(rule.confidence * 100).toFixed(1)}%</span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-extrabold ${
+                          rule.lift >= 2.0
+                            ? 'bg-accent text-white'
+                            : rule.lift >= 1.5
+                            ? 'bg-accent-soft text-accent'
+                            : 'bg-emerald-50 text-emerald-700'
+                        }`}>
+                          {rule.lift.toFixed(2)}x
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-line bg-canvas/60 py-10 px-4 text-center">
@@ -762,52 +731,64 @@ export default function DwmDashboardSection({ accessToken }) {
             </div>
           ) : kmeansData?.profiles?.length ? (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {kmeansData.profiles.map((profile) => (
-                <div
-                  key={profile.cluster_id}
-                  onClick={() => setSelectedClusterFilter(selectedClusterFilter === profile.cluster_id ? '' : profile.cluster_id)}
-                  className={`cursor-pointer rounded-xl border p-5 transition-all ${
-                    selectedClusterFilter === profile.cluster_id
-                      ? 'border-accent bg-accent-soft/20 shadow-md ring-2 ring-accent'
-                      : 'border-line bg-surface hover:border-accent/40'
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-2">
-                    <span className="rounded bg-accent px-2 py-0.5 text-[10px] font-extrabold uppercase text-white">
-                      Group {profile.cluster_id}
-                    </span>
-                    <span className="text-xs font-extrabold text-accent">
-                      {profile.pct_of_userbase}% of shoppers
-                    </span>
-                  </div>
+              {kmeansData.profiles.map((profile, pIdx) => {
+                const theme = getClusterTheme(profile, pIdx)
+                const isSelected = selectedClusterFilter === profile.cluster_id
+                return (
+                  <div
+                    key={profile.cluster_id}
+                    onClick={() => setSelectedClusterFilter(isSelected ? '' : profile.cluster_id)}
+                    className={`cursor-pointer rounded-xl border p-5 transition-all ${
+                      isSelected
+                        ? 'shadow-md ring-2'
+                        : 'border-line bg-surface hover:border-slate-300'
+                    }`}
+                    style={{
+                      borderColor: isSelected ? theme.fill : undefined,
+                      backgroundColor: isSelected ? theme.soft : undefined,
+                      boxShadow: isSelected ? `0 0 0 2px ${theme.fill}` : undefined,
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <span
+                        className="rounded px-2 py-0.5 text-[10px] font-extrabold uppercase text-white shadow-xs"
+                        style={{ backgroundColor: theme.fill }}
+                      >
+                        Group {profile.cluster_id}
+                      </span>
+                      <span className="text-xs font-extrabold" style={{ color: theme.fill }}>
+                        {Number(profile.pct_of_userbase).toFixed(1)}% of shoppers
+                      </span>
+                    </div>
 
-                  <h4 className="mt-3 text-sm font-bold text-ink">{profile.cluster_name}</h4>
-                  <p className="mt-1 text-xs text-muted line-clamp-2">{profile.segment_description}</p>
+                    <h4 className="mt-3 text-sm font-bold text-ink">{profile.cluster_name}</h4>
+                    <p className="mt-1 text-xs text-muted line-clamp-2">{profile.segment_description}</p>
 
-                  <div className="mt-4 grid grid-cols-2 gap-2 border-t border-line/60 pt-3 text-xs">
-                    <div>
-                      <span className="text-[10px] font-semibold text-muted">Avg Try-Ons</span>
-                      <p className="font-bold text-ink">{Number(profile.avg_tryons_per_user).toFixed(1)}</p>
+                    <div className="mt-4 grid grid-cols-2 gap-2 border-t border-line/60 pt-3 text-xs">
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted">Avg Try-Ons</span>
+                        <p className="font-bold text-ink">{Number(profile.avg_tryons_per_user).toFixed(1)}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted">Success Rate</span>
+                        <p className="font-bold text-emerald-600">{Number(profile.avg_success_rate_pct).toFixed(1)}%</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted">Photo Quality</span>
+                        <p className="font-bold text-ink">{Number(profile.avg_quality_score).toFixed(2)}</p>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-semibold text-muted">Wishlist Rate</span>
+                        <p className="font-bold text-accent">{Number(profile.avg_wishlist_rate_pct).toFixed(1)}%</p>
+                      </div>
                     </div>
-                    <div>
-                      <span className="text-[10px] font-semibold text-muted">Success Rate</span>
-                      <p className="font-bold text-emerald-600">{Number(profile.avg_success_rate_pct).toFixed(1)}%</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-semibold text-muted">Photo Quality</span>
-                      <p className="font-bold text-ink">{Number(profile.avg_quality_score).toFixed(2)}</p>
-                    </div>
-                    <div>
-                      <span className="text-[10px] font-semibold text-muted">Wishlist Rate</span>
-                      <p className="font-bold text-accent">{Number(profile.avg_wishlist_rate_pct).toFixed(1)}%</p>
+
+                    <div className="mt-3 rounded bg-canvas p-2 text-[11px] text-muted">
+                      <strong className="text-ink">Suggested Strategy:</strong> {profile.recommended_marketing_action}
                     </div>
                   </div>
-
-                  <div className="mt-3 rounded bg-canvas p-2 text-[11px] text-muted">
-                    <strong className="text-ink">Suggested Strategy:</strong> {profile.recommended_marketing_action}
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           ) : (
             <div className="rounded-lg border border-dashed border-line bg-canvas/60 py-10 px-4 text-center">
@@ -881,9 +862,21 @@ export default function DwmDashboardSection({ accessToken }) {
                         <td className="py-2 px-3">{user.avg_quality_score}</td>
                         <td className="py-2 px-3 font-semibold text-accent">{user.wishlist_rate_pct}%</td>
                         <td className="py-2 px-3">
-                          <span className="inline-flex rounded-full bg-accent-soft px-2.5 py-0.5 text-[11px] font-bold text-accent">
-                            {user.cluster_name}
-                          </span>
+                          {(() => {
+                            const userTheme = getClusterTheme(user.cluster_name)
+                            return (
+                              <span
+                                className="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold"
+                                style={{
+                                  backgroundColor: userTheme.badgeBg,
+                                  color: userTheme.badgeText,
+                                  border: `1px solid ${userTheme.badgeBorder}`,
+                                }}
+                              >
+                                {user.cluster_name}
+                              </span>
+                            )
+                          })()}
                         </td>
                       </tr>
                     ))

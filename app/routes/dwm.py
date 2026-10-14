@@ -381,6 +381,21 @@ def run_apriori_mining(
         make_error(status_code=500, detail=f"Apriori rule mining failed: {str(e)}", code="APRIORI_ERROR")
 
 
+def _resolve_cluster_key(name: str) -> str:
+    s = (name or "").lower()
+    if "power" in s or "vip" in s:
+        return "power_shoppers"
+    if "engaged" in s or "explorer" in s:
+        return "engaged_explorers"
+    if "selective" in s or "seeker" in s:
+        return "selective_seekers"
+    if "occasional" in s or "trial" in s or "casual" in s:
+        return "occasional_trial"
+    if "risk" in s or "sensitive" in s or "dormant" in s:
+        return "at_risk"
+    return "power_shoppers"
+
+
 # ─────────────────────────────────────────────────────────────
 # 3. Clustering (K-Means User Segmentation)
 # ─────────────────────────────────────────────────────────────
@@ -415,6 +430,7 @@ def get_kmeans_clusters(
     for p in profiles:
         formatted_profiles.append({
             "cluster_id": int(p["cluster_id"]),
+            "cluster_key": _resolve_cluster_key(p.get("cluster_name", "")),
             "cluster_name": p["cluster_name"],
             "user_count": int(p["user_count"]),
             "pct_of_userbase": float(p["pct_of_userbase"]),
@@ -440,6 +456,7 @@ def get_kmeans_clusters(
             "avg_quality_score": round(float(u["avg_quality_score"]), 2),
             "wishlist_rate_pct": round(float(u["wishlist_rate"]) * 100, 1),
             "cluster_id": int(u["cluster_id"]),
+            "cluster_key": _resolve_cluster_key(u.get("cluster_name", "")),
             "cluster_name": u["cluster_name"],
         })
 
@@ -512,6 +529,7 @@ def run_kmeans_clustering(
                 "avg_quality_score": round(u["avg_quality_score"], 2),
                 "wishlist_rate_pct": round(u["wishlist_rate"] * 100, 1),
                 "cluster_id": u["cluster_id"],
+                "cluster_key": u.get("cluster_key", _resolve_cluster_key(u.get("cluster_name", ""))),
                 "cluster_name": u["cluster_name"],
             }
             for u in user_rows

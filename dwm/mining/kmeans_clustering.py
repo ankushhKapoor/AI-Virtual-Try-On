@@ -278,6 +278,17 @@ def segment_users_kmeans(
         ("Dormant Signups", "Minimal platform interaction post-registration.", "Send targeted win-back campaigns and introductory styling discounts.")
     ]
 
+    cluster_key_map = {}
+    persona_key_dict = {
+        "Power Shoppers (High Frequency VIPs)": "power_shoppers",
+        "Engaged Fashion Explorers": "engaged_explorers",
+        "Selective Style Seekers": "selective_seekers",
+        "Occasional / Trial Users": "occasional_trial",
+        "At-Risk / Sensitive Users": "at_risk",
+        "Casual Window Shoppers": "occasional_trial",
+        "Dormant Signups": "at_risk",
+    }
+
     persona_idx = 0
     for cs in sorted_by_volume:
         cid = cs["cluster_id"]
@@ -287,19 +298,22 @@ def segment_users_kmeans(
 
         if cid == at_risk_cluster_id:
             cluster_name_map[cid] = "At-Risk / Sensitive Users"
+            cluster_key_map[cid] = "at_risk"
             cluster_desc_map[cid] = f"Average {avg_t_fmt} try-ons, {avg_s_fmt} success rate ({100 - cs['avg_success'] * 100:.1f}% failure), and {avg_w_fmt} wishlist rate."
             cluster_action_map[cid] = "Trigger guided photo re-upload assistance modal, lighting checks, and retry apology coupons."
         else:
             p_name, _, p_action = volume_personas[min(persona_idx, len(volume_personas) - 1)]
             persona_idx += 1
             cluster_name_map[cid] = p_name
+            cluster_key_map[cid] = persona_key_dict.get(p_name, f"cluster_{cid}")
             cluster_desc_map[cid] = f"Average {avg_t_fmt} try-ons, {avg_s_fmt} success rate, and {avg_w_fmt} wishlist rate."
             cluster_action_map[cid] = p_action
 
-    # Update user feature rows with names
+    # Update user feature rows with names and stable keys
     for row in user_feature_rows:
         cid = row["cluster_id"]
         row["cluster_name"] = cluster_name_map.get(cid, f"Cluster {cid}")
+        row["cluster_key"] = cluster_key_map.get(cid, f"cluster_{cid}")
 
     # Build cluster profile summaries
     cluster_profiles = []
@@ -314,6 +328,7 @@ def segment_users_kmeans(
 
         cluster_profiles.append({
             "cluster_id": cid,
+            "cluster_key": cluster_key_map.get(cid, f"cluster_{cid}"),
             "cluster_name": cluster_name_map.get(cid, f"Cluster {cid}"),
             "user_count": cnt,
             "pct_of_userbase": pct_base,
