@@ -40,6 +40,7 @@ from dwm.mining.correlation_analysis import (
     generate_and_save_correlations,
 )
 from dwm.mining.rollups import refresh_all_rollups
+from dwm.mining.olap_cube import execute_olap_cube_query, get_olap_filter_options
 
 logger = logging.getLogger("app.routes.dwm")
 
@@ -800,3 +801,107 @@ def refresh_rollups_endpoint(
         "daily": daily,
         "monthly": monthly
     }
+
+
+# ─────────────────────────────────────────────────────────────
+# 5. OLAP Operations (Drill-Down, Roll-Up, Slice & Dice)
+# ─────────────────────────────────────────────────────────────
+class OlapQueryRequest(BaseModel):
+    source: Optional[str] = "benchmark_10k"
+    level: Optional[str] = "month"
+    year: Optional[str] = None
+    month: Optional[str] = None
+    day: Optional[str] = None
+    category: Optional[str] = None
+    color: Optional[str] = None
+    device_type: Optional[str] = None
+    upload_method: Optional[str] = None
+    outcome: Optional[str] = None
+    price_bracket: Optional[str] = None
+    date_from: Optional[str] = None
+    date_to: Optional[str] = None
+    search: Optional[str] = None
+    limit_records: Optional[int] = 40
+
+
+@router.get("/olap/options")
+def get_olap_options(
+    source: Optional[str] = "benchmark_10k",
+    _: Admin = Depends(get_current_admin)
+):
+    """Returns available distinct dimension values for OLAP Slice & Dice filters."""
+    norm_src = normalize_source(source)
+    return get_olap_filter_options(source=norm_src)
+
+
+@router.get("/olap/cube")
+def get_olap_cube(
+    source: Optional[str] = "benchmark_10k",
+    level: Optional[str] = "month",
+    year: Optional[str] = None,
+    month: Optional[str] = None,
+    day: Optional[str] = None,
+    category: Optional[str] = None,
+    color: Optional[str] = None,
+    device_type: Optional[str] = None,
+    upload_method: Optional[str] = None,
+    outcome: Optional[str] = None,
+    price_bracket: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    search: Optional[str] = None,
+    limit_records: int = 40,
+    _: Admin = Depends(get_current_admin)
+):
+    """
+    Executes an interactive OLAP query.
+    - Drill-Down: Pass child level with parent year/month/day.
+    - Roll-Up: Switch level to month or year.
+    - Slice: Pass single dimension constraint (e.g. category=Jackets).
+    - Dice: Pass multiple dimension constraints.
+    """
+    norm_src = normalize_source(source)
+    return execute_olap_cube_query(
+        source=norm_src,
+        level=level,
+        year=year,
+        month=month,
+        day=day,
+        category=category,
+        color=color,
+        device_type=device_type,
+        upload_method=upload_method,
+        outcome=outcome,
+        price_bracket=price_bracket,
+        date_from=date_from,
+        date_to=date_to,
+        search=search,
+        limit_records=limit_records,
+    )
+
+
+@router.post("/olap/cube")
+def post_olap_cube(
+    payload: OlapQueryRequest,
+    _: Admin = Depends(get_current_admin)
+):
+    """JSON POST alternative for multidimensional OLAP slicing and dicing."""
+    norm_src = normalize_source(payload.source)
+    return execute_olap_cube_query(
+        source=norm_src,
+        level=payload.level or "month",
+        year=payload.year,
+        month=payload.month,
+        day=payload.day,
+        category=payload.category,
+        color=payload.color,
+        device_type=payload.device_type,
+        upload_method=payload.upload_method,
+        outcome=payload.outcome,
+        price_bracket=payload.price_bracket,
+        date_from=payload.date_from,
+        date_to=payload.date_to,
+        search=payload.search,
+        limit_records=payload.limit_records or 40,
+    )
+

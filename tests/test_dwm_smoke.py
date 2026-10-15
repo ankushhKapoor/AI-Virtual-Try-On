@@ -253,6 +253,68 @@ def test_rollups_live_empty_dwh_guard():
 
 
 # ─────────────────────────────────────────────────────────────
+# 6. OLAP Operations (Drill-Down, Roll-Up, Slice & Dice) Tests
+# ─────────────────────────────────────────────────────────────
+def test_olap_options_endpoint():
+    resp = client.get("/admin/dwm/olap/options?source=benchmark_10k")
+    assert_clean_response(resp, (200,))
+    data = resp.json()
+    assert "categories" in data and len(data["categories"]) > 0
+    assert "devices" in data and len(data["devices"]) >= 3
+    assert "colors" in data and len(data["colors"]) > 0
+    assert "hierarchy_levels" in data and len(data["hierarchy_levels"]) == 4
+
+
+def test_olap_cube_get_hierarchy():
+    # Test all 4 levels: year, month, day, hour
+    for lvl in ["year", "month", "day", "hour"]:
+        resp = client.get(f"/admin/dwm/olap/cube?source=benchmark_10k&level={lvl}")
+        assert_clean_response(resp, (200,))
+        data = resp.json()
+        assert data["level"] == lvl
+        assert "kpis" in data
+        assert data["kpis"]["total_tryons"] > 0
+        assert "time_series" in data
+        assert "by_category" in data
+        assert "by_device" in data
+        assert "by_outcome" in data
+        assert "sliced_records" in data
+
+
+def test_olap_slice_and_dice():
+    # Slice: single category
+    resp_slice = client.get("/admin/dwm/olap/cube?source=benchmark_10k&category=Jackets")
+    assert_clean_response(resp_slice, (200,))
+    data_slice = resp_slice.json()
+    assert data_slice["active_operation"]["type"] == "SLICE"
+    assert data_slice["total_records_matched"] > 0
+    for r in data_slice["sliced_records"][:10]:
+        assert r["category"].lower() == "jackets"
+
+    # Dice: Category + Device + Outcome
+    payload = {
+        "source": "benchmark_10k",
+        "category": "Jackets",
+        "device_type": "Mobile",
+        "outcome": "SUCCESS",
+    }
+    resp_dice = client.post("/admin/dwm/olap/cube", json=payload)
+    assert_clean_response(resp_dice, (200,))
+    data_dice = resp_dice.json()
+    assert data_dice["active_operation"]["type"] == "DICE"
+    assert data_dice["kpis"]["failed_tryons"] == 0
+    assert data_dice["kpis"]["success_rate_pct"] == 100.0
+
+
+def test_olap_live_empty_dwh_guard():
+    resp = client.get("/admin/dwm/olap/cube?source=live&level=month")
+    assert_clean_response(resp, (200, 400))
+    if resp.status_code == 200:
+        data = resp.json()
+        assert "status" in data
+
+
+# ─────────────────────────────────────────────────────────────
 # Standalone Runner
 # ─────────────────────────────────────────────────────────────
 if __name__ == "__main__":
@@ -275,6 +337,10 @@ if __name__ == "__main__":
         ("GET /admin/dwm/rollups (Monthly: 7 Months)", test_rollups_benchmark_monthly),
         ("POST /admin/dwm/rollups/run (Benchmark)", test_rollups_benchmark_post_run),
         ("Rollups Live DWH Guard (Clean 200/400)", test_rollups_live_empty_dwh_guard),
+        ("GET /admin/dwm/olap/options", test_olap_options_endpoint),
+        ("GET /admin/dwm/olap/cube (Hierarchies: Year/Month/Day/Hour)", test_olap_cube_get_hierarchy),
+        ("OLAP Slice & Dice (Category, Device, Outcome)", test_olap_slice_and_dice),
+        ("OLAP Live DWH Guard (Clean 200/400)", test_olap_live_empty_dwh_guard),
     ]
 
     passed = 0
@@ -298,3 +364,4 @@ if __name__ == "__main__":
 
     if failed > 0:
         sys.exit(1)
+

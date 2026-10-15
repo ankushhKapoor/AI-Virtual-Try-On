@@ -96,6 +96,32 @@ function runDwmRollups(payload, accessToken) {
   })
 }
 
+function getDwmOlapOptions(source = 'benchmark_10k', accessToken) {
+  const query = new URLSearchParams()
+  if (source) query.set('source', source)
+  const qs = query.toString() ? `?${query.toString()}` : ''
+  return request(`/admin/dwm/olap/options${qs}`, { accessToken })
+}
+
+function getDwmOlapCube(params = {}, accessToken) {
+  const query = new URLSearchParams()
+  Object.entries(params).forEach(([key, val]) => {
+    if (val !== undefined && val !== null && val !== '') {
+      query.set(key, val)
+    }
+  })
+  const qs = query.toString() ? `?${query.toString()}` : ''
+  return request(`/admin/dwm/olap/cube${qs}`, { accessToken })
+}
+
+function queryDwmOlapCube(payload, accessToken) {
+  return request('/admin/dwm/olap/cube', {
+    method: 'POST',
+    body: JSON.stringify(payload),
+    accessToken,
+  })
+}
+
 export {
   getAdminStatistics,
   getAdminUsers,
@@ -109,4 +135,7 @@ export {
   runDwmCorrelations,
   getDwmRollups,
   runDwmRollups,
-}
+  getDwmOlapOptions,
+  getDwmOlapCube,
+  queryDwmOlapCube,
+}

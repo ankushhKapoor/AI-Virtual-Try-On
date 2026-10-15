@@ -44,11 +44,13 @@ graph TD
         KMeans["kmeans_clustering.py\n(User Segmentation Clustering)"]
         Correlation["correlation_analysis.py\n(Failure & Quality Analysis)"]
         Rollups["rollups.py\n(Daily & Monthly Time-Series Rollups)"]
+        OLAPCube["olap_cube.py\n(Drill-Down, Roll-Up, Slice & Dice)"]
 
         Fact --> Apriori
         Fact --> KMeans
         Fact --> Correlation
         Fact --> Rollups
+        Fact --> OLAPCube
         
         RulesTable["mining_association_rules"]
         ProfilesTable["mining_kmeans_cluster_profiles"]
@@ -91,7 +93,8 @@ dwm/
     ├── association_rules.py     # Pure-Python Apriori algorithm discovering co-tried products
     ├── kmeans_clustering.py     # K-Means user segmentation with dynamic K & persona labelling
     ├── correlation_analysis.py  # Model failure / quality correlation across dimensions
-    └── rollups.py               # Daily and monthly pre-aggregated OLAP time-series rollups
+    ├── rollups.py               # Daily and monthly pre-aggregated OLAP time-series rollups
+    └── olap_cube.py             # Multidimensional OLAP cube engine (drill-down, roll-up, slice & dice)
 ```
 
 ---
@@ -135,24 +138,50 @@ dwm/
 
 ---
 
-## 4. The 4 Data Mining Techniques
+## 4. The 5 Data Mining & OLAP Techniques
 
 1. **Association Rule Mining (Apriori)**:
    - Module: `dwm/mining/association_rules.py`
    - Purpose: Discovers frequently tried-together apparel itemsets for bundling recommendations.
+   - Output: Mined rules with Support, Confidence, and Lift metrics displayed in an enterprise tabular format with tiered badges ($\ge 2.0\text{x}, \ge 1.5\text{x}$).
 2. **Clustering (K-Means User Segmentation)**:
    - Module: `dwm/mining/kmeans_clustering.py`
-   - Purpose: Partitions user base into behavioral personas (*Power Shoppers VIPs*, *Engaged Explorers*, *Occasional Trial*, *At-Risk / Sensitive*) across try-on volume, success rate, quality, and wishlist rate.
+   - Purpose: Segments shoppers across 4 normalized features (volume, success rate, quality, wishlist adoption) with dynamic $K \in [2, 6]$ and sample silhouette score evaluation ($\bar{s} \in [-1.0, +1.0]$).
+   - 5 Canonical Behavioral Personas & Stable Color Tokens:
+     - **Power Shoppers (High Frequency VIPs)** (`key: power_shoppers`, `#4F46E5` Deep Indigo)
+     - **Engaged Fashion Explorers** (`key: engaged_explorers`, `#0F9D78` Teal Green)
+     - **Selective Style Seekers** (`key: selective_seekers`, `#D97706` Muted Amber)
+     - **Occasional / Trial Users** (`key: occasional_trial`, `#64748B` Slate Blue)
+     - **At-Risk / Sensitive Users** (`key: at_risk`, `#8B5CF6` Muted Plum)
+   - Visualized via an interactive 2D Scatter Map (metric switching, unclipped canvas, translucent points) and a Donut Chart with a custom geometric center text plugin.
 3. **Correlation Analysis**:
    - Module: `dwm/mining/correlation_analysis.py`
-   - Purpose: Pinpoints root causes of AI model failures across devices, upload methods, fabric types, and peak hours.
+   - Purpose: Pinpoints root causes of AI model failures across devices, upload methods, fabric types, and peak hours using Pearson correlation factors ($r$).
 4. **OLAP Time-Series Rollups**:
    - Module: `dwm/mining/rollups.py`
-   - Purpose: Pre-aggregates daily and monthly analytical summaries for rapid executive dashboards.
+   - Purpose: Pre-aggregates daily (60-day) and monthly (7-month) analytical summaries for rapid executive dashboards.
+5. **Multidimensional OLAP Cube Operations (Distributed Across 4 Dedicated Tabs)**:
+   - Module: `dwm/mining/olap_cube.py`
+   - Purpose: Real-time multidimensional analytical processing across hierarchical temporal granularities (Year $\rightarrow$ Month $\rightarrow$ Day $\rightarrow$ Hour) and orthogonal categorical attributes (Category, Color, Device, Upload Method, Outcome, Price Tier).
+   - Distributed into 4 dedicated, non-technical dashboard tabs:
+     - **Tab 5: Timeline Deep Dive** (OLAP Drill-Down from Year to Hour with click-to-zoom charts).
+     - **Tab 6: Period Summaries** (OLAP Roll-Up macro aggregations with comparative period table).
+     - **Tab 7: Filter by Feature** (OLAP Slice single-dimension isolation with 1-click quick presets).
+     - **Tab 8: Multi-Filter Search** (OLAP Dice multi-dimensional subcube extraction with active filter tags).
 
 ---
 
-## 5. How to Run
+## 5. How to Run & Test
+
+### Run Automated Smoke Test Suite
+Validate all analytical endpoints, parameter edges, and empty DWH guards across 22 automated tests:
+```powershell
+# Using uv:
+uv run python tests/test_dwm_smoke.py
+
+# Or using the local virtual environment:
+.\venv\Scripts\python.exe tests/test_dwm_smoke.py
+```
 
 ### Run Standalone Mining & Pipeline Scripts
 ```powershell
@@ -177,4 +206,8 @@ Launch the web interface using:
 ```powershell
 .\run_web.bat
 ```
-Navigate to `http://localhost:5173/admin/login` (Login: `admin@example.com` / *(Configured Admin Password)*) and click **"DWM Data Mining Hub"**.
+Navigate to `http://localhost:5173/admin/login`:
+- **Email**: `admin@example.com`
+- **Password**: `AdminPass123`
+
+Click **"DWM Data Mining Hub"** in the top navigation bar to explore all 8 dedicated analytical modules: tabular outfit pairings (Apriori), behavioral scatter & donut maps (K-Means), failure & quality correlation diagnostics, store activity trends, and the 4 interactive OLAP operations: Drill-Down, Roll-Up, Slice, and Dice.

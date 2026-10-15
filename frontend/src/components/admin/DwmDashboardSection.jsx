@@ -18,11 +18,20 @@ import {
   Cpu,
   ChevronDown,
   Info,
+  ArrowUp,
+  X,
+  RotateCcw,
+  Compass,
+  Calendar,
+  ChevronRight,
+  SlidersHorizontal,
 } from 'lucide-react'
 import Button from '../Button'
 import KMeansClusterChart from './charts/KMeansClusterChart'
 import CorrelationsRiskChart from './charts/CorrelationsRiskChart'
 import RollupsTrendChart from './charts/RollupsTrendChart'
+import OlapDrilldownChart from './charts/OlapDrilldownChart'
+import OlapBreakdownCharts from './charts/OlapBreakdownCharts'
 import { getClusterTheme } from './charts/chartSetup'
 import {
   getDwmStats,
@@ -34,12 +43,248 @@ import {
   runDwmCorrelations,
   getDwmRollups,
   runDwmRollups,
+  getDwmOlapOptions,
+  getDwmOlapCube,
 } from '../../services/adminService'
 
 function formatFailureReasons(val) {
   if (!val) return 'None'
   if (Array.isArray(val)) return val.join(', ')
   return String(val)
+}
+
+function OlapKpiGrid({ kpis }) {
+  return (
+    <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+      <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <div className="flex items-center justify-between text-muted">
+          <span className="text-[11px] font-bold uppercase tracking-wider">Try-On Volume</span>
+          <Sparkles size={16} className="text-accent" />
+        </div>
+        <p className="mt-2 text-2xl font-extrabold text-ink">
+          {kpis?.total_tryons?.toLocaleString() || 0}
+        </p>
+        <span className="text-[11px] text-muted">
+          {kpis?.pct_of_warehouse || 100}% of all sessions
+        </span>
+      </div>
+
+      <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <div className="flex items-center justify-between text-muted">
+          <span className="text-[11px] font-bold uppercase tracking-wider">Success Rate</span>
+          <CheckCircle2 size={16} className="text-emerald-600" />
+        </div>
+        <p className="mt-2 text-2xl font-extrabold text-emerald-600">
+          {kpis?.success_rate_pct || 0}%
+        </p>
+        <span className="text-[11px] text-muted">
+          {kpis?.successful_tryons?.toLocaleString() || 0} successful
+        </span>
+      </div>
+
+      <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <div className="flex items-center justify-between text-muted">
+          <span className="text-[11px] font-bold uppercase tracking-wider">Failure Rate</span>
+          <AlertTriangle size={16} className="text-danger" />
+        </div>
+        <p className="mt-2 text-2xl font-extrabold text-danger">
+          {kpis?.failure_rate_pct || 0}%
+        </p>
+        <span className="text-[11px] text-muted">
+          {kpis?.failed_tryons?.toLocaleString() || 0} issues / retries
+        </span>
+      </div>
+
+      <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <div className="flex items-center justify-between text-muted">
+          <span className="text-[11px] font-bold uppercase tracking-wider">Avg Latency</span>
+          <Clock size={16} className="text-amber-600" />
+        </div>
+        <p className="mt-2 text-2xl font-extrabold text-ink">
+          {((kpis?.avg_processing_time_ms || 0) / 1000).toFixed(2)}s
+        </p>
+        <span className="text-[11px] text-muted">
+          {kpis?.avg_processing_time_ms || 0} ms synthesis
+        </span>
+      </div>
+
+      <div className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+        <div className="flex items-center justify-between text-muted">
+          <span className="text-[11px] font-bold uppercase tracking-wider">Visual Fidelity</span>
+          <Cpu size={16} className="text-accent" />
+        </div>
+        <p className="mt-2 text-2xl font-extrabold text-ink">
+          {kpis?.avg_quality_score || 0}
+        </p>
+        <span className="text-[11px] text-muted">Avg quality / 1.00</span>
+      </div>
+    </div>
+  )
+}
+
+function GranularTryonRecordsTable({
+  records = [],
+  loading = false,
+  page = 1,
+  onPageChange,
+  title = 'Fitting Sessions (Detailed Records)',
+  subtitle = 'Showing individual fitting sessions matching your selected filters.',
+  emptyTitle = 'No Fitting Sessions Match Selected Filters',
+  emptySubtitle = 'Try clearing some filters or clicking Reset.',
+  onReset = null,
+}) {
+  const totalPages = Math.max(1, Math.ceil(records.length / 10))
+  const pageRecords = records.slice((page - 1) * 10, page * 10)
+
+  return (
+    <div className="rounded-xl border border-line bg-surface p-5 shadow-sm space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+        <div>
+          <h4 className="text-sm font-bold text-ink">{title}</h4>
+          <p className="text-xs text-muted">{subtitle}</p>
+        </div>
+        <span className="rounded-md border border-line bg-canvas px-3 py-1 text-xs font-semibold text-muted">
+          {records.length} records loaded in view
+        </span>
+      </div>
+
+      {loading ? (
+        <div className="space-y-2">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="h-10 animate-pulse rounded-lg bg-canvas" />
+          ))}
+        </div>
+      ) : records.length > 0 ? (
+        <div className="overflow-x-auto rounded-lg border border-line">
+          <table className="w-full text-left text-xs">
+            <thead>
+              <tr className="border-b border-line bg-canvas text-[11px] font-bold uppercase text-muted">
+                <th className="py-2.5 px-3">#</th>
+                <th className="py-2.5 px-3">Timestamp</th>
+                <th className="py-2.5 px-3">Shopper</th>
+                <th className="py-2.5 px-3">Garment & ASIN</th>
+                <th className="py-2.5 px-3">Category</th>
+                <th className="py-2.5 px-3">Device / Upload Channel</th>
+                <th className="py-2.5 px-3">Outcome</th>
+                <th className="py-2.5 px-3 text-right">Latency</th>
+                <th className="py-2.5 px-3 text-right">Quality</th>
+                <th className="py-2.5 px-3 text-center">Wishlist</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {pageRecords.map((rec, idx) => (
+                <tr key={idx} className="hover:bg-canvas/50 transition-colors">
+                  <td className="py-2.5 px-3 font-mono font-bold text-muted">
+                    {(page - 1) * 10 + idx + 1}
+                  </td>
+                  <td className="py-2.5 px-3 font-mono text-[11px] text-muted whitespace-nowrap">
+                    {rec.timestamp}
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <p className="font-semibold text-ink">{rec.user_name}</p>
+                    <span className="text-[10px] text-muted">{rec.user_email}</span>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <p className="font-medium text-ink line-clamp-1 max-w-[220px]" title={rec.product_title}>
+                      {rec.product_title}
+                    </p>
+                    <span className="font-mono text-[10px] text-muted">{rec.asin}</span>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span className="inline-flex rounded bg-canvas px-2 py-0.5 text-[11px] font-medium text-muted border border-line">
+                      {rec.category}
+                    </span>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span className="font-medium text-ink">{rec.device_type}</span>
+                    <span className="text-[10px] text-muted block">{rec.upload_method}</span>
+                  </td>
+                  <td className="py-2.5 px-3">
+                    <span
+                      className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-bold ${
+                        rec.outcome === 'SUCCESS'
+                          ? 'bg-emerald-50 text-emerald-700'
+                          : 'bg-danger-soft text-danger'
+                      }`}
+                    >
+                      {rec.outcome === 'SUCCESS' ? (
+                        <CheckCircle2 size={11} />
+                      ) : (
+                        <AlertTriangle size={11} />
+                      )}
+                      <span>{rec.outcome}</span>
+                    </span>
+                    {rec.failure_reason && rec.failure_reason !== 'None' && (
+                      <span className="block text-[10px] text-muted line-clamp-1 max-w-[140px]" title={rec.failure_reason}>
+                        {rec.failure_reason}
+                      </span>
+                    )}
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono text-muted">
+                    {(rec.processing_time_ms / 1000).toFixed(2)}s
+                  </td>
+                  <td className="py-2.5 px-3 text-right font-mono font-bold text-ink">
+                    {Number(rec.quality_score).toFixed(2)}
+                  </td>
+                  <td className="py-2.5 px-3 text-center">
+                    <span
+                      className={`inline-flex size-5 items-center justify-center rounded-full text-[10px] font-bold ${
+                        rec.saved_to_wishlist === 'Yes'
+                          ? 'bg-emerald-100 text-emerald-800'
+                          : 'bg-canvas text-muted'
+                      }`}
+                    >
+                      {rec.saved_to_wishlist === 'Yes' ? '✓' : '—'}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {records.length > 10 && (
+            <div className="flex items-center justify-between border-t border-line bg-canvas/40 px-4 py-2.5 text-xs text-muted">
+              <span>
+                Page <strong className="text-ink">{page}</strong> of{' '}
+                <strong className="text-ink">{totalPages}</strong> ({records.length} records)
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => onPageChange && onPageChange(Math.max(1, page - 1))}
+                  disabled={page === 1}
+                  className="rounded border border-line bg-surface px-2.5 py-1 font-semibold text-ink disabled:opacity-40 disabled:cursor-not-allowed hover:bg-canvas"
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => onPageChange && onPageChange(Math.min(totalPages, page + 1))}
+                  disabled={page >= totalPages}
+                  className="rounded border border-line bg-surface px-2.5 py-1 font-semibold text-ink disabled:opacity-40 disabled:cursor-not-allowed hover:bg-canvas"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-dashed border-line bg-canvas/60 py-10 px-4 text-center">
+          <Filter className="mx-auto size-8 text-muted mb-2 opacity-50" />
+          <h5 className="text-sm font-bold text-ink">{emptyTitle}</h5>
+          <p className="mt-1 text-xs text-muted max-w-md mx-auto">{emptySubtitle}</p>
+          {onReset && (
+            <button
+              onClick={onReset}
+              className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-accent px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:bg-accent/90"
+            >
+              <RotateCcw size={13} />
+              <span>Reset Filters</span>
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 export default function DwmDashboardSection({ accessToken }) {
@@ -84,6 +329,45 @@ export default function DwmDashboardSection({ accessToken }) {
   const [rollupsLoading, setRollupsLoading] = useState(false)
   const [rollupsRunning, setRollupsRunning] = useState(false)
   const [rollupPeriod, setRollupPeriod] = useState('daily') // 'daily' or 'monthly'
+
+  // Shared OLAP Dimension Options
+  const [olapOptions, setOlapOptions] = useState(null)
+
+  // 5. OLAP Drill-Down State (Year → Month → Day → Hour)
+  const [drillData, setDrillData] = useState(null)
+  const [drillLoading, setDrillLoading] = useState(false)
+  const [drillLevel, setDrillLevel] = useState('month')
+  const [drillHierarchy, setDrillHierarchy] = useState({ year: null, month: null, day: null })
+  const [drillTablePage, setDrillTablePage] = useState(1)
+
+  // 6. OLAP Roll-Up State (Hour → Day → Month → Year)
+  const [rollupOlapData, setRollupOlapData] = useState(null)
+  const [rollupOlapLoading, setRollupOlapLoading] = useState(false)
+  const [rollupOlapLevel, setRollupOlapLevel] = useState('month')
+
+  // 7. OLAP Slice State (Single-Dimension Isolation)
+  const [sliceData, setSliceData] = useState(null)
+  const [sliceLoading, setSliceLoading] = useState(false)
+  const [sliceDimension, setSliceDimension] = useState('category')
+  const [sliceValue, setSliceValue] = useState('Jackets')
+  const [sliceTablePage, setSliceTablePage] = useState(1)
+
+  // 8. OLAP Dice State (Multi-Dimensional Constrained Subcube)
+  const [diceData, setDiceData] = useState(null)
+  const [diceLoading, setDiceLoading] = useState(false)
+  const [diceLevel, setDiceLevel] = useState('month')
+  const [diceFilters, setDiceFilters] = useState({
+    category: '',
+    color: '',
+    device_type: '',
+    upload_method: '',
+    outcome: '',
+    price_bracket: '',
+    date_from: '',
+    date_to: '',
+    search: '',
+  })
+  const [diceTablePage, setDiceTablePage] = useState(1)
 
   // Action status message
   const [actionFeedback, setActionFeedback] = useState(null)
@@ -317,20 +601,274 @@ export default function DwmDashboardSection({ accessToken }) {
     }
   }
 
+  // ──────────────────────────────────────────
+  // Shared OLAP Options Loader
+  // ──────────────────────────────────────────
+  useEffect(() => {
+    if (['olap_drilldown', 'olap_rollup', 'olap_slice', 'olap_dice'].includes(activeTab) && !olapOptions) {
+      getDwmOlapOptions(source, accessToken).then(setOlapOptions).catch(console.warn)
+    }
+  }, [activeTab, source, accessToken, olapOptions])
+
+  // ──────────────────────────────────────────
+  // 5. OLAP Drill-Down Handlers
+  // ──────────────────────────────────────────
+  const fetchDrillCube = useCallback(async (overrides = {}) => {
+    try {
+      setDrillLoading(true)
+      const effectiveLevel = overrides.level !== undefined ? overrides.level : drillLevel
+      const effectiveHierarchy = overrides.hierarchy !== undefined ? overrides.hierarchy : drillHierarchy
+
+      const params = {
+        source,
+        level: effectiveLevel,
+        year: effectiveHierarchy.year || '',
+        month: effectiveHierarchy.month || '',
+        day: effectiveHierarchy.day || '',
+        limit_records: 50,
+      }
+
+      const res = await getDwmOlapCube(params, accessToken)
+      setDrillData(res)
+      setDrillTablePage(1)
+    } catch (err) {
+      console.error('Error fetching Drill-Down cube:', err)
+      showFeedback(`Drill-down failed: ${err.message || 'Server error'}`, 'error')
+    } finally {
+      setDrillLoading(false)
+    }
+  }, [source, drillLevel, drillHierarchy, accessToken])
+
+  const handleDrillDownAction = (item) => {
+    if (!item || !item.can_drill_down || !item.drill_params) return
+    const nextLevel = item.drill_params.level || 'month'
+    const nextHierarchy = {
+      year: item.drill_params.year || drillHierarchy.year,
+      month: item.drill_params.month || drillHierarchy.month,
+      day: item.drill_params.day || drillHierarchy.day,
+    }
+    setDrillLevel(nextLevel)
+    setDrillHierarchy(nextHierarchy)
+    fetchDrillCube({ level: nextLevel, hierarchy: nextHierarchy })
+    showFeedback(`Drilled down to ${nextLevel.toUpperCase()}: ${item.label}`, 'success')
+  }
+
+  const handleDrillRollUpAction = (targetLevel) => {
+    const levels = ['year', 'month', 'day', 'hour']
+    let nextLevel = targetLevel
+    if (!nextLevel) {
+      const idx = levels.indexOf(drillLevel)
+      nextLevel = idx > 0 ? levels[idx - 1] : 'year'
+    }
+    let nextHierarchy = { ...drillHierarchy }
+    if (nextLevel === 'year') {
+      nextHierarchy = { year: null, month: null, day: null }
+    } else if (nextLevel === 'month') {
+      nextHierarchy = { year: drillHierarchy.year, month: null, day: null }
+    } else if (nextLevel === 'day') {
+      nextHierarchy = { year: drillHierarchy.year, month: drillHierarchy.month, day: null }
+    }
+    setDrillLevel(nextLevel)
+    setDrillHierarchy(nextHierarchy)
+    fetchDrillCube({ level: nextLevel, hierarchy: nextHierarchy })
+    showFeedback(`Stepped up to ${nextLevel.toUpperCase()}`, 'success')
+  }
+
+  const handleDrillBreadcrumbClick = (crumb) => {
+    const nextLevel = crumb.params?.level || 'year'
+    const nextHierarchy = {
+      year: crumb.params?.year || null,
+      month: crumb.params?.month || null,
+      day: crumb.params?.day || null,
+    }
+    setDrillLevel(nextLevel)
+    setDrillHierarchy(nextHierarchy)
+    fetchDrillCube({ level: nextLevel, hierarchy: nextHierarchy })
+  }
+
+  // ──────────────────────────────────────────
+  // 6. OLAP Roll-Up Handlers
+  // ──────────────────────────────────────────
+  const fetchRollupOlapCube = useCallback(async (overrides = {}) => {
+    try {
+      setRollupOlapLoading(true)
+      const effectiveLevel = overrides.level !== undefined ? overrides.level : rollupOlapLevel
+
+      const params = {
+        source,
+        level: effectiveLevel,
+        limit_records: 50,
+      }
+
+      const res = await getDwmOlapCube(params, accessToken)
+      setRollupOlapData(res)
+    } catch (err) {
+      console.error('Error fetching Roll-Up cube:', err)
+      showFeedback(`Roll-up failed: ${err.message || 'Server error'}`, 'error')
+    } finally {
+      setRollupOlapLoading(false)
+    }
+  }, [source, rollupOlapLevel, accessToken])
+
+  const handleRollupLevelSelect = (lvl) => {
+    setRollupOlapLevel(lvl)
+    fetchRollupOlapCube({ level: lvl })
+    showFeedback(`Aggregated view switched to ${lvl.toUpperCase()}`, 'success')
+  }
+
+  const handleRollupStepUp = () => {
+    const levels = ['year', 'month', 'day', 'hour']
+    const idx = levels.indexOf(rollupOlapLevel)
+    const nextLevel = idx > 0 ? levels[idx - 1] : 'year'
+    setRollupOlapLevel(nextLevel)
+    fetchRollupOlapCube({ level: nextLevel })
+    showFeedback(`Rolled up to ${nextLevel.toUpperCase()}`, 'success')
+  }
+
+  // ──────────────────────────────────────────
+  // 7. OLAP Slice Handlers (Single Dimension)
+  // ──────────────────────────────────────────
+  const fetchSliceCube = useCallback(async (overrides = {}) => {
+    try {
+      setSliceLoading(true)
+      const effectiveDim = overrides.dimension !== undefined ? overrides.dimension : sliceDimension
+      const effectiveVal = overrides.value !== undefined ? overrides.value : sliceValue
+
+      const params = {
+        source,
+        level: 'month',
+        limit_records: 50,
+      }
+      if (effectiveDim && effectiveVal) {
+        params[effectiveDim] = effectiveVal
+      }
+
+      const res = await getDwmOlapCube(params, accessToken)
+      setSliceData(res)
+      setSliceTablePage(1)
+    } catch (err) {
+      console.error('Error fetching Slice cube:', err)
+      showFeedback(`Slice failed: ${err.message || 'Server error'}`, 'error')
+    } finally {
+      setSliceLoading(false)
+    }
+  }, [source, sliceDimension, sliceValue, accessToken])
+
+  const handleSliceDimensionChange = (dim) => {
+    setSliceDimension(dim)
+    let initialVal = ''
+    if (olapOptions) {
+      if (dim === 'category') initialVal = olapOptions.categories?.[0] || ''
+      else if (dim === 'device_type') initialVal = olapOptions.devices?.[0] || ''
+      else if (dim === 'upload_method') initialVal = olapOptions.upload_methods?.[0] || ''
+      else if (dim === 'outcome') initialVal = 'SUCCESS'
+      else if (dim === 'price_bracket') initialVal = olapOptions.price_brackets?.[0] || ''
+      else if (dim === 'color') initialVal = olapOptions.colors?.[0] || ''
+    }
+    setSliceValue(initialVal)
+    fetchSliceCube({ dimension: dim, value: initialVal })
+  }
+
+  const handleSliceValueChange = (val) => {
+    setSliceValue(val)
+    fetchSliceCube({ value: val })
+    showFeedback(val ? `Sliced by ${sliceDimension}: ${val}` : 'Slice cleared (full warehouse)', 'success')
+  }
+
+  const handleQuickSlice = (dim, val) => {
+    setSliceDimension(dim)
+    setSliceValue(val)
+    fetchSliceCube({ dimension: dim, value: val })
+    showFeedback(val ? `Sliced by ${dim}: ${val}` : 'Slice reset to full warehouse', 'success')
+  }
+
+  // ──────────────────────────────────────────
+  // 8. OLAP Dice Handlers (Multi-Dimensional)
+  // ──────────────────────────────────────────
+  const fetchDiceCube = useCallback(async (overrides = {}) => {
+    try {
+      setDiceLoading(true)
+      const effectiveFilters = overrides.filters !== undefined ? overrides.filters : diceFilters
+      const effectiveLevel = overrides.level !== undefined ? overrides.level : diceLevel
+
+      const params = {
+        source,
+        level: effectiveLevel,
+        category: effectiveFilters.category || '',
+        color: effectiveFilters.color || '',
+        device_type: effectiveFilters.device_type || '',
+        upload_method: effectiveFilters.upload_method || '',
+        outcome: effectiveFilters.outcome || '',
+        price_bracket: effectiveFilters.price_bracket || '',
+        date_from: effectiveFilters.date_from || '',
+        date_to: effectiveFilters.date_to || '',
+        search: effectiveFilters.search || '',
+        limit_records: 50,
+      }
+
+      const res = await getDwmOlapCube(params, accessToken)
+      setDiceData(res)
+      setDiceTablePage(1)
+    } catch (err) {
+      console.error('Error fetching Dice cube:', err)
+      showFeedback(`Dice operation failed: ${err.message || 'Server error'}`, 'error')
+    } finally {
+      setDiceLoading(false)
+    }
+  }, [source, diceFilters, diceLevel, accessToken])
+
+  const handleDiceFilterChange = (key, val) => {
+    const updated = { ...diceFilters, [key]: val }
+    setDiceFilters(updated)
+    fetchDiceCube({ filters: updated })
+  }
+
+  const handleResetDiceFilters = () => {
+    const cleared = {
+      category: '',
+      color: '',
+      device_type: '',
+      upload_method: '',
+      outcome: '',
+      price_bracket: '',
+      date_from: '',
+      date_to: '',
+      search: '',
+    }
+    setDiceFilters(cleared)
+    fetchDiceCube({ filters: cleared })
+    showFeedback('All dice filters reset', 'success')
+  }
+
   // Trigger tab data fetch on tab switch or source toggle
   useEffect(() => {
     if (activeTab === 'apriori') fetchApriori()
     else if (activeTab === 'kmeans') fetchKMeans()
     else if (activeTab === 'correlations') fetchCorrelations()
     else if (activeTab === 'rollups') fetchRollups()
-  }, [activeTab, source, fetchApriori, fetchKMeans, fetchCorrelations, fetchRollups])
+    else if (activeTab === 'olap_drilldown') fetchDrillCube()
+    else if (activeTab === 'olap_rollup') fetchRollupOlapCube()
+    else if (activeTab === 'olap_slice') fetchSliceCube()
+    else if (activeTab === 'olap_dice') fetchDiceCube()
+  }, [
+    activeTab,
+    source,
+    fetchApriori,
+    fetchKMeans,
+    fetchCorrelations,
+    fetchRollups,
+    fetchDrillCube,
+    fetchRollupOlapCube,
+    fetchSliceCube,
+    fetchDiceCube,
+  ])
 
   // Derive model health dynamically
   const modelHealthText = useMemo(() => {
     if (source === 'live' && isLiveEmpty) {
       return { status: 'Awaiting Live Orders', count: '0 Active', color: 'text-amber-600' }
     }
-    return { status: 'All 4 Ready & Active', count: '4 Insight Tools', color: 'text-emerald-600' }
+    return { status: 'All 8 Ready & Active', count: '8 Analytics Tools', color: 'text-emerald-600' }
   }, [source, isLiveEmpty])
 
   return (
@@ -470,6 +1008,54 @@ export default function DwmDashboardSection({ accessToken }) {
           >
             <TrendingUp size={17} />
             <span>4. Store Activity Trends (Daily & Monthly)</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('olap_drilldown')}
+            className={`flex items-center gap-2 border-b-2 px-3.5 py-3 text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === 'olap_drilldown'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-muted hover:border-line hover:text-ink'
+            }`}
+          >
+            <Compass size={17} />
+            <span>5. Timeline Deep Dive</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('olap_rollup')}
+            className={`flex items-center gap-2 border-b-2 px-3.5 py-3 text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === 'olap_rollup'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-muted hover:border-line hover:text-ink'
+            }`}
+          >
+            <ArrowUp size={17} />
+            <span>6. Period Summaries</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('olap_slice')}
+            className={`flex items-center gap-2 border-b-2 px-3.5 py-3 text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === 'olap_slice'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-muted hover:border-line hover:text-ink'
+            }`}
+          >
+            <SlidersHorizontal size={17} />
+            <span>7. Filter by Feature</span>
+          </button>
+
+          <button
+            onClick={() => setActiveTab('olap_dice')}
+            className={`flex items-center gap-2 border-b-2 px-3.5 py-3 text-xs sm:text-sm font-semibold transition-all ${
+              activeTab === 'olap_dice'
+                ? 'border-accent text-accent'
+                : 'border-transparent text-muted hover:border-line hover:text-ink'
+            }`}
+          >
+            <Layers size={17} />
+            <span>8. Multi-Filter Search</span>
           </button>
         </div>
       </div>
@@ -1239,6 +1825,672 @@ export default function DwmDashboardSection({ accessToken }) {
           </div>
         </div>
       )}
+
+      {/* Tab 5: Timeline Deep Dive (Year → Month → Day → Hour) */}
+      {activeTab === 'olap_drilldown' && (
+        <div className="mt-6 space-y-6">
+          {/* Concept Banner */}
+          <div className="rounded-lg border border-accent/20 bg-accent-soft/30 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Compass className="text-accent" size={20} />
+                <h3 className="font-bold text-ink">5. Timeline Deep Dive — Explore Activity by Year, Month, Day & Hour</h3>
+              </div>
+              <span className="rounded-full bg-accent px-3 py-0.5 text-xs font-bold text-white">
+                Year → Month → Day → Hour
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted leading-relaxed">
+              Explore try-on activity over time from high-level yearly summaries down to hourly details: <strong>Year → Month → Day → Hour</strong>. Click directly on any bar in the chart to zoom into that time period and view matching sessions below.
+            </p>
+          </div>
+
+          {/* Navigation, Breadcrumbs & Operation Status Bar */}
+          <div className="rounded-xl border border-line bg-surface p-4 shadow-sm space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold tracking-wide bg-accent-soft text-accent border border-accent/30">
+                  <span className="size-2 rounded-full bg-current animate-pulse" />
+                  <span>TIMELINE EXPLORATION</span>
+                </span>
+                <span className="text-xs text-muted">
+                  Matched: <strong className="text-ink">{drillData?.total_records_matched?.toLocaleString() || 0}</strong> / {drillData?.kpis?.warehouse_total?.toLocaleString() || '10,000'} sessions ({drillData?.kpis?.pct_of_warehouse || 100}%)
+                </span>
+              </div>
+
+              {/* Granularity Switcher */}
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-muted">Time Level:</span>
+                <div className="flex items-center rounded-lg border border-line bg-canvas p-1">
+                  {['year', 'month', 'day', 'hour'].map((lvl) => (
+                    <button
+                      key={lvl}
+                      onClick={() => handleDrillRollUpAction(lvl)}
+                      className={`rounded px-3 py-1 text-xs font-bold uppercase tracking-wider transition-all ${
+                        drillLevel === lvl
+                          ? 'bg-accent text-white shadow-sm'
+                          : 'text-muted hover:text-ink hover:bg-surface'
+                      }`}
+                    >
+                      {lvl}
+                    </button>
+                  ))}
+                </div>
+                <button
+                  onClick={() => fetchDrillCube()}
+                  className="inline-flex size-8 items-center justify-center rounded border border-line bg-canvas text-muted hover:text-ink transition-colors"
+                  title="Refresh timeline view"
+                >
+                  <RefreshCw size={14} className={drillLoading ? 'animate-spin' : ''} />
+                </button>
+              </div>
+            </div>
+
+            {/* Hierarchical Breadcrumb Trail */}
+            <div className="flex flex-wrap items-center gap-1.5 border-t border-line/60 pt-3 text-xs text-muted">
+              <span className="font-bold text-ink flex items-center gap-1">
+                <Compass size={14} className="text-accent" />
+                <span>Time Path:</span>
+              </span>
+              {drillData?.breadcrumbs?.map((crumb, idx) => {
+                const isLast = idx === (drillData.breadcrumbs.length - 1)
+                return (
+                  <React.Fragment key={idx}>
+                    {idx > 0 && <ChevronRight size={13} className="text-muted/60" />}
+                    <button
+                      onClick={() => handleDrillBreadcrumbClick(crumb)}
+                      disabled={isLast}
+                      className={`rounded px-2.5 py-0.5 font-semibold transition-all ${
+                        isLast
+                          ? 'bg-accent-soft text-accent cursor-default font-bold'
+                          : 'hover:bg-canvas text-ink hover:text-accent underline decoration-dotted'
+                      }`}
+                      title={isLast ? 'Current Level' : `Navigate back to ${crumb.label}`}
+                    >
+                      {crumb.label}
+                    </button>
+                  </React.Fragment>
+                )
+              })}
+              {drillLevel !== 'year' && (
+                <button
+                  onClick={() => handleDrillRollUpAction()}
+                  className="ml-3 inline-flex items-center gap-1 rounded border border-line bg-canvas px-2.5 py-0.5 text-xs font-semibold text-muted hover:text-ink hover:border-accent"
+                  title="Zoom out one level"
+                >
+                  <ArrowUp size={12} className="text-accent" />
+                  <span>Zoom Out</span>
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* KPI Summary Cards */}
+          <OlapKpiGrid kpis={drillData?.kpis} />
+
+          {/* Drill-Down Time-Series Chart */}
+          <OlapDrilldownChart
+            timeSeries={drillData?.time_series || []}
+            level={drillLevel}
+            onDrillDown={handleDrillDownAction}
+            onRollUp={handleDrillRollUpAction}
+            canRollUp={drillLevel !== 'year'}
+          />
+
+          {/* Granular Try-On Events Table */}
+          <GranularTryonRecordsTable
+            records={drillData?.sliced_records || []}
+            loading={drillLoading}
+            page={drillTablePage}
+            onPageChange={setDrillTablePage}
+            title="Fitting Sessions (Selected Time Window)"
+            subtitle={`Individual fitting sessions within the selected ${drillLevel.toUpperCase()} period.`}
+          />
+        </div>
+      )}
+
+      {/* Tab 6: Period Summaries (Hour → Day → Month → Year) */}
+      {activeTab === 'olap_rollup' && (
+        <div className="mt-6 space-y-6">
+          {/* Concept Banner */}
+          <div className="rounded-lg border border-accent/20 bg-accent-soft/30 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <ArrowUp className="text-accent" size={20} />
+                <h3 className="font-bold text-ink">6. Period Summaries — High-Level Performance Trends</h3>
+              </div>
+              <span className="rounded-full bg-accent px-3 py-0.5 text-xs font-bold text-white">
+                Hour → Day → Month → Year
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-muted leading-relaxed">
+              View summarized try-on performance grouped by broad time periods: <strong>Hour, Day, Month, or Year</strong>. Compare trends across periods to track store growth, customer traffic, and fitting success rates.
+            </p>
+          </div>
+
+          {/* Roll-Up Control Bar */}
+          <div className="rounded-xl border border-line bg-surface p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold tracking-wide bg-purple-50 text-purple-700 border border-purple-200">
+                <span className="size-2 rounded-full bg-current animate-pulse" />
+                <span>PERIOD SUMMARY</span>
+              </span>
+              <span className="text-xs text-muted">
+                Displaying <strong>{rollupOlapData?.time_series?.length || 0}</strong> time periods in <strong>{rollupOlapLevel.toUpperCase()}</strong> view
+              </span>
+            </div>
+
+            {/* Aggregation Level Switcher */}
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-bold uppercase tracking-wider text-muted">Group By:</span>
+              <div className="flex items-center rounded-lg border border-line bg-canvas p-1">
+                {[
+                  { id: 'year', label: 'Yearly' },
+                  { id: 'month', label: 'Monthly' },
+                  { id: 'day', label: 'Daily' },
+                  { id: 'hour', label: 'Hourly' },
+                ].map(({ id, label }) => (
+                  <button
+                    key={id}
+                    onClick={() => handleRollupLevelSelect(id)}
+                    className={`rounded px-3 py-1 text-xs font-bold transition-all ${
+                      rollupOlapLevel === id
+                        ? 'bg-accent text-white shadow-sm'
+                        : 'text-muted hover:text-ink hover:bg-surface'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+              {rollupOlapLevel !== 'year' && (
+                <button
+                  onClick={handleRollupStepUp}
+                  className="inline-flex items-center gap-1 rounded border border-line bg-canvas px-3 py-1.5 text-xs font-bold text-ink hover:border-accent hover:text-accent transition-all"
+                  title="Zoom out to broader time group"
+                >
+                  <ArrowUp size={13} className="text-accent" />
+                  <span>Zoom Out</span>
+                </button>
+              )}
+              <button
+                onClick={() => fetchRollupOlapCube()}
+                className="inline-flex size-8 items-center justify-center rounded border border-line bg-canvas text-muted hover:text-ink transition-colors"
+                title="Refresh summary data"
+              >
+                <RefreshCw size={14} className={rollupOlapLoading ? 'animate-spin' : ''} />
+              </button>
+            </div>
+          </div>
+
+          {/* Roll-Up KPI Summary Cards */}
+          <OlapKpiGrid kpis={rollupOlapData?.kpis} />
+
+          {/* Roll-Up Trend Visualizer */}
+          <OlapDrilldownChart
+            timeSeries={rollupOlapData?.time_series || []}
+            level={rollupOlapLevel}
+            onDrillDown={() => {}}
+            onRollUp={handleRollupStepUp}
+            canRollUp={rollupOlapLevel !== 'year'}
+          />
+
+          {/* Comprehensive Period Breakdown Table */}
+          <div className="overflow-x-auto rounded-xl border border-line bg-surface shadow-sm p-5 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+              <div>
+                <h4 className="text-sm font-bold text-ink">
+                  Performance by Period ({rollupOlapLevel.toUpperCase()} View)
+                </h4>
+                <p className="text-xs text-muted">
+                  Comparative performance metrics grouped across each time period.
+                </p>
+              </div>
+              <span className="rounded-md border border-line bg-canvas px-3 py-1 text-xs font-semibold text-muted">
+                {rollupOlapData?.time_series?.length || 0} periods summarized
+              </span>
+            </div>
+
+            {rollupOlapLoading ? (
+              <div className="space-y-2">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="h-10 animate-pulse rounded-lg bg-canvas" />
+                ))}
+              </div>
+            ) : (
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-line bg-canvas text-[11px] font-bold uppercase text-muted">
+                    <th className="py-2.5 px-3">Period Bucket</th>
+                    <th className="py-2.5 px-3 text-right">Try-On Volume</th>
+                    <th className="py-2.5 px-3 text-right">Share of Total</th>
+                    <th className="py-2.5 px-3 text-right">Successful</th>
+                    <th className="py-2.5 px-3 text-right">Failed</th>
+                    <th className="py-2.5 px-3 text-center">Success Rate</th>
+                    <th className="py-2.5 px-3 text-right">Avg Latency</th>
+                    <th className="py-2.5 px-3 text-right">Avg Quality</th>
+                    <th className="py-2.5 px-3 text-right">Unique Users</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-line">
+                  {rollupOlapData?.time_series?.map((b, idx) => (
+                    <tr key={idx} className="hover:bg-canvas/50 transition-colors">
+                      <td className="py-2.5 px-3 font-mono font-bold text-ink">{b.period_key || b.label}</td>
+                      <td className="py-2.5 px-3 text-right font-bold text-ink">{b.total_tryons?.toLocaleString()}</td>
+                      <td className="py-2.5 px-3 text-right text-muted">
+                        {rollupOlapData?.kpis?.total_tryons
+                          ? `${((b.total_tryons / rollupOlapData.kpis.total_tryons) * 100).toFixed(1)}%`
+                          : '—'}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-semibold text-emerald-600">{b.successful_tryons?.toLocaleString()}</td>
+                      <td className="py-2.5 px-3 text-right font-semibold text-danger">{b.failed_tryons?.toLocaleString()}</td>
+                      <td className="py-2.5 px-3 text-center">
+                        <span className="inline-flex rounded-full px-2.5 py-0.5 text-[11px] font-bold bg-emerald-50 text-emerald-700">
+                          {b.success_rate_pct}%
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono text-muted">
+                        {((b.avg_processing_time_ms || 0) / 1000).toFixed(2)}s
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-mono font-bold text-ink">
+                        {Number(b.avg_quality_score || 0).toFixed(2)}
+                      </td>
+                      <td className="py-2.5 px-3 text-right font-semibold text-accent">{b.unique_users?.toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Tab 7: Filter by Feature (Single-Feature Focus) */}
+      {activeTab === 'olap_slice' && (
+        <div className="mt-6 space-y-6">
+          {/* Concept Banner */}
+          <div className="rounded-lg border border-accent/20 bg-accent-soft/30 p-4">
+            <div className="flex items-center gap-2">
+              <SlidersHorizontal className="text-accent" size={20} />
+              <h3 className="font-bold text-ink">7. Filter by Feature — Single Feature Focus</h3>
+            </div>
+            <p className="mt-1 text-xs text-muted leading-relaxed">
+              Focus on any single feature (such as Category = 'Jackets' or Device = 'Mobile') to see how that specific group performs compared to your overall store average.
+            </p>
+          </div>
+
+          {/* Single-Feature Control Toolbar */}
+          <div className="rounded-xl border border-line bg-surface p-5 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold tracking-wide bg-emerald-50 text-emerald-800 border border-emerald-200">
+                  <span className="size-2 rounded-full bg-current animate-pulse" />
+                  <span>FILTERED BY: {sliceDimension.toUpperCase()} = {sliceValue || 'ALL'}</span>
+                </span>
+                <span className="text-xs text-muted">
+                  Matched: <strong className="text-ink">{sliceData?.total_records_matched?.toLocaleString() || 0}</strong> / {sliceData?.kpis?.warehouse_total?.toLocaleString() || '10,000'} sessions ({sliceData?.kpis?.pct_of_warehouse || 100}%)
+                </span>
+              </div>
+              <button
+                onClick={() => fetchSliceCube()}
+                className="inline-flex size-8 items-center justify-center rounded border border-line bg-canvas text-muted hover:text-ink transition-colors"
+                title="Refresh data"
+              >
+                <RefreshCw size={14} className={sliceLoading ? 'animate-spin' : ''} />
+              </button>
+            </div>
+
+            {/* Feature & Value Selectors */}
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted">
+                  1. Choose Feature to Filter
+                </label>
+                <select
+                  value={sliceDimension}
+                  onChange={(e) => handleSliceDimensionChange(e.target.value)}
+                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="category">Apparel Category</option>
+                  <option value="device_type">Hardware Device Type</option>
+                  <option value="upload_method">Photo Upload Channel (Camera vs Gallery)</option>
+                  <option value="outcome">Try-On Outcome Status</option>
+                  <option value="price_bracket">Garment Price Tier</option>
+                  <option value="color">Garment Color</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-muted">
+                  2. Choose Filter Value ({sliceDimension})
+                </label>
+                <select
+                  value={sliceValue}
+                  onChange={(e) => handleSliceValueChange(e.target.value)}
+                  className="mt-1.5 w-full rounded-md border border-line bg-canvas px-3 py-2 text-sm font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All (Full Store Data)</option>
+                  {sliceDimension === 'category' &&
+                    olapOptions?.categories?.map((c) => (
+                      <option key={c} value={c}>{c}</option>
+                    ))}
+                  {sliceDimension === 'device_type' &&
+                    olapOptions?.devices?.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  {sliceDimension === 'upload_method' &&
+                    olapOptions?.upload_methods?.map((u) => (
+                      <option key={u} value={u}>{u}</option>
+                    ))}
+                  {sliceDimension === 'outcome' && (
+                    <>
+                      <option value="SUCCESS">SUCCESS Only</option>
+                      <option value="FAILURE">FAILURE Only</option>
+                    </>
+                  )}
+                  {sliceDimension === 'price_bracket' &&
+                    olapOptions?.price_brackets?.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  {sliceDimension === 'color' &&
+                    olapOptions?.colors?.map((col) => (
+                      <option key={col} value={col}>{col}</option>
+                    ))}
+                </select>
+              </div>
+            </div>
+
+            {/* 1-Click Quick Filters */}
+            <div className="border-t border-line/60 pt-3">
+              <span className="text-xs font-bold text-muted mr-2">Quick Filters:</span>
+              <div className="inline-flex flex-wrap gap-1.5 mt-1 sm:mt-0">
+                {[
+                  { dim: 'category', val: 'Jackets', label: 'Jackets' },
+                  { dim: 'category', val: 'Dresses', label: 'Dresses' },
+                  { dim: 'device_type', val: 'Mobile', label: 'Mobile Devices' },
+                  { dim: 'upload_method', val: 'Camera', label: 'Camera Uploads' },
+                  { dim: 'outcome', val: 'FAILURE', label: 'Model Failures' },
+                  { dim: 'price_bracket', val: 'Budget (<500)', label: 'Budget (<500)' },
+                  { dim: 'category', val: '', label: 'Show All Records' },
+                ].map(({ dim, val, label }) => {
+                  const isActive = sliceDimension === dim && sliceValue === val
+                  return (
+                    <button
+                      key={label}
+                      onClick={() => handleQuickSlice(dim, val)}
+                      className={`rounded-full px-3 py-1 text-xs font-semibold transition-all ${
+                        isActive
+                          ? 'bg-accent text-white shadow-sm'
+                          : 'border border-line bg-canvas text-ink hover:border-accent hover:text-accent'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          </div>
+
+          {/* Sliced KPI Summary Cards */}
+          <OlapKpiGrid kpis={sliceData?.kpis} />
+
+          {/* Multidimensional Breakdown Visualizers */}
+          <OlapBreakdownCharts
+            byCategory={sliceData?.by_category || []}
+            byDevice={sliceData?.by_device || []}
+            byOutcome={sliceData?.by_outcome || { SUCCESS: 0, FAILURE: 0, success_rate_pct: 0, failure_rate_pct: 0 }}
+            onSliceCategory={(cat) => handleQuickSlice('category', cat)}
+            onSliceDevice={(dev) => handleQuickSlice('device_type', dev)}
+            selectedCategory={sliceDimension === 'category' ? sliceValue : ''}
+            selectedDevice={sliceDimension === 'device_type' ? sliceValue : ''}
+          />
+
+          {/* Filtered Records Table */}
+          <GranularTryonRecordsTable
+            records={sliceData?.sliced_records || []}
+            loading={sliceLoading}
+            page={sliceTablePage}
+            onPageChange={setSliceTablePage}
+            title={`Matching Try-On Sessions (${sliceDimension.toUpperCase()} = ${sliceValue || 'ALL'})`}
+            subtitle="All try-on sessions matching the selected filter."
+            onReset={() => handleQuickSlice('category', '')}
+          />
+        </div>
+      )}
+
+      {/* Tab 8: Multi-Filter Search (Combined Filter Finder) */}
+      {activeTab === 'olap_dice' && (
+        <div className="mt-6 space-y-6">
+          {/* Concept Banner */}
+          <div className="rounded-lg border border-accent/20 bg-accent-soft/30 p-4">
+            <div className="flex items-center gap-2">
+              <Layers className="text-accent" size={20} />
+              <h3 className="font-bold text-ink">8. Multi-Filter Search — Advanced Customer & Session Finder</h3>
+            </div>
+            <p className="mt-1 text-xs text-muted leading-relaxed">
+              Combine multiple filters together (such as Category, Device, Upload Method, Price, and Date Range) to pinpoint specific customer sessions and uncover detailed shopping patterns.
+            </p>
+          </div>
+
+          {/* Multidimensional Dicing Toolbar */}
+          <div className="rounded-xl border border-line bg-surface p-5 shadow-sm space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-3">
+              <div className="flex items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-extrabold tracking-wide bg-indigo-50 text-indigo-700 border border-indigo-200">
+                  <span className="size-2 rounded-full bg-current animate-pulse" />
+                  <span>
+                    {Object.values(diceFilters).filter(Boolean).length === 0
+                      ? 'ALL SESSIONS (NO FILTERS)'
+                      : `MATCHING SESSIONS: ${Object.values(diceFilters).filter(Boolean).length} ACTIVE FILTERS`}
+                  </span>
+                </span>
+                <span className="text-xs text-muted">
+                  Matched: <strong className="text-ink">{diceData?.total_records_matched?.toLocaleString() || 0}</strong> / {diceData?.kpis?.warehouse_total?.toLocaleString() || '10,000'} sessions ({diceData?.kpis?.pct_of_warehouse || 100}%)
+                </span>
+              </div>
+              {Object.values(diceFilters).filter(Boolean).length > 0 && (
+                <button
+                  onClick={handleResetDiceFilters}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-danger hover:underline"
+                >
+                  <RotateCcw size={12} />
+                  <span>Clear All Filters</span>
+                </button>
+              )}
+            </div>
+
+            {/* Filter Dropdowns Grid */}
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Category</label>
+                <select
+                  value={diceFilters.category}
+                  onChange={(e) => handleDiceFilterChange('category', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Categories</option>
+                  {olapOptions?.categories?.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Device</label>
+                <select
+                  value={diceFilters.device_type}
+                  onChange={(e) => handleDiceFilterChange('device_type', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Devices</option>
+                  {olapOptions?.devices?.map((d) => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">
+                  Upload Channel (Method)
+                </label>
+                <select
+                  value={diceFilters.upload_method}
+                  onChange={(e) => handleDiceFilterChange('upload_method', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Upload Channels</option>
+                  {olapOptions?.upload_methods?.map((u) => (
+                    <option key={u} value={u}>{u}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Outcome</label>
+                <select
+                  value={diceFilters.outcome}
+                  onChange={(e) => handleDiceFilterChange('outcome', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Outcomes</option>
+                  <option value="SUCCESS">SUCCESS Only</option>
+                  <option value="FAILURE">FAILURE Only</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Price Bracket</label>
+                <select
+                  value={diceFilters.price_bracket}
+                  onChange={(e) => handleDiceFilterChange('price_bracket', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Brackets</option>
+                  {olapOptions?.price_brackets?.map((p) => (
+                    <option key={p} value={p}>{p}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Color</label>
+                <select
+                  value={diceFilters.color}
+                  onChange={(e) => handleDiceFilterChange('color', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs font-semibold text-ink focus:border-accent focus:outline-none"
+                >
+                  <option value="">All Colors</option>
+                  {olapOptions?.colors?.map((col) => (
+                    <option key={col} value={col}>{col}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Date Range & Keyword Search */}
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 pt-2">
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Date From</label>
+                <input
+                  type="date"
+                  value={diceFilters.date_from}
+                  onChange={(e) => handleDiceFilterChange('date_from', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink focus:border-accent focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Date To</label>
+                <input
+                  type="date"
+                  value={diceFilters.date_to}
+                  onChange={(e) => handleDiceFilterChange('date_to', e.target.value)}
+                  className="mt-1 w-full rounded-md border border-line bg-canvas px-2.5 py-1.5 text-xs text-ink focus:border-accent focus:outline-none"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-bold uppercase tracking-wider text-muted">Search Garment or Shopper</label>
+                <div className="relative mt-1">
+                  <Search size={14} className="absolute left-2.5 top-2.5 text-muted" />
+                  <input
+                    type="text"
+                    placeholder="Search garment, ASIN, customer..."
+                    value={diceFilters.search}
+                    onChange={(e) => handleDiceFilterChange('search', e.target.value)}
+                    className="w-full rounded-md border border-line bg-canvas py-1.5 pl-8 pr-3 text-xs text-ink focus:border-accent focus:outline-none"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Active Tag Chips */}
+            {Object.entries(diceFilters).some(([_, v]) => Boolean(v)) && (
+              <div className="flex flex-wrap items-center gap-2 border-t border-line/60 pt-3">
+                <span className="text-xs font-bold text-muted">Active Filters:</span>
+                {Object.entries(diceFilters).map(([k, val]) => {
+                  if (!val) return null
+                  const labelMap = {
+                    category: 'Category',
+                    device_type: 'Device',
+                    upload_method: 'Upload Channel',
+                    outcome: 'Outcome',
+                    price_bracket: 'Price',
+                    color: 'Color',
+                    date_from: 'From',
+                    date_to: 'To',
+                    search: 'Search',
+                  }
+                  return (
+                    <span
+                      key={k}
+                      className="inline-flex items-center gap-1.5 rounded-full border border-accent/20 bg-accent-soft px-3 py-1 text-xs font-semibold text-accent"
+                    >
+                      <span>
+                        <strong>{labelMap[k] || k}:</strong> {val}
+                      </span>
+                      <button
+                        onClick={() => handleDiceFilterChange(k, '')}
+                        className="rounded-full p-0.5 hover:bg-accent/20 text-accent transition-colors"
+                        title={`Remove ${k} filter`}
+                      >
+                        <X size={12} />
+                      </button>
+                    </span>
+                  )
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Diced Subcube KPI Summary Cards */}
+          <OlapKpiGrid kpis={diceData?.kpis} />
+
+          {/* Multidimensional Breakdown Visualizers */}
+          <OlapBreakdownCharts
+            byCategory={diceData?.by_category || []}
+            byDevice={diceData?.by_device || []}
+            byOutcome={diceData?.by_outcome || { SUCCESS: 0, FAILURE: 0, success_rate_pct: 0, failure_rate_pct: 0 }}
+            onSliceCategory={(cat) => handleDiceFilterChange('category', diceFilters.category === cat ? '' : cat)}
+            onSliceDevice={(dev) => handleDiceFilterChange('device_type', diceFilters.device_type === dev ? '' : dev)}
+            selectedCategory={diceFilters.category}
+            selectedDevice={diceFilters.device_type}
+          />
+
+          {/* Matching Sessions Drill-Through Table */}
+          <GranularTryonRecordsTable
+            records={diceData?.sliced_records || []}
+            loading={diceLoading}
+            page={diceTablePage}
+            onPageChange={setDiceTablePage}
+            title="Matching Try-On Sessions (Combined Filters)"
+            subtitle="Individual try-on sessions matching all selected filter criteria."
+            onReset={handleResetDiceFilters}
+          />
+        </div>
+      )}
     </section>
   )
 }
+

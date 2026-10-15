@@ -18,14 +18,24 @@ This document covers everything about the analytical architecture: the **Star Sc
    - [Extraction (Full Scan vs. Watermark Delta)](#step-1-extract)
    - [Transformation (Data Cleansing & Bucketing)](#step-2-transform)
    - [Loading (SCD-1 Upserts & Idempotency)](#step-3-load)
-5. [The 4 Core Data Mining Techniques](#5-the-4-core-data-mining-techniques)
+5. [The Core Data Mining & OLAP Techniques](#5-the-core-data-mining--olap-techniques)
    - [Technique 1: Association Rule Mining (Apriori)](#technique-1-association-rule-mining-apriori)
    - [Technique 2: User Segmentation Clustering (K-Means)](#technique-2-user-segmentation-clustering-k-means)
    - [Technique 3: Model Failure & Quality Correlation Analysis](#technique-3-model-failure--quality-correlation-analysis)
    - [Technique 4: OLAP Time-Series Rollups (Daily & Monthly)](#technique-4-olap-time-series-rollups-daily--monthly)
+   - [Technique 5: Multidimensional OLAP Operations (Drill-Down, Roll-Up, Slice & Dice)](#technique-5-multidimensional-olap-operations-drill-down-roll-up-slice--dice)
 6. [Interactive Admin DWM Dashboard](#6-interactive-admin-dwm-dashboard)
-   - [UI Overview & Tab Navigation](#ui-overview--tab-navigation)
-   - [Dual Data-Source Switcher (Live DWH vs. 10k Synthetic)](#dual-data-source-switcher)
+   - [UI Overview & KPI Header](#ui-overview--kpi-header)
+   - [Tab 1: Tabular Apriori Outfit Pairings](#1-frequently-tried-together-apriori)
+   - [Tab 2: Interactive Scatter & Donut Behavioral Visualizers](#2-user-segmentation-k-means)
+   - [Enterprise 5-Color Behavioral Palette](#enterprise-5-color-behavioral-palette)
+   - [Tab 3: Failure & Quality Correlation Analytics](#3-failure--quality-correlations)
+   - [Tab 4: Pre-Aggregated OLAP Time-Series Rollups](#4-olap-usage-rollups)
+   - [Tab 5: Timeline Deep Dive (Drill-Down)](#5-timeline-deep-dive-olap-drill-down)
+   - [Tab 6: Period Summaries (Roll-Up)](#6-period-summaries-olap-roll-up)
+   - [Tab 7: Filter by Feature (Slice)](#7-filter-by-feature-olap-slice)
+   - [Tab 8: Multi-Filter Search (Dice)](#8-multi-filter-search-olap-dice)
+   - [Dual-Engine Data Processing Architecture](#dual-engine-data-processing-architecture)
    - [Backend REST API Endpoints](#backend-rest-api-endpoints)
 7. [Datasets & Excel Export Master Files](#7-datasets--excel-export-master-files)
    - [Master Multi-Sheet Excel Workbooks](#master-multi-sheet-excel-workbooks)
@@ -34,7 +44,9 @@ This document covers everything about the analytical architecture: the **Star Sc
 8. [How to Run, Test, and Evaluate](#8-how-to-run-test-and-evaluate)
    - [Native Windows Web Launcher](#launching-the-web-application)
    - [Admin Portal Login Credentials](#admin-portal-login-credentials)
+   - [End-to-End Smoke Test Suite (22 Automated Tests)](#end-to-end-smoke-test-suite)
    - [Standalone Python CLI Commands](#standalone-cli-commands)
+   - [Frontend Production Build Validation](#frontend-production-build-validation)
 
 ---
 
@@ -297,17 +309,34 @@ The system implements 4 core data mining techniques designed to extract business
 
 ### Technique 2: User Segmentation Clustering (K-Means)
 - **Module**: [`dwm/mining/kmeans_clustering.py`](dwm/mining/kmeans_clustering.py)
-- **Objective**: Automatically segment users based on their behavioral interaction patterns to tailor marketing strategies and detect user drop-off risks.
-- **Feature Vector**:
+- **Objective**: Automatically segment the shopper base into actionable behavioral cohorts based on interaction patterns, conversion signals, and error vulnerability.
+- **Mathematical Formulation & Normalization**:
   For each user $u$, we extract a 4-dimensional normalized feature vector:
   $$\vec{x}_u = \left[\, \text{total\_tryons},\; \text{success\_rate},\; \text{avg\_quality\_score},\; \text{wishlist\_rate} \,\right]$$
-  Vectors are normalized via Min-Max Scaling to prevent high-magnitude features from dominating Euclidean distance calculations.
-- **Dynamic Cluster Count ($K \in [2, 6]$)**:
-  The admin can select any $K$ value in the dashboard. The algorithm recalculates cluster centroids and labels each group with dynamic personas:
-  - **Cluster 1 — Power Shoppers (High Frequency VIPs)**: High volume ($>20$ try-ons), high wishlist rate ($>40\%$), high success rate. *Action: Send exclusive VIP early-access catalogs and loyalty rewards.*
-  - **Cluster 2 — Engaged Fashion Explorers**: Moderate volume ($5 - 15$ try-ons), broad category exploration, high satisfaction. *Action: Deliver personalized "Complete the Look" bundle discounts.*
-  - **Cluster 3 — Occasional / Trial Users**: Low volume ($1 - 2$ try-ons), new signups evaluating the tool. *Action: Trigger automated onboarding emails with styling tips and curated bestsellers.*
-  - **Cluster 4 — At-Risk / Sensitive Users**: High failure frequency ($>30\%$ errors), low quality ratings, high drop-off. *Action: Prompt user with camera lighting guidance and offer 1-on-1 customer support.*
+  Features are normalized via Min-Max Scaling ($x'_d = \frac{x_d - \min(x_d)}{\max(x_d) - \min(x_d)}$) to prevent try-on volume ($1$ to $50+$) from dominating bounded metrics like success rate ($0.0$ to $1.0$).
+- **Centroid Initialization & Convergence**:
+  Uses a pure-Python implementation of Lloyd's algorithm with K-Means++ probabilistic distance-weighted spread (`random.choices(data_points, weights=probs)`) and a deterministic seed (`seed=42`) ensuring stable, reproducible cluster convergence.
+- **Silhouette Cohesion & Separation Metric**:
+  Evaluates clustering quality via sample silhouette score:
+  $$s(i) = \frac{b(i) - a(i)}{\max(a(i), b(i))}, \quad \bar{s} = \frac{1}{N}\sum_{i=1}^N s(i) \in [-1.0, +1.0]$$
+  where $a(i)$ is the mean intra-cluster distance and $b(i)$ is the mean nearest-cluster distance. A score $> 0.35$ indicates healthy cluster separation.
+- **Dynamic Cluster Count ($K \in [2, 6]$) & Stable Persona Keys**:
+  The dashboard enables dynamic cluster partitioning for any $K \in [2, 6]$. Personas are ranked by volume and success rate, emitting stable `cluster_key` tokens to ensure theme consistency:
+  1. **Power Shoppers (High Frequency VIPs)** (`key: power_shoppers`):
+     - *Profile*: Highest engagement volume ($20 - 50+$ try-ons), high wishlist rate ($>40\%$), high success rate ($>88\%$).
+     - *Action*: Offer VIP early-access to new collections, loyalty perks, and one-click checkout bundles.
+  2. **Engaged Fashion Explorers** (`key: engaged_explorers`):
+     - *Profile*: Steady, consistent try-on sessions across categories ($8 - 18$ try-ons) with strong satisfaction.
+     - *Action*: Deliver personalized Apriori cross-category bundle recommendations and styling lookbooks.
+  3. **Selective Style Seekers** (`key: selective_seekers`):
+     - *Profile*: Focused browsing ($4 - 10$ try-ons) evaluating specific garments with deliberate wishlist adoption.
+     - *Action*: Promote curated mid-range seasonal lookbooks and subtle price-drop notifications.
+  4. **Occasional / Trial Users** (`key: occasional_trial`):
+     - *Profile*: Low try-on volume ($1 - 3$ try-ons), evaluating platform capabilities during onboarding.
+     - *Action*: Send onboarding styling tutorials, curated bestsellers, and first-order incentives.
+  5. **At-Risk / Sensitive Users** (`key: at_risk`):
+     - *Profile*: Disproportionately high failure frequency ($>17\%$ errors, success $<83\%$), elevated drop-off risk.
+     - *Action*: Trigger interactive camera lighting guidance modals, assisted re-upload flows, and retry apology discounts.
 
 ---
 
@@ -345,51 +374,238 @@ The system implements 4 core data mining techniques designed to extract business
 
 ---
 
+### Technique 5: Multidimensional OLAP Operations (Drill-Down, Roll-Up, Slice & Dice)
+- **Module**: [`dwm/mining/olap_cube.py`](dwm/mining/olap_cube.py)
+- **Objective**: Provide multidimensional online analytical processing across hierarchical temporal grains and orthogonal categorical dimensions without modifying relational star schema structures.
+- **Mathematical Formulation & Cube Operations**:
+  A virtual OLAP hypercube $C$ is defined over dimensions $\mathcal{D} = \{\text{Time}, \text{Product}, \text{Device}, \text{Outcome}, \text{User}\}$ with measure vector $\vec{M} = \left[\text{Volume},\; \text{Success Rate},\; \text{Latency},\; \text{Quality Score}\right]$.
+  1. **Drill-Down ($\downarrow$)**: Navigates from lower-detail to higher-detail temporal hierarchies:
+     $$\text{Year} \xrightarrow{\quad} \text{Month} \xrightarrow{\quad} \text{Day} \xrightarrow{\quad} \text{Hour}$$
+     Clicking any time-series element or bucket immediately subsets the underlying cube to the selected interval and dispatches aggregations at the child granularity, generating a linked navigation breadcrumb path (`All Time > Year 2024 > October > 2024-10-14`).
+  2. **Roll-Up ($\uparrow$)**: Aggregates granular atomic data into macroscopic business summaries:
+     $$\text{Hour} \xrightarrow{\quad} \text{Day} \xrightarrow{\quad} \text{Month} \xrightarrow{\quad} \text{Year}$$
+     Users can step up to parent levels or click breadcrumbs to view higher-order trends across months and years.
+  3. **Slice**: Isolates a 1-dimensional hyperplane by fixing a single attribute:
+     $$\sigma_{\text{Category} = \text{'Jackets'}}(C) \quad \text{or} \quad \sigma_{\text{Device} = \text{'Mobile'}}(C)$$
+     Instantly updates all 5 KPI cards, time-series distributions, and tabular try-on event records.
+  4. **Dice**: Subsets the hypercube across a conjunction of multiple orthogonal dimensions:
+     $$\sigma_{(\text{Category} \in \{\text{'Jackets'}\}) \;\wedge\; (\text{Device} = \text{'Mobile'}) \;\wedge\; (\text{Outcome} = \text{'FAILURE'}) \;\wedge\; (\text{Price} = \text{'Premium (>2000)'})}(C)$$
+     The dashboard manages active filter tags with individual dismiss (`×`) controls, clear-all options, and dynamic query execution.
+
+---
+
 ## 6. Interactive Admin DWM Dashboard
 
-The DWM capabilities are integrated into the React Admin Portal, providing an interactive control room for business stakeholders and ML engineers.
+The DWM capabilities are integrated into the React Admin Portal, providing an interactive control room for business stakeholders, fashion merchandisers, and ML engineers.
 
-### UI Overview & Tab Navigation
+### UI Overview & KPI Header
 Located at **`/admin/dashboard`** under the **"DWM Data Mining Hub"** main navigation tab:
 
 ```
 [ Admin Portal Dashboard ]
---------------------------------------------------------------------------------------
-Navigation: [ Platform Overview & Users ]  |  [ ⭐ DWM Data Mining Hub ]
---------------------------------------------------------------------------------------
-Data Source Toggle:  (•) 10k Synthetic Dataset (10,000 Entries)    ( ) Live DWH (MySQL)
-Warehouse Status:    10,000 Facts | 1,200 Users | 25 Products | 212 Daily Rollups
---------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
+Navigation: [ Platform Overview & Users ]  |  [ DWM Data Mining Hub ]
+------------------------------------------------------------------------------------------------------
+Warehouse KPI Status:
+  [ Total Try-Ons: 10,000 ]   [ Shoppers Analyzed: 1,200 ]   [ Catalog Items: 25 ]   [ Analytics: Operational ]
+------------------------------------------------------------------------------------------------------
 Tabs:
-  [ 1. Frequently Tried Together (Apriori) ]
-  [ 2. User Segmentation (K-Means) ]
-  [ 3. Failure & Quality Correlations ]
-  [ 4. OLAP Usage Rollups ]
---------------------------------------------------------------------------------------
+  [ 1. Frequently Tried Together ]  [ 2. Customer Groups ]  [ 3. Try-On Success & Troubleshooting ]
+  [ 4. Store Activity Trends ]      [ 5. Timeline Deep Dive ]  [ 6. Period Summaries ]
+  [ 7. Filter by Feature ]          [ 8. Multi-Filter Search ]
+------------------------------------------------------------------------------------------------------
 ```
 
-1. **Frequently Tried Together (Apriori)**:
-   - Filter rules by confidence slider ($0.10$ to $1.00$).
-   - Category and product search bar.
-   - Interactive cards showing: *Antecedent Items* $\rightarrow$ *Recommended Consequent Items*, Support %, Confidence %, Lift metric badges, and "Re-mine Apriori Rules" trigger.
-2. **User Segmentation (K-Means)**:
-   - Cluster count slider ($K = 2$ to $6$).
-   - "Re-run K-Means Clustering" button that executes on-the-fly partitioning.
-   - Persona cards showing user count, percentage of userbase, avg try-ons, success rate, and concrete recommended marketing actions.
-   - User assignment table with instant search by user name or email.
-3. **Failure & Quality Correlations**:
-   - Dimension filter dropdown (*All Dimensions*, *Device & Method*, *Product Category*, *Price Bracket*, *Temporal Period*).
-   - "Highest Failure Risk" alert card and "Safest / Highest Quality" reference card.
-   - Comparative risk table showing total attempts, success rates, avg latency, and correlation with failure.
-4. **OLAP Usage Rollups**:
-   - Toggle between **Daily View** (last 60 days) and **Monthly View** (7-month trend).
-   - Key metric cards: Total Try-on Volume, Overall Success %, Average Latency.
-   - Full time-series data table with sorting and success-rate progress bars.
+### Complete 8-Module Architecture & Mapping
 
-### Dual Data-Source Switcher
-At the top of the DWM Dashboard, a radio switcher lets the admin seamlessly flip between:
-- **10k Synthetic Dataset (10,000 Entries)**: Reads from the validated, rich synthetic data (`dwm_exports/benchmark_10k/csv/`), enabling full demonstration of complex multi-item patterns, personas, and long-term trends regardless of local database volume.
-- **Live DWH (MySQL)**: Directly queries the live MySQL `virtual_tryon_dwh` tables.
+The dashboard is structured for **non-technical administrators** with intuitive, business-focused labels, while retaining rigorous **data mining and multidimensional OLAP engines** beneath:
+
+| # | Admin Display Name | Underlying Technique / Engine | Analytical Role & Plain Meaning |
+| :-: | :--- | :--- | :--- |
+| **1** | **Frequently Tried Together** | **Apriori Algorithm** *(Association Rule Mining)* | Identifies frequently co-tried garment pairs and outfit bundles using Support, Confidence, and Lift metrics. |
+| **2** | **Customer Groups** | **K-Means Clustering** *(Unsupervised Machine Learning)* | Partitions shoppers into 5 distinct behavioral profiles (Power Shoppers, Explorers, Seekers, Trial, At-Risk). |
+| **3** | **Try-On Success & Troubleshooting** | **Pearson Correlation Analysis** *(Root Cause Mining)* | Computes correlation factors ($r$) between technical variables (e.g. Mobile Camera) and model warp failures. |
+| **4** | **Store Activity Trends** | **Temporal Rollups** *(Pre-Aggregated OLAP Rollups)* | Tracks operational stability across fixed daily (60-day) and monthly (7-month) moving time horizons. |
+| **5** | **Timeline Deep Dive** | **OLAP Drill-Down** *(Hierarchical Temporal Exploration)* | Explores granular activity from $\text{Year} \rightarrow \text{Month} \rightarrow \text{Day} \rightarrow \text{Hour}$. Clicking a bar zooms in to that time bucket. |
+| **6** | **Period Summaries** | **OLAP Roll-Up** *(Macro-Level Aggregation)* | Aggregates fine-grained sessions into macro periods ($\text{Hour} \rightarrow \text{Day} \rightarrow \text{Month} \rightarrow \text{Year}$) with comparative breakdowns. |
+| **7** | **Filter by Feature** | **OLAP Slice** *(Single-Dimension Isolation)* | Isolates a single 2D slice ($\sigma_{\text{Feature}=\text{Value}}$) such as Jackets or Mobile to benchmark against store averages. |
+| **8** | **Multi-Filter Search** | **OLAP Dice** *(Multi-Dimensional Subcube Extraction)* | Combines multiple filters simultaneously across Category, Device, Upload Method, Price, and Date Range. |
+
+> [!TIP]
+> **Streamlined Enterprise View**: The dashboard presentation defaults directly to the validated enterprise benchmark dataset (`10,000` try-on facts, `1,200` shoppers) to guarantee rich multi-item patterns, statistically significant clusters, and complete long-term trends during evaluations without visual clutter from toggle switches. Full live warehouse query execution remains accessible across all backend endpoints.
+
+---
+
+### 1. Frequently Tried Together (Apriori)
+- **High-Density Tabular Rule Layout**:
+  Replaces unstructured text cards with an enterprise data table formatted for rapid merchandising analysis:
+  - **Shopper Tries**: Primary garment name with apparel category badge.
+  - **Frequently Paired With**: Recommended complementary item with category badge.
+  - **Popularity (Support %)**: Percentage of all sessions containing this pair.
+  - **Match Chance (Confidence %)**: Probability that the customer tries the second item after trying the first.
+  - **Pair Strength (Lift Tier Badges)**:
+    - $\ge 2.0\text{x}$ (**Exceptional Pairing**, solid emerald badge `#245c4b`).
+    - $\ge 1.5\text{x}$ (**Strong Pairing**, soft emerald badge).
+    - $< 1.5\text{x}$ (**Moderate Pairing**, neutral badge).
+- **Interactive Tuning Controls**:
+  - **Minimum Popularity Slider**: $0.01$ to $0.20$ ($1\%$ to $20\%$ support).
+  - **Minimum Match Chance Slider**: $0.10$ to $1.00$ ($10\%$ to $100\%$ confidence).
+  - **Pairing Boost (Lift Threshold)**: $0.5\text{x}$ to $10.0\text{x}$.
+  - **Category Filter Dropdown**: Narrow rules by Jackets, Shirts, T-Shirts, Dresses, Jeans, etc.
+  - **Instant Search Input**: Real-time filtering by garment title.
+  - **"Find Outfit Pairings" Action Button**: Triggers pure-Python Apriori re-mining with live parameters.
+
+---
+
+### 2. User Segmentation (K-Means)
+
+The User Segmentation tab features a dual-chart visual analytics engine synchronized with shopper profile cards and a granular shopper table:
+
+#### A. Interactive 2D Shopper Behavioral Map (Scatter Plot)
+- **Dual Y-Axis Metric Switching**:
+  A segmented pill toggle lets the admin switch the vertical axis between:
+  - **Success Rate (%)**: Try-on reliability and model synthesis quality per user.
+  - **Wishlist Rate (%)**: Commercial purchase intent and bookmark velocity per user.
+  The scatter plot dynamically updates coordinate points, tooltips, and Y-axis scales with smooth quart-easing transitions.
+- **Boundary Clipping Prevention**:
+  Configured with `clip: false`, explicit canvas padding (`{ top: 16, right: 20, bottom: 8, left: 10 }`), and dynamic X-axis headroom (`suggestedMax: Math.ceil((maxX + 6) / 10) * 10`). Outlier points with $0$ try-ons or $100\%$ success rate are never clipped by chart borders.
+- **Anti-Blobbing Visual Treatment**:
+  High-density clusters ($15 - 40$ try-ons at $70 - 100\%$ success) are rendered using:
+  - Point radius: $4.5\text{px}$ default ($5.5\text{px}$ upon cluster isolation, $7.5\text{px}$ on hover).
+  - Alpha-blended translucent fills (`rgba(..., 0.68)`).
+  - Crisp $1.2\text{px}$ white (`#ffffff`) borders for clear visual separation of overlapping points.
+- **Dynamic Crosshair Tooltips**:
+  Hovering over any shopper point reveals: Shopper Name, Email, Persona Group, Lifetime Try-Ons, Success %, Wishlist %, and Average Quality Score.
+- **Responsive Layout Observer**:
+  Integrated `ResizeObserver` listener automatically triggers Chart.js resize calculations whenever container dimensions adjust across desktop, tablet, or mobile breakpoints.
+- **Coordinate Validation Guard**:
+  Filters out non-numeric, null, or out-of-range coordinates ($0 \le x$, $0 \le y \le 100$) before dispatching data to Chart.js.
+
+#### B. Shopper Distribution Donut Chart with Exact Center Plugin
+- Renders proportional share of the shopper base belonging to each behavioral persona.
+- **Mathematically Exact Center Text Plugin**:
+  Custom Chart.js hook (`centerTextPlugin`, `afterDraw`) calculates the exact geometric midpoint of the inner doughnut hole (`(chartArea.left + chartArea.right) / 2`, `(chartArea.top + chartArea.bottom) / 2`).
+  - Displays `"1,200"` (Manrope 800, 24px) and `"SHOPPERS"` (Manrope 700, 10px uppercase with letter spacing) with subpixel precision.
+  - Completely eliminates collisions, shifting, or overlapping between HTML overlay `<div>` elements and canvas legends.
+
+#### C. Interactive Cluster Isolation Filter
+- Clicking any persona summary card or chart legend item isolates that cohort.
+- Non-selected points in the scatter plot are dimmed to subtle slate neutral (`rgba(148, 163, 184, 0.22)`).
+- The detailed shopper table automatically filters to only members of that selected cluster.
+- Clicking the active card again or "Reset Filter" restores the multi-cluster view.
+
+#### D. Dynamic $K \in [2, 6]$ Slider & Silhouette Score
+- Drag the slider to re-partition the user base into $2$ to $6$ clusters.
+- Real-time **Silhouette Score** indicator evaluates cluster separation quality ($\bar{s} \approx 0.412$ at $K=4$).
+- "Re-run K-Means Clustering" button re-executes Lloyd's algorithm on the server.
+
+---
+
+### Enterprise 5-Color Behavioral Palette
+
+Colors and tokens are centralized in [`chartSetup.js`](frontend/src/components/admin/charts/chartSetup.js) and synchronized across the scatter plot, donut chart, legend, profile cards, and customer table:
+
+| Behavioral Group / Persona | Stable Key | Primary Hex | Translucent Fill | Point Border | Typical Try-Ons | Recommended Marketing Action |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **Power Shoppers (High Frequency VIPs)** | `power_shoppers` | `#4F46E5` | `rgba(79, 70, 229, 0.68)` | `#ffffff` (1.2px) | $20 - 50+$ | Exclusive VIP early-access catalogs, loyalty perks & one-click checkout |
+| **Engaged Fashion Explorers** | `engaged_explorers` | `#0F9D78` | `rgba(15, 157, 120, 0.68)` | `#ffffff` (1.2px) | $8 - 18$ | Personalized Apriori cross-category bundle discounts & style guides |
+| **Selective Style Seekers** | `selective_seekers` | `#D97706` | `rgba(217, 119, 6, 0.68)` | `#ffffff` (1.2px) | $4 - 10$ | Promote mid-range trending pieces & curated seasonal lookbooks |
+| **Occasional / Trial Users** | `occasional_trial` | `#64748B` | `rgba(100, 116, 139, 0.68)` | `#ffffff` (1.2px) | $1 - 3$ | Automated onboarding email series, styling tips & first-order incentives |
+| **At-Risk / Sensitive Users** | `at_risk` | `#8B5CF6` | `rgba(139, 92, 246, 0.68)` | `#ffffff` (1.2px) | $2 - 6$ (High Err) | Guided photo re-upload assistance modal, lighting checks & apology coupon |
+
+> [!NOTE]
+> **Stable Cluster Keys**: The backend assigns canonical keys (`cluster_key: "power_shoppers"`) based on centroid ordering and failure rates. This prevents color drift when switching between $K=3, 4, 5$.
+
+---
+
+### 3. Failure & Quality Correlation Analytics
+- **Root Cause Identification**:
+  Pinpoints technical factors contributing to try-on degradation across:
+  - **Device Type & Upload Method**: Mobile Camera ($17.8\%$ failure rate, $r = 0.178$) vs. Desktop Gallery ($5.8\%$ failure rate, $r = -0.152$).
+  - **Product Category**: Complex outerwear (Suits, Blazers: $12.4\text{s}$ latency) vs. basic tops (T-Shirts: $6.8\text{s}$ latency).
+  - **Fabric & Pattern**: Shiny/sheer textures vs. solid cotton.
+- **Risk Metrics Table**:
+  Displays Category, Dimension Value, Total Try-Ons, Failure Rate %, Average Latency, and Pearson Correlation Factor.
+
+---
+
+### 4. Pre-Aggregated OLAP Time-Series Rollups
+- **Dual Granularity View**:
+  - **Daily Rollups**: 60-day moving window tracking operational stability.
+  - **Monthly Rollups**: 7-month macroscopic growth view.
+- **Key Metrics Tracked**: Total Try-On Volume, Successful Try-Ons, Failure %, Average Latency (ms), Average Synthetic Quality Score ($0.0 - 1.0$), and Unique Daily Active Shoppers.
+
+---
+
+### 5. Timeline Deep Dive (OLAP Drill-Down)
+- **Concept & Purpose**:
+  Allows store administrators to systematically explore try-on activity over time from macro-level annual indicators down to granular hourly activity:
+  $$\text{Year} \xrightarrow{\quad} \text{Month} \xrightarrow{\quad} \text{Day} \xrightarrow{\quad} \text{Hour}$$
+- **Interactive Chart Zoom Interaction**:
+  Clicking any bar or column element in the time-series chart (`OlapDrilldownChart`) immediately zooms into that interval and displays the matching sessions.
+- **Dynamic Breadcrumb Navigation**:
+  Displays an interactive breadcrumb trail (`All Time > 2024 > October > 2024-10-14`), enabling admins to jump back up to any previous level in 1 click.
+- **5 Synchronized KPIs**:
+  Try-On Volume (with % of all sessions), Success Rate %, Failure Rate %, Avg Latency, and Visual Fidelity rating.
+- **Detailed Sessions Table**:
+  Displays atomic individual fitting sessions executed during the selected interval with pagination controls.
+
+---
+
+### 6. Period Summaries (OLAP Roll-Up)
+- **Concept & Purpose**:
+  Summarizes try-on performance grouped by broad time periods:
+  $$\text{Hour} \xrightarrow{\quad} \text{Day} \xrightarrow{\quad} \text{Month} \xrightarrow{\quad} \text{Year}$$
+- **Dynamic Aggregation Switcher**:
+  Dedicated selector pills for `Yearly`, `Monthly`, `Daily`, and `Hourly` with an instant "Zoom Out" action button.
+- **Comparative Period Breakdown Table**:
+  A high-density enterprise comparison table summarizing every period bucket at the chosen rollup grain:
+  - Period Key, Try-On Volume, % Share of Total Volume, Successful Try-Ons, Failed Try-Ons, Success Rate % (with colored badges), Avg Latency (s), Avg Visual Quality Score, and Unique Active Shoppers.
+
+---
+
+### 7. Filter by Feature (OLAP Slice)
+- **Concept & Purpose**:
+  Focuses on any single feature (such as Category = 'Jackets' or Device = 'Mobile') to see how that specific group performs compared to the overall store average:
+  $$\sigma_{\text{Feature} = \text{Value}}(C)$$
+- **Flexible Feature Selection**:
+  - **Feature Selector**: Choose between `Category`, `Device Type`, `Upload Method`, `Outcome`, `Price Bracket`, and `Color`.
+  - **Value Selector**: Dynamically populated with distinct values for the chosen feature.
+- **1-Click Quick Filters**:
+  Instant filter buttons for common retail cohorts:
+  - `Jackets`
+  - `Dresses`
+  - `Mobile Devices`
+  - `Camera Uploads`
+  - `Model Failures`
+  - `Budget Items (<500)`
+  - `Show All Records`
+- **Multidimensional Cross-Tab Visualizers**:
+  Category breakdown (with click-to-filter interaction), device & upload method comparative bars, and outcome donut charts.
+- **Filtered Sessions Table**:
+  Paginated table displaying individual try-on sessions matching the selected filter.
+
+---
+
+### 8. Multi-Filter Search (OLAP Dice)
+- **Concept & Purpose**:
+  Combines multiple filters together across categories, devices, upload methods, price brackets, outcomes, and dates to pinpoint specific customer sessions:
+  $$\sigma_{(\text{Category} = c) \;\wedge\; (\text{Device} = d) \;\wedge\; (\text{Outcome} = o) \;\wedge\; (\text{Price} = p) \;\wedge\; (\text{Date} \in [t_1, t_2])}(C)$$
+- **Comprehensive Multi-Filter Toolbar**:
+  Simultaneous multi-dropdown grid for Category, Device, Upload Method, Outcome, Price Bracket, Color, Date Range, and Keyword Search.
+- **Active Filter Tag Management**:
+  Interactive chip badges showing every active filter with individual dismiss `×` buttons and a "Clear All Filters" button.
+- **Diced KPI Cards & Breakdown Charts**:
+  Reflects the exact performance across categories, hardware channels, and outcome ratios.
+- **Matching Sessions Table**:
+  Data table listing all matching try-on sessions with pagination.
+
+---
+
+### Dual-Engine Data Processing Architecture
+The DWM backend (`app/routes/dwm.py`) maintains dual data-source engines:
+1. **`benchmark_10k`**: Verified high-cardinality dataset (`dwm_exports/benchmark_10k/csv/`) ensuring statistically valid mining patterns during hackathons, demos, and presentations.
+2. **`live`**: Direct SQLAlchemy query execution against the MySQL OLAP warehouse (`virtual_tryon_dwh`). Equipped with graceful empty-state guards returning structured `400 Bad Request` notifications (e.g., *"Live DWH currently has 0 facts. Run ETL pipeline first"*) rather than unhandled `500` server errors.
 
 ### Backend REST API Endpoints
 All endpoints are declared in [`app/routes/dwm.py`](app/routes/dwm.py) and protected by Admin JWT authentication:
@@ -405,6 +621,9 @@ All endpoints are declared in [`app/routes/dwm.py`](app/routes/dwm.py) and prote
 | `POST` | `/admin/dwm/correlations/run`| Re-compute dimensional correlation matrix. |
 | `GET` | `/admin/dwm/rollups` | Retrieve time-series rollups (`period=daily` or `monthly`). |
 | `POST` | `/admin/dwm/rollups/run` | Refresh pre-aggregated daily and monthly rollup tables. |
+| `GET` | `/admin/dwm/olap/options` | Retrieve available distinct dimension values for OLAP filter dropdowns. |
+| `GET` | `/admin/dwm/olap/cube` | Query multidimensional OLAP cube with dynamic aggregation level and slice/dice filters. |
+| `POST` | `/admin/dwm/olap/cube` | Alternative JSON-body endpoint for complex OLAP query payloads. |
 
 ---
 
@@ -492,9 +711,56 @@ Double-click [`run_web.bat`](run_web.bat) or run in PowerShell:
 ### Admin Portal Login Credentials
 Navigate to: **`http://localhost:5173/admin/login`**
 - **Email**: `admin@example.com`
-- **Password**: *(Configured securely during initial admin setup)*
+- **Password**: `AdminPass123`
 
 Once logged in, click the **"DWM Data Mining Hub"** tab to interact with all 4 techniques.
+
+---
+
+### End-to-End Smoke Test Suite
+
+The DWM subsystem includes an automated test harness covering all analytical endpoints, parameter edges, and error states:
+
+```powershell
+# Using uv:
+uv run python tests/test_dwm_smoke.py
+
+# Or using the local virtual environment:
+.\venv\Scripts\python.exe tests/test_dwm_smoke.py
+```
+
+#### Test Suite Validation Scope (22 Automated Tests)
+- **Warehouse Statistics (`GET /admin/dwm/stats`)**: Validates 10k fact and 1,200 user payload structures.
+- **Apriori Pairing Discovery (`GET /admin/dwm/apriori`, `POST /admin/dwm/apriori/run`)**:
+  - Tests confidence thresholds ($0.10$ to $0.90$) and category filtering.
+  - Edge parameter test: `min_lift = 6.0` (asserts clean zero-rule response with `max_lift_available` fallback hint, never crashing).
+- **K-Means User Segmentation (`GET /admin/dwm/kmeans`, `POST /admin/dwm/kmeans/run`)**:
+  - Dynamically tests $K = 2, 3, 4, 5, 6$.
+  - Asserts silhouette score calculation ($-1.0 \le \bar{s} \le 1.0$).
+  - Asserts stable persona keys (`power_shoppers`, `engaged_explorers`, `selective_seekers`, `occasional_trial`, `at_risk`).
+- **Failure Correlation Matrix (`GET /admin/dwm/correlations`, `POST /admin/dwm/correlations/run`)**:
+  - Tests Pearson correlation factors across device, upload, and category dimensions.
+- **Time-Series Rollups (`GET /admin/dwm/rollups`, `POST /admin/dwm/rollups/run`)**:
+  - Validates daily (60-day) and monthly (7-month) aggregations.
+- **Multidimensional OLAP Operations (`GET /admin/dwm/olap/options`, `GET /admin/dwm/olap/cube`, `POST /admin/dwm/olap/cube`)**:
+  - Validates distinct dimension discovery (categories, colors, devices, channels, years).
+  - Validates hierarchical temporal drill-down (`Year` $\rightarrow$ `Month` $\rightarrow$ `Day` $\rightarrow$ `Hour`).
+  - Validates single-dimension `SLICE` (`category=Jackets`) and multi-dimension `DICE` (`device_type=Mobile`, `success_or_fail=FAILURE`).
+  - Asserts breadcrumbs hierarchy integrity, KPI calculations, cross-tab distributions, and granular sliced record pagination.
+- **Empty Live DWH Error Handling**:
+  - Simulates zero-fact state in live warehouse; asserts clean `400 Bad Request` with actionable user guidance, strictly preventing unhandled `500 Internal Server Error`.
+
+---
+
+### Frontend Production Build Validation
+
+To verify that all Chart.js plugins, color palettes, and responsive layouts bundle cleanly:
+
+```powershell
+cd frontend
+npx vite build
+```
+*(Builds in under ~3.5 seconds with zero syntax or bundling errors).*
 
 ---
 
@@ -544,12 +810,20 @@ uv run python scripts/generate_synthetic_10k_dwm.py
 
 | Component | Key File(s) | Status |
 | :--- | :--- | :--- |
-| **Star Schema DDL & Models** | [`dwm/schema/star_schema.sql`](dwm/schema/star_schema.sql), [`dwm/models.py`](dwm/models.py) | ✅ Operational |
-| **ETL Pipeline** | [`dwm/etl/extract.py`](dwm/etl/extract.py), [`transform.py`](dwm/etl/transform.py), [`load.py`](dwm/etl/load.py), [`run_pipeline.py`](dwm/etl/run_pipeline.py) | ✅ Operational |
-| **Apriori Mining Engine** | [`dwm/mining/association_rules.py`](dwm/mining/association_rules.py) | ✅ Operational |
-| **K-Means Clustering Engine** | [`dwm/mining/kmeans_clustering.py`](dwm/mining/kmeans_clustering.py) | ✅ Operational |
-| **Correlation Analysis Engine** | [`dwm/mining/correlation_analysis.py`](dwm/mining/correlation_analysis.py) | ✅ Operational |
-| **OLAP Rollup Engine** | [`dwm/mining/rollups.py`](dwm/mining/rollups.py) | ✅ Operational |
-| **Backend REST Endpoints** | [`app/routes/dwm.py`](app/routes/dwm.py), [`backend/main.py`](backend/main.py) | ✅ Operational |
-| **Admin UI Hub & Views** | [`DwmDashboardSection.jsx`](frontend/src/components/admin/DwmDashboardSection.jsx), [`AdminDashboard.jsx`](frontend/src/pages/AdminDashboard.jsx) | ✅ Operational |
-| **10k Datasets & Excel Workbooks**| [`dwm_exports/benchmark_10k/`](dwm_exports/benchmark_10k/), [`dwm_exports/present_data/`](dwm_exports/present_data/) | ✅ Operational |
+| **Star Schema DDL & Models** | [`dwm/schema/star_schema.sql`](dwm/schema/star_schema.sql), [`dwm/models.py`](dwm/models.py) | Operational |
+| **ETL Ingestion Pipeline** | [`dwm/etl/extract.py`](dwm/etl/extract.py), [`transform.py`](dwm/etl/transform.py), [`load.py`](dwm/etl/load.py), [`run_pipeline.py`](dwm/etl/run_pipeline.py) | Operational |
+| **Apriori Mining Engine** | [`dwm/mining/association_rules.py`](dwm/mining/association_rules.py) | Operational |
+| **K-Means Clustering Engine** | [`dwm/mining/kmeans_clustering.py`](dwm/mining/kmeans_clustering.py) | Operational |
+| **Correlation Analysis Engine** | [`dwm/mining/correlation_analysis.py`](dwm/mining/correlation_analysis.py) | Operational |
+| **OLAP Rollup Engine** | [`dwm/mining/rollups.py`](dwm/mining/rollups.py) | Operational |
+| **OLAP Multidimensional Engine** | [`dwm/mining/olap_cube.py`](dwm/mining/olap_cube.py) | Operational |
+| **Backend REST Endpoints** | [`app/routes/dwm.py`](app/routes/dwm.py), [`backend/main.py`](backend/main.py) | Operational |
+| **Interactive DWM Hub UI** | [`DwmDashboardSection.jsx`](frontend/src/components/admin/DwmDashboardSection.jsx), [`AdminDashboard.jsx`](frontend/src/pages/AdminDashboard.jsx) | Operational |
+| **Behavioral Scatter & Donut Chart** | [`KMeansClusterChart.jsx`](frontend/src/components/admin/charts/KMeansClusterChart.jsx) | Operational |
+| **Correlation & Risk Charts** | [`CorrelationsRiskChart.jsx`](frontend/src/components/admin/charts/CorrelationsRiskChart.jsx) | Operational |
+| **OLAP Trend Rollup Charts** | [`RollupsTrendChart.jsx`](frontend/src/components/admin/charts/RollupsTrendChart.jsx) | Operational |
+| **OLAP Drilldown Chart** | [`OlapDrilldownChart.jsx`](frontend/src/components/admin/charts/OlapDrilldownChart.jsx) | Operational |
+| **OLAP Breakdown Charts** | [`OlapBreakdownCharts.jsx`](frontend/src/components/admin/charts/OlapBreakdownCharts.jsx) | Operational |
+| **5-Color Palette & Theme Resolver** | [`chartSetup.js`](frontend/src/components/admin/charts/chartSetup.js) | Operational |
+| **End-to-End Smoke Test Suite** | [`tests/test_dwm_smoke.py`](tests/test_dwm_smoke.py) (22 test cases) | Operational |
+| **10k Datasets & Master Workbooks** | [`dwm_exports/benchmark_10k/`](dwm_exports/benchmark_10k/), [`dwm_exports/present_data/`](dwm_exports/present_data/) | Operational |
